@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Window theme shown before Compose draws its first frame. Using the brand surface
+      color avoids a white flash, and the night variant avoids one in dark mode.
+      All real styling lives in SahyogTheme (Compose).
+    -->
+    <style name="Theme.SAHYOG" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/sahyog_window_background</item>
+    </style>
+</resources>

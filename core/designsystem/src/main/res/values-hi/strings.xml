@@ -1,0 +1,11 @@
+<resources>
+    <string name="designsystem_logo_description">सहयोग लोगो</string>
+    <string name="designsystem_navigate_back">वापस जाएँ</string>
+    <string name="designsystem_loading">लोड हो रहा है</string>
+    <string name="designsystem_retry">फिर से कोशिश करें</string>
+    <string name="designsystem_rating_description">5 में से %1$s रेटिंग</string>
+    <plurals name="designsystem_rating_summary_description">
+        <item quantity="one">%2$d समीक्षा से 5 में से %1$s रेटिंग</item>
+        <item quantity="other">%2$d समीक्षाओं से 5 में से %1$s रेटिंग</item>
+    </plurals>
+</resources>

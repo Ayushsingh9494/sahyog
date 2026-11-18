@@ -1,0 +1,17 @@
+# Normalise text to LF in the repo; check out with platform-appropriate endings.
+* text=auto
+
+# Shell scripts must keep LF or they fail on Linux/macOS CI.
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows scripts need CRLF.
+*.bat text eol=crlf
+
+# Binary assets: never touch.
+*.jar binary
+*.ttf binary
+*.otf binary
+*.png binary
+*.webp binary
+*.jks binary

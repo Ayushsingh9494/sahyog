@@ -1,0 +1,12 @@
+<resources>
+    <string name="designsystem_brand_name" translatable="false">Sahyog</string>
+    <string name="designsystem_logo_description">Sahyog logo</string>
+    <string name="designsystem_navigate_back">Navigate back</string>
+    <string name="designsystem_loading">Loading</string>
+    <string name="designsystem_retry">Try again</string>
+    <string name="designsystem_rating_description">Rated %1$s out of 5</string>
+    <plurals name="designsystem_rating_summary_description">
+        <item quantity="one">Rated %1$s out of 5 from %2$d review</item>
+        <item quantity="other">Rated %1$s out of 5 from %2$d reviews</item>
+    </plurals>
+</resources>

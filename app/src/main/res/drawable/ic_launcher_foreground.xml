@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sahyog mark: two interlocking rings (customer + worker, joined by the cooperative).
+  Same geometry as SahyogLogoMark in core:designsystem, offset by (28, 37) to centre
+  it in the 108dp adaptive-icon canvas, and inside the 66dp safe zone.
+  Draw order: marigold ring, white ring, then the top-left quarter of the marigold
+  ring (180 to 270 deg) re-drawn over the top crossing so the rings appear linked.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M50,54a13,13 0,1 0,26 0a13,13 0,1 0,-26 0"
+        android:strokeWidth="7"
+        android:strokeColor="#F4A340" />
+    <path
+        android:pathData="M32,54a13,13 0,1 0,26 0a13,13 0,1 0,-26 0"
+        android:strokeWidth="7"
+        android:strokeColor="#FFFFFF" />
+    <path
+        android:pathData="M50,54A13,13 0,0 1,63 41"
+        android:strokeWidth="7"
+        android:strokeColor="#F4A340" />
+</vector>
