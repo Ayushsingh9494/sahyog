@@ -1,0 +1,21 @@
+<resources>
+    <string name="account_title">खाता</string>
+    <string name="account_role_customer">ग्राहक</string>
+    <string name="account_role_worker">कारीगर</string>
+    <string name="account_worker_not_submitted">दस्तावेज़ ज़रूरी</string>
+    <string name="account_worker_pending">सत्यापन लंबित</string>
+    <string name="account_worker_verified">सत्यापित</string>
+    <string name="account_worker_rejected">सत्यापन अस्वीकृत</string>
+    <string name="account_mode_title">मोड</string>
+    <string name="account_mode_support">सेवाएँ बुक करने और काम करने के बीच बदलें।</string>
+    <string name="account_theme_title">दिखावट</string>
+    <string name="account_theme_system">सिस्टम</string>
+    <string name="account_theme_light">लाइट</string>
+    <string name="account_theme_dark">डार्क</string>
+    <string name="account_developer_title">डेवलपर</string>
+    <string name="account_design_catalog">डिज़ाइन सिस्टम कैटलॉग</string>
+    <string name="account_sign_out">साइन आउट</string>
+    <string name="account_sign_out_confirm_title">सहयोग से साइन आउट करें?</string>
+    <string name="account_sign_out_confirm_body">वापस साइन इन करने के लिए आपको अपना मोबाइल नंबर फिर से सत्यापित करना होगा।</string>
+    <string name="account_cancel">रद्द करें</string>
+</resources>

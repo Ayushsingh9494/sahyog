@@ -37,15 +37,29 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [x] Fixed on device: status-bar icons now follow the app theme, not the system theme
 - [ ] Native-speaker review of Hindi strings
 
-## M3: Navigation shell
-- [ ] Move `DesignSystemCatalog` behind a debug-only entry point
-- [ ] `core:model` (User, Role, SessionState)
-- [ ] `core:datastore`, `core:data` with fake `SessionRepository`
-- [ ] Splash (SplashScreen API) resolving start destination
-- [ ] Auth / Onboarding / Customer / Worker graphs with type-safe routes
-- [ ] Bottom navigation per role; back stack cleared on role/session change
+## M3: Navigation shell ✅
+- [x] `core:model`: User, UserRole, WorkerVerificationStatus, UserPreferences, `SessionState.resolve` (+ tests)
+- [x] `core:common`: Phone / OTP / Name validators (+ tests; strips pasted +91 / 0 prefixes)
+- [x] `core:datastore`: Preferences DataStore (theme, active mode, cached profile; corrupt file → defaults)
+- [x] `core:data`: Auth / User / UserPreferences repositories; fakes bound in `DataModule` (demo OTP 123456)
+- [x] `core:ui`: AppError → message mapping (EN/HI), `ObserveAsEvents`, shared phone formatting
+- [x] `core:testing`: MainDispatcherRule, controllable test repositories
+- [x] `sahyog.android.feature` convention plugin
+- [x] `feature:auth`: Welcome → Phone → OTP (auto-verify, 30 s resend, SMS-code autofill hint)
+- [x] `feature:onboarding`: name + role selection (one or both)
+- [x] `feature:account`: profile, mode switch, theme (persisted), sign-out confirmation, debug catalog link
+- [x] Splash (core-splashscreen) held until the session is loaded
+- [x] Session-driven root: sections swap on state change; per-section ViewModel scope
+- [x] Customer / Worker shells with bottom nav (state-saving tabs); placeholder tabs; worker verification banner
+- [x] Design catalog moved behind a debug-only entry (Account → Developer)
+- [x] Design system: `SahyogOtpField`, `SahyogSelectableCard`, `SahyogSegmentedControl`
+- [x] Per-app language (Android 13+): English / Hindi via `locales_config`
+- [x] Verified: 43 unit tests, lint 0 errors on all modules, debug + release builds
+- [x] Verified on device: full sign-up flow, mode switch, theme persistence across restart,
+      sign-out + Back exits app (no return to signed-in screens), Hindi UI
 
 ## M4: Authentication
+- [ ] Replace `FakeAuthRepository` binding with Firebase phone OTP
 - [ ] Firebase phone OTP
 - [ ] Session persistence, logout
 - [ ] Account deletion entry point (Play requirement)

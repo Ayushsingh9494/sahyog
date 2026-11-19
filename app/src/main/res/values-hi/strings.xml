@@ -1,0 +1,35 @@
+<resources>
+    <!-- Bottom navigation -->
+    <string name="tab_home">होम</string>
+    <string name="tab_search">खोजें</string>
+    <string name="tab_bookings">बुकिंग</string>
+    <string name="tab_account">खाता</string>
+    <string name="tab_jobs">काम</string>
+    <string name="tab_schedule">समय-सारणी</string>
+    <string name="tab_earnings">कमाई</string>
+
+    <!-- Customer -->
+    <string name="home_greeting">नमस्ते, %1$s</string>
+    <string name="placeholder_home_title">सेवाएँ जल्द आ रही हैं</string>
+    <string name="placeholder_home_message">जल्द ही आप यहाँ श्रेणियाँ देख सकेंगे और अपने पास सत्यापित कारीगर खोज सकेंगे।</string>
+    <string name="placeholder_search_title">खोज जल्द आ रही है</string>
+    <string name="placeholder_search_message">आप किसी भी सेवा या कारीगर को खोज सकेंगे।</string>
+    <string name="placeholder_bookings_title">अभी कोई बुकिंग नहीं</string>
+    <string name="placeholder_bookings_message">आपकी बुक की गई सेवाएँ यहाँ दिखेंगी।</string>
+
+    <!-- Worker -->
+    <string name="placeholder_jobs_title">अभी कोई काम का अनुरोध नहीं</string>
+    <string name="placeholder_jobs_message">आपके पास के ग्राहकों के नए अनुरोध यहाँ दिखेंगे।</string>
+    <string name="placeholder_schedule_title">आपकी समय-सारणी खाली है</string>
+    <string name="placeholder_schedule_message">अपनी उपलब्धता तय करें और आने वाले काम यहाँ देखें।</string>
+    <string name="placeholder_earnings_title">अभी कोई कमाई नहीं</string>
+    <string name="placeholder_earnings_message">पूरे किए गए कामों के भुगतान यहाँ दिखेंगे।</string>
+
+    <!-- Worker verification -->
+    <string name="verification_not_submitted">सत्यापन ज़रूरी</string>
+    <string name="verification_not_submitted_body">अपना पहचान पत्र और कौशल विवरण अपलोड करें ताकि सहकारी संस्था आपको सत्यापित कर सके। सत्यापन के बाद आपको काम मिलने लगेंगे।</string>
+    <string name="verification_pending">सत्यापन जारी है</string>
+    <string name="verification_pending_body">सहकारी संस्था आपके दस्तावेज़ों की जाँच कर रही है। इसमें आमतौर पर 1–2 दिन लगते हैं।</string>
+    <string name="verification_rejected">सत्यापन असफल</string>
+    <string name="verification_rejected_body">कृपया प्रतिक्रिया देखें और अपने दस्तावेज़ फिर से जमा करें।</string>
+</resources>

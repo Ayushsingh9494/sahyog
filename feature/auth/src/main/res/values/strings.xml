@@ -1,0 +1,31 @@
+<resources>
+    <!-- Welcome -->
+    <string name="auth_welcome_title">Skilled help, right in your neighbourhood</string>
+    <string name="auth_welcome_subtitle">Book trusted electricians, plumbers, carpenters and more from a cooperative of local professionals.</string>
+    <string name="auth_welcome_point_verified_title">Verified professionals</string>
+    <string name="auth_welcome_point_verified_body">Every worker is checked by the cooperative before taking jobs.</string>
+    <string name="auth_welcome_point_fair_title">Fair, transparent pricing</string>
+    <string name="auth_welcome_point_fair_body">See the price before you book. No hidden charges.</string>
+    <string name="auth_welcome_point_coop_title">Owned by the community</string>
+    <string name="auth_welcome_point_coop_body">Workers are members, not gig numbers. More of what you pay reaches them.</string>
+    <string name="auth_welcome_cta">Get started</string>
+
+    <!-- Phone -->
+    <string name="auth_phone_title">Enter your mobile number</string>
+    <string name="auth_phone_subtitle">We\'ll send you a 6-digit code to verify it.</string>
+    <string name="auth_phone_label">Mobile number</string>
+    <string name="auth_phone_cta">Send code</string>
+    <string name="auth_phone_error_invalid">Enter a valid 10-digit mobile number</string>
+
+    <!-- OTP -->
+    <string name="auth_otp_title">Enter verification code</string>
+    <string name="auth_otp_subtitle">Sent by SMS to %1$s</string>
+    <string name="auth_otp_change_number">Change number</string>
+    <string name="auth_otp_verifying">Verifying…</string>
+    <string name="auth_otp_error_wrong_code">That code isn\'t right. Please try again.</string>
+    <string name="auth_otp_resent">A new code has been sent</string>
+    <string name="auth_otp_not_received">Didn\'t get it?</string>
+    <string name="auth_otp_resend">Resend code</string>
+    <string name="auth_otp_resend_in">Resend in %1$ds</string>
+    <string name="auth_otp_demo_hint">Demo mode: use code 123456</string>
+</resources>

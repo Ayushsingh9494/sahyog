@@ -78,6 +78,7 @@ import com.sahyog.core.designsystem.theme.SahyogTheme
 fun DesignSystemCatalog(
     darkTheme: Boolean,
     onDarkThemeChange: (Boolean) -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
 ) {
     SahyogTheme(darkTheme = darkTheme) {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -89,6 +90,7 @@ fun DesignSystemCatalog(
                 SahyogTopAppBar(
                     title = "Design system",
                     scrollBehavior = scrollBehavior,
+                    onNavigateBack = onNavigateBack,
                     actions = {
                         Text("Dark", style = SahyogTheme.typography.labelLarge)
                         Spacer(Modifier.width(SahyogSpacing.sm))

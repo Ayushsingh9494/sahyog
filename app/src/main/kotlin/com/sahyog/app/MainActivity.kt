@@ -6,31 +6,43 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import com.sahyog.core.designsystem.catalog.DesignSystemCatalog
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sahyog.app.ui.SahyogApp
+import com.sahyog.core.designsystem.theme.SahyogTheme
+import com.sahyog.core.model.ThemePreference
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
- * Single activity. All screens are composables hosted here; navigation between
- * them is handled by Navigation Compose (added in Milestone 3).
+ * Single activity. Shows the splash until the session is known, then hands
+ * everything to [SahyogApp], which decides which section of the app to render.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: MainActivityViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Must run before super.onCreate so the splash theme is swapped correctly.
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Keep the splash up until we know whether to show login, onboarding or home.
+        // Avoids flashing the wrong screen on launch.
+        splashScreen.setKeepOnScreenCondition { viewModel.uiState.value is MainActivityUiState.Loading }
+
         enableEdgeToEdge()
         setContent {
-            val systemDark = isSystemInDarkTheme()
-            // Temporary in-memory toggle. Becomes the persisted Light/Dark/System preference in M3.
-            var darkTheme by rememberSaveable { mutableStateOf(systemDark) }
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val ready = uiState as? MainActivityUiState.Ready
+            val darkTheme = shouldUseDarkTheme(ready?.theme ?: ThemePreference.System)
 
-            // The status/navigation bar icon color must follow the APP's theme, not the system's.
-            // Otherwise dark icons sit on a dark app background when the two disagree.
+            // Status/navigation bar icons must follow the APP's theme, not the system's.
             DisposableEffect(darkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },
@@ -39,10 +51,25 @@ class MainActivity : ComponentActivity() {
                 onDispose {}
             }
 
-            // Temporary: shows the design-system catalog until the navigation shell lands.
-            DesignSystemCatalog(darkTheme = darkTheme, onDarkThemeChange = { darkTheme = it })
+            SahyogTheme(darkTheme = darkTheme) {
+                if (ready != null) {
+                    SahyogApp(
+                        session = ready.session,
+                        darkTheme = darkTheme,
+                        onThemeChange = viewModel::setTheme,
+                        showDeveloperOptions = BuildConfig.DEBUG,
+                    )
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun shouldUseDarkTheme(theme: ThemePreference): Boolean = when (theme) {
+    ThemePreference.System -> isSystemInDarkTheme()
+    ThemePreference.Light -> false
+    ThemePreference.Dark -> true
 }
 
 // Same scrims androidx.activity uses by default for 3-button navigation bars.

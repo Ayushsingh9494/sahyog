@@ -1,0 +1,15 @@
+<resources>
+    <string name="onboarding_title">Welcome to Sahyog</string>
+    <string name="onboarding_subtitle">Tell us a little about yourself to get started.</string>
+    <string name="onboarding_name_label">Full name</string>
+    <string name="onboarding_name_support">Shown on your bookings and profile</string>
+    <string name="onboarding_name_error">Enter your name using letters only (at least 2)</string>
+    <string name="onboarding_roles_title">How will you use Sahyog?</string>
+    <string name="onboarding_roles_support">Choose one or both. You can switch anytime.</string>
+    <string name="onboarding_role_customer_title">Book services</string>
+    <string name="onboarding_role_customer_body">Find trusted workers near you</string>
+    <string name="onboarding_role_worker_title">Offer my skills</string>
+    <string name="onboarding_role_worker_body">Get jobs and grow your income</string>
+    <string name="onboarding_cta">Continue</string>
+    <string name="onboarding_different_number">Use a different number</string>
+</resources>

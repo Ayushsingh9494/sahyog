@@ -16,10 +16,7 @@ import com.sahyog.core.designsystem.R
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.theme.SahyogTheme
 
-/**
- * Screen top bar. Shows a back arrow when [onNavigateBack] is provided.
- * Pass a [scrollBehavior] so the bar tints as content scrolls under it.
- */
+/** Screen top bar. Shows a back arrow when [onNavigateBack] is provided. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SahyogTopAppBar(
@@ -27,7 +24,28 @@ fun SahyogTopAppBar(
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null,
+) {
+    SahyogTopAppBar(
+        title = title,
+        scrollBehavior = null,
+        modifier = modifier,
+        onNavigateBack = onNavigateBack,
+        actions = actions,
+    )
+}
+
+/**
+ * Variant that tints as content scrolls under it. Material's scroll-behavior API is
+ * still experimental, so only callers that need it have to opt in.
+ */
+@ExperimentalMaterial3Api
+@Composable
+fun SahyogTopAppBar(
+    title: String,
+    scrollBehavior: TopAppBarScrollBehavior?,
+    modifier: Modifier = Modifier,
+    onNavigateBack: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         title = {

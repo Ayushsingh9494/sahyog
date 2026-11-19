@@ -1,0 +1,31 @@
+<resources>
+    <!-- Welcome -->
+    <string name="auth_welcome_title">कुशल मदद, आपके अपने पड़ोस में</string>
+    <string name="auth_welcome_subtitle">स्थानीय पेशेवरों की सहकारी संस्था से भरोसेमंद इलेक्ट्रीशियन, प्लंबर, बढ़ई और अन्य सेवाएँ बुक करें।</string>
+    <string name="auth_welcome_point_verified_title">सत्यापित पेशेवर</string>
+    <string name="auth_welcome_point_verified_body">काम लेने से पहले हर कारीगर की जाँच सहकारी संस्था करती है।</string>
+    <string name="auth_welcome_point_fair_title">उचित और पारदर्शी दाम</string>
+    <string name="auth_welcome_point_fair_body">बुक करने से पहले दाम देखें। कोई छिपा शुल्क नहीं।</string>
+    <string name="auth_welcome_point_coop_title">समुदाय की अपनी संस्था</string>
+    <string name="auth_welcome_point_coop_body">कारीगर सदस्य हैं, सिर्फ़ नंबर नहीं। आपके भुगतान का अधिक हिस्सा उन तक पहुँचता है।</string>
+    <string name="auth_welcome_cta">शुरू करें</string>
+
+    <!-- Phone -->
+    <string name="auth_phone_title">अपना मोबाइल नंबर दर्ज करें</string>
+    <string name="auth_phone_subtitle">इसे सत्यापित करने के लिए हम आपको 6 अंकों का कोड भेजेंगे।</string>
+    <string name="auth_phone_label">मोबाइल नंबर</string>
+    <string name="auth_phone_cta">कोड भेजें</string>
+    <string name="auth_phone_error_invalid">10 अंकों का सही मोबाइल नंबर दर्ज करें</string>
+
+    <!-- OTP -->
+    <string name="auth_otp_title">सत्यापन कोड दर्ज करें</string>
+    <string name="auth_otp_subtitle">%1$s पर SMS से भेजा गया</string>
+    <string name="auth_otp_change_number">नंबर बदलें</string>
+    <string name="auth_otp_verifying">सत्यापित किया जा रहा है…</string>
+    <string name="auth_otp_error_wrong_code">यह कोड सही नहीं है। कृपया फिर से कोशिश करें।</string>
+    <string name="auth_otp_resent">नया कोड भेज दिया गया है</string>
+    <string name="auth_otp_not_received">कोड नहीं मिला?</string>
+    <string name="auth_otp_resend">कोड फिर भेजें</string>
+    <string name="auth_otp_resend_in">%1$d सेकंड में फिर भेजें</string>
+    <string name="auth_otp_demo_hint">डेमो मोड: कोड 123456 इस्तेमाल करें</string>
+</resources>

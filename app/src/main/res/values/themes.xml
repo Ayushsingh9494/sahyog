@@ -8,4 +8,14 @@
     <style name="Theme.SAHYOG" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/sahyog_window_background</item>
     </style>
+
+    <!--
+      Launch theme (androidx core-splashscreen): brand-teal splash with the Sahyog mark,
+      identical on every Android version. Swapped to Theme.SAHYOG by installSplashScreen().
+    -->
+    <style name="Theme.SAHYOG.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/sahyog_brand_teal</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.SAHYOG</item>
+    </style>
 </resources>

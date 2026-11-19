@@ -1,0 +1,21 @@
+<resources>
+    <string name="account_title">Account</string>
+    <string name="account_role_customer">Customer</string>
+    <string name="account_role_worker">Worker</string>
+    <string name="account_worker_not_submitted">Documents needed</string>
+    <string name="account_worker_pending">Verification pending</string>
+    <string name="account_worker_verified">Verified</string>
+    <string name="account_worker_rejected">Verification rejected</string>
+    <string name="account_mode_title">Mode</string>
+    <string name="account_mode_support">Switch between booking services and doing jobs.</string>
+    <string name="account_theme_title">Appearance</string>
+    <string name="account_theme_system">System</string>
+    <string name="account_theme_light">Light</string>
+    <string name="account_theme_dark">Dark</string>
+    <string name="account_developer_title">Developer</string>
+    <string name="account_design_catalog">Design system catalog</string>
+    <string name="account_sign_out">Sign out</string>
+    <string name="account_sign_out_confirm_title">Sign out of Sahyog?</string>
+    <string name="account_sign_out_confirm_body">You\'ll need to verify your mobile number again to sign back in.</string>
+    <string name="account_cancel">Cancel</string>
+</resources>

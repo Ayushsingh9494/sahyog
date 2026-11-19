@@ -24,14 +24,15 @@ UI (Compose)  --actions-->  ViewModel  -->  UseCase (only when real logic)  --> 
 | `app` | Android app | Application, MainActivity, root NavHost, role routing | M0 |
 | `core:common` | JVM | `AppError`, `AppResult`, dispatcher injection | M1 |
 | `core:designsystem` | Android lib | `SahyogTheme`, tokens, reusable `Sahyog*` components | M1 |
-| `core:model` | JVM | Domain models (User, Role, Booking, ...) | M3 |
-| `core:ui` | Android lib | Domain-aware shared UI (model-bound cards, formatters) | M5 |
-| `core:datastore` | Android lib | Preferences (theme, language, onboarding) | M3 |
+| `core:model` | JVM | Domain models and pure rules (User, UserRole, SessionState, ...) | M3 |
+| `core:ui` | Android lib | Shared non-visual UI helpers: error messages, event collection, formatters | M3 |
+| `core:datastore` | Android lib | DataStore: theme, active mode, cached profile | M3 |
 | `core:data` | Android lib | Repository interfaces, implementations, fakes | M3 |
 | `core:database` | Android lib | Room | M5 |
 | `core:network` | Android lib | Retrofit/OkHttp, DTOs, auth interceptor | M10 |
 | `core:testing` | Android lib | Shared fakes and test rules | M3 |
-| `feature:*` | Android lib | One per feature; never depend on each other | M3+ |
+| `feature:auth`, `:onboarding`, `:account` | Android lib | Sign-in, first-run profile, account settings | M3 |
+| `feature:*` | Android lib | One per feature; never depend on each other (`sahyog.android.feature`) | M3+ |
 
 Modules are created when they first get real content, not as empty shells.
 
@@ -39,6 +40,32 @@ Modules are created when they first get real content, not as empty shells.
 - `feature` → `core` only.
 - `core:data` → `network`/`database`/`datastore`.
 - `app` → everything.
+
+## Navigation and sessions
+
+```
+MainActivity ── splash held while MainActivityUiState.Loading
+   └─ SahyogApp(session)          one section per SessionState (AnimatedContent)
+        ├─ SignedOut           → AuthNavHost: Welcome → Phone → Otp(phone)
+        ├─ NeedsOnboarding     → Onboarding
+        ├─ SignedIn(Customer)  → CustomerShell [Home · Search · Bookings · Account]
+        └─ SignedIn(Worker)    → WorkerShell   [Jobs · Schedule · Earnings · Account]
+```
+
+- **State drives sections; nothing navigates across them.** Verifying an OTP, finishing
+  onboarding, switching mode and signing out only change data. `SessionState.resolve`
+  maps (user, preferences) to a section, and the root swaps the section together with its
+  back stack. Back can never return to a signed-out user's previous screens.
+- **Inside a section**, Navigation Compose with `@Serializable` routes. Arguments are typed
+  constructor properties. ViewModels needing route arguments use Hilt assisted injection.
+- **ViewModel scope per section** (`SectionViewModelScope`): cleared when the section leaves,
+  kept across configuration changes.
+- **Tabs** keep their own state (`saveState`/`restoreState`). The bottom bar is hidden on pushed screens.
+- **Screen pattern:** `XxxScreen` (gets the ViewModel and collects state/events) wraps a stateless
+  `XxxContent(uiState, callbacks)` used by previews and tests. One `StateFlow<UiState>` per
+  ViewModel; one-off events go through a `Channel`, collected by `ObserveAsEvents`.
+- **Fakes:** `FakeAuthRepository` / `FakeUserRepository` (demo OTP `123456`) are bound in
+  `core:data/di/DataModule`. Swapping to Firebase / Spring Boot changes only those bindings.
 
 ## Conventions
 
@@ -85,7 +112,7 @@ Rules:
 | Roles | One account can hold Customer and Worker roles; active mode switch | Default |
 | Role source of truth | Backend (never client) | Decided |
 | Login | Firebase phone OTP | Default |
-| Navigation | Navigation Compose, type-safe `@Serializable` routes | Decided |
+| Navigation | Session-driven sections + Navigation Compose type-safe routes within | Decided |
 | Modularization | Multi-module + convention plugins | Decided |
 | Geo matching | Server-side PostGIS | Decided |
 | Payments | Server-verified via gateway webhook; gateway TBD | Open |

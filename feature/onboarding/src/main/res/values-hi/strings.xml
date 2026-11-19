@@ -1,0 +1,15 @@
+<resources>
+    <string name="onboarding_title">सहयोग में आपका स्वागत है</string>
+    <string name="onboarding_subtitle">शुरू करने के लिए अपने बारे में थोड़ा बताएँ।</string>
+    <string name="onboarding_name_label">पूरा नाम</string>
+    <string name="onboarding_name_support">आपकी बुकिंग और प्रोफ़ाइल पर दिखाया जाएगा</string>
+    <string name="onboarding_name_error">केवल अक्षरों में अपना नाम दर्ज करें (कम से कम 2)</string>
+    <string name="onboarding_roles_title">आप सहयोग का उपयोग कैसे करेंगे?</string>
+    <string name="onboarding_roles_support">एक या दोनों चुनें। आप कभी भी बदल सकते हैं।</string>
+    <string name="onboarding_role_customer_title">सेवाएँ बुक करें</string>
+    <string name="onboarding_role_customer_body">अपने पास भरोसेमंद कारीगर खोजें</string>
+    <string name="onboarding_role_worker_title">अपना हुनर दें</string>
+    <string name="onboarding_role_worker_body">काम पाएँ और अपनी आमदनी बढ़ाएँ</string>
+    <string name="onboarding_cta">आगे बढ़ें</string>
+    <string name="onboarding_different_number">दूसरा नंबर इस्तेमाल करें</string>
+</resources>

@@ -2,4 +2,6 @@
 <resources>
     <!-- Must match LightColors.surface in core:designsystem. -->
     <color name="sahyog_window_background">#F7FAF8</color>
+    <!-- Must match SahyogBrand.Teal. Splash background in both light and dark mode. -->
+    <color name="sahyog_brand_teal">#0B6B58</color>
 </resources>

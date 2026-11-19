@@ -1,4 +1,38 @@
 <resources>
     <!-- Brand name: identical in every language. -->
     <string name="app_name" translatable="false">Sahyog</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_home">Home</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_bookings">Bookings</string>
+    <string name="tab_account">Account</string>
+    <string name="tab_jobs">Jobs</string>
+    <string name="tab_schedule">Schedule</string>
+    <string name="tab_earnings">Earnings</string>
+
+    <!-- Customer -->
+    <string name="home_greeting">Namaste, %1$s</string>
+    <string name="placeholder_home_title">Services are on their way</string>
+    <string name="placeholder_home_message">Soon you\'ll browse categories and find verified workers near you here.</string>
+    <string name="placeholder_search_title">Search is coming soon</string>
+    <string name="placeholder_search_message">You\'ll be able to search for any service or worker.</string>
+    <string name="placeholder_bookings_title">No bookings yet</string>
+    <string name="placeholder_bookings_message">Services you book will appear here.</string>
+
+    <!-- Worker -->
+    <string name="placeholder_jobs_title">No job requests yet</string>
+    <string name="placeholder_jobs_message">New requests from customers near you will appear here.</string>
+    <string name="placeholder_schedule_title">Your schedule is empty</string>
+    <string name="placeholder_schedule_message">Set your availability and see upcoming jobs here.</string>
+    <string name="placeholder_earnings_title">No earnings yet</string>
+    <string name="placeholder_earnings_message">Payments for completed jobs will show up here.</string>
+
+    <!-- Worker verification -->
+    <string name="verification_not_submitted">Verification needed</string>
+    <string name="verification_not_submitted_body">Upload your ID and skill details so the cooperative can verify you. You\'ll start getting jobs once verified.</string>
+    <string name="verification_pending">Verification in progress</string>
+    <string name="verification_pending_body">The cooperative is reviewing your documents. This usually takes 1–2 days.</string>
+    <string name="verification_rejected">Verification unsuccessful</string>
+    <string name="verification_rejected_body">Please check the feedback and resubmit your documents.</string>
 </resources>

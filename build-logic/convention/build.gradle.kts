@@ -38,6 +38,10 @@ gradlePlugin {
             id = "sahyog.android.compose"
             implementationClass = "AndroidComposeConventionPlugin"
         }
+        register("androidFeature") {
+            id = "sahyog.android.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
         register("jvmLibrary") {
             id = "sahyog.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"

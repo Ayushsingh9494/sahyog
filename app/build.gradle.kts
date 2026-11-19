@@ -2,6 +2,7 @@ plugins {
     id("sahyog.android.application")
     id("sahyog.android.compose")
     id("sahyog.hilt")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -12,6 +13,11 @@ android {
         applicationId = "com.sahyog.app"
         versionCode = 1
         versionName = "0.1.0"
+    }
+
+    buildFeatures {
+        // BuildConfig.DEBUG gates developer-only screens (design catalog).
+        buildConfig = true
     }
 
     buildTypes {
@@ -26,13 +32,28 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
+    implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:model"))
+    implementation(project(":core:ui"))
+    implementation(project(":feature:account"))
+    implementation(project(":feature:auth"))
+    implementation(project(":feature:onboarding"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
+    testImplementation(project(":core:testing"))
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
