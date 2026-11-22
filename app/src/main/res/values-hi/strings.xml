@@ -9,11 +9,6 @@
     <string name="tab_earnings">कमाई</string>
 
     <!-- Customer -->
-    <string name="home_greeting">नमस्ते, %1$s</string>
-    <string name="placeholder_home_title">सेवाएँ जल्द आ रही हैं</string>
-    <string name="placeholder_home_message">जल्द ही आप यहाँ श्रेणियाँ देख सकेंगे और अपने पास सत्यापित कारीगर खोज सकेंगे।</string>
-    <string name="placeholder_search_title">खोज जल्द आ रही है</string>
-    <string name="placeholder_search_message">आप किसी भी सेवा या कारीगर को खोज सकेंगे।</string>
     <string name="placeholder_bookings_title">अभी कोई बुकिंग नहीं</string>
     <string name="placeholder_bookings_message">आपकी बुक की गई सेवाएँ यहाँ दिखेंगी।</string>
 

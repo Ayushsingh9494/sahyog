@@ -12,11 +12,6 @@
     <string name="tab_earnings">Earnings</string>
 
     <!-- Customer -->
-    <string name="home_greeting">Namaste, %1$s</string>
-    <string name="placeholder_home_title">Services are on their way</string>
-    <string name="placeholder_home_message">Soon you\'ll browse categories and find verified workers near you here.</string>
-    <string name="placeholder_search_title">Search is coming soon</string>
-    <string name="placeholder_search_message">You\'ll be able to search for any service or worker.</string>
     <string name="placeholder_bookings_title">No bookings yet</string>
     <string name="placeholder_bookings_message">Services you book will appear here.</string>
 

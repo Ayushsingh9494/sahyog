@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":feature:account"))
     implementation(project(":feature:auth"))
+    implementation(project(":feature:discovery"))
     implementation(project(":feature:onboarding"))
 
     implementation(libs.androidx.core.ktx)

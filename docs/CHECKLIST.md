@@ -75,9 +75,24 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [ ] Add release SHA-1/SHA-256 to Firebase when Play App Signing is set up (M14)
 - [ ] Account deletion entry point (Play requirement): moved to M10, it needs the backend
 
-## M5: Customer discovery
-- [ ] Home, categories, search, worker profile
-- [ ] Room cache
+## M5: Customer discovery ✅
+- [x] `core:model`: ServiceCategory, Worker, WorkerService, `Paise` (money as integer paise), PriceUnit
+- [x] `core:database` (Room 2.8.5): categories, workers, worker↔category, services; schema exported
+      to `core/database/schemas`; atomic catalog replace; LIKE search with escaping
+- [x] `core:data`: `CatalogRepository` (offline-first: screens read Room, `refresh()` downloads),
+      `CatalogNetworkDataSource` + TEMPORARY `DemoCatalogDataSource` (18 fictional workers, 8 categories)
+- [x] Search covers worker name, area, category, service and Hindi keywords (e.g. "बिजली", "नल")
+- [x] `core:ui`: category icons (Material Symbols, Apache 2.0) + EN/HI labels, Indian rupee
+      formatting (₹1,23,456), shared `WorkerCard`
+- [x] `feature:discovery`: Home (greeting, search entry, category grid, top-rated, pull-to-refresh,
+      loading / error / empty states), Category ("Available now" filter), Search (debounced, survives
+      process death), Worker profile (stats, services and prices, details)
+- [x] Verified: 66 unit tests, 4 Room DAO tests on device, lint 0 errors on all modules
+- [x] Verified on device: Home → category → filter → profile, search results and no-results,
+      Hindi UI, dark theme
+- [ ] Server-side localisation of service names / about text (needs backend, M10)
+- [ ] Distance and "near you" sorting (needs location, M8)
+- [ ] Worker photos (needs image upload, M7 + an image loader)
 
 ## M6: Booking flow
 - [ ] Create → track → history, cancellation

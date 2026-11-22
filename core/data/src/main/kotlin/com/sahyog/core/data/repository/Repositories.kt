@@ -2,10 +2,12 @@ package com.sahyog.core.data.repository
 
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.model.AuthSession
+import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
 import com.sahyog.core.model.UserRole
+import com.sahyog.core.model.Worker
 import kotlinx.coroutines.flow.Flow
 
 /** Outcome of asking for a verification code. */
@@ -59,4 +61,25 @@ interface UserPreferencesRepository {
     suspend fun setTheme(theme: ThemePreference)
 
     suspend fun setActiveRole(role: UserRole)
+}
+
+/**
+ * The service catalog customers browse: categories and bookable workers.
+ * Reads come from the on-device cache and keep working offline; [refresh] updates it.
+ */
+interface CatalogRepository {
+    /** Categories in the cooperative's display order. Empty until the first successful refresh. */
+    val categories: Flow<List<ServiceCategory>>
+
+    /** Workers, best rated first; all of them when [categoryId] is null. */
+    fun workers(categoryId: String? = null): Flow<List<Worker>>
+
+    /** Workers whose name, area, category (incl. Hindi keywords) or service matches [query]. */
+    fun searchWorkers(query: String): Flow<List<Worker>>
+
+    /** Emits null if the worker isn't (or is no longer) in the catalog. */
+    fun worker(id: String): Flow<Worker?>
+
+    /** Downloads the latest catalog. On failure the cached copy is left untouched. */
+    suspend fun refresh(): AppResult<Unit>
 }

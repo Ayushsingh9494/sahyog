@@ -28,10 +28,11 @@ UI (Compose)  --actions-->  ViewModel  -->  UseCase (only when real logic)  --> 
 | `core:ui` | Android lib | Shared non-visual UI helpers: error messages, event collection, formatters | M3 |
 | `core:datastore` | Android lib | DataStore: theme, active mode; temporary local profiles (until M10) | M3 |
 | `core:data` | Android lib | Repository interfaces and implementations (Firebase Auth from M4) | M3 |
-| `core:database` | Android lib | Room | M5 |
+| `core:database` | Android lib | Room: offline catalog cache (entities, DAOs, schemas) | M5 |
 | `core:network` | Android lib | Retrofit/OkHttp, DTOs, auth interceptor | M10 |
 | `core:testing` | Android lib | Shared fakes and test rules | M3 |
 | `feature:auth`, `:onboarding`, `:account` | Android lib | Sign-in, first-run profile, account settings | M3 |
+| `feature:discovery` | Android lib | Customer Home, Search, Category, Worker profile | M5 |
 | `feature:*` | Android lib | One per feature; never depend on each other (`sahyog.android.feature`) | M3+ |
 
 Modules are created when they first get real content, not as empty shells.
@@ -82,6 +83,29 @@ MainActivity ── splash held while MainActivityUiState.Loading
   server verifies it.
 - Setup: `app/google-services.json` is gitignored; download it from the Firebase console. Debug
   SHA-1/SHA-256 must be registered there. Use Firebase test phone numbers during development.
+
+## Service catalog (M5)
+
+```
+HomeScreen / SearchScreen / CategoryScreen / WorkerProfileScreen
+        │  (Flow from Room, always)
+        ▼
+OfflineFirstCatalogRepository ── refresh() ──► CatalogNetworkDataSource
+        │  replaceCatalog() in one transaction      └ DemoCatalogDataSource (until M10 → Retrofit)
+        ▼
+Room: categories · workers · worker_categories · worker_services
+```
+
+- Screens never wait on the network: they observe Room and show what's cached. Home triggers a
+  refresh each time it opens; a failed refresh shows a snackbar if content is cached, or a
+  full-screen error with retry if nothing is.
+- `refresh()` replaces the whole catalog atomically and is de-duplicated with a mutex. Links to
+  categories missing from a response are dropped rather than failing the refresh.
+- Category look (icon, translated label) is chosen on the client by stable category id; unknown
+  ids fall back to the server's name and a generic icon, so new categories need no app update.
+- Money is `Paise` (Long). Formatting with Indian grouping lives in `core:ui` (`formatRupees`).
+- The database is a cache: everything in it can be downloaded again. Schema changes bump the
+  version and add a migration (exported schemas in `core/database/schemas`).
 
 ## Conventions
 

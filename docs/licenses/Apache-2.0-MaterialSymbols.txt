@@ -1,0 +1,3 @@
+Material Symbols (Google) — category icons in core/ui/src/main/res/drawable/ic_category_*.xml
+Source: https://github.com/google/material-design-icons (symbols/android, rounded style)
+License: Apache License, Version 2.0 — https://www.apache.org/licenses/LICENSE-2.0

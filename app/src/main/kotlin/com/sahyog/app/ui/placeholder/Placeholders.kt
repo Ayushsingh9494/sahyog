@@ -12,8 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import com.sahyog.app.R
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
@@ -28,8 +26,7 @@ import com.sahyog.core.model.WorkerVerificationStatus
 
 /*
  * Temporary tab content so the navigation shell can be used end to end.
- * Each one is replaced by a real feature module: customer discovery (M5),
- * bookings (M6) and the worker side (M7).
+ * Each one is replaced by a real feature module: bookings (M6) and the worker side (M7).
  */
 
 @Composable
@@ -55,23 +52,6 @@ internal fun PlaceholderTab(
             )
         }
     }
-}
-
-@Composable
-internal fun CustomerHomePlaceholder(user: User) {
-    PlaceholderTab(
-        titleRes = R.string.tab_home,
-        emptyTitleRes = R.string.placeholder_home_title,
-        emptyMessageRes = R.string.placeholder_home_message,
-        icon = SahyogIcons.Service,
-        header = {
-            Text(
-                text = stringResource(R.string.home_greeting, user.firstName()),
-                style = SahyogTheme.typography.headlineSmall,
-                modifier = Modifier.semantics { heading() },
-            )
-        },
-    )
 }
 
 @Composable
@@ -108,5 +88,3 @@ private fun VerificationBanner(status: WorkerVerificationStatus) {
         Text(stringResource(bodyRes), style = SahyogTheme.typography.bodyMedium)
     }
 }
-
-private fun User.firstName(): String = name?.trim()?.substringBefore(' ').orEmpty()

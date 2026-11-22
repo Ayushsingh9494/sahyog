@@ -1,0 +1,25 @@
+package com.sahyog.core.database.di
+
+import android.content.Context
+import androidx.room.Room
+import com.sahyog.core.database.SahyogDatabase
+import com.sahyog.core.database.dao.CatalogDao
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal object DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun providesDatabase(@ApplicationContext context: Context): SahyogDatabase =
+        Room.databaseBuilder(context, SahyogDatabase::class.java, "sahyog.db").build()
+
+    @Provides
+    fun providesCatalogDao(database: SahyogDatabase): CatalogDao = database.catalogDao()
+}

@@ -2,6 +2,10 @@ package com.sahyog.core.data.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.sahyog.core.data.auth.FirebaseAuthRepository
+import com.sahyog.core.data.catalog.CatalogNetworkDataSource
+import com.sahyog.core.data.catalog.DemoCatalogDataSource
+import com.sahyog.core.data.catalog.OfflineFirstCatalogRepository
+import com.sahyog.core.data.repository.CatalogRepository
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.LocalProfileUserRepository
 import com.sahyog.core.data.repository.OfflineUserPreferencesRepository
@@ -30,6 +34,13 @@ internal interface DataModule {
 
     @Binds
     fun bindsUserPreferencesRepository(impl: OfflineUserPreferencesRepository): UserPreferencesRepository
+
+    @Binds
+    fun bindsCatalogRepository(impl: OfflineFirstCatalogRepository): CatalogRepository
+
+    /** Demo data until the Spring Boot API exists (M10). */
+    @Binds
+    fun bindsCatalogNetworkDataSource(impl: DemoCatalogDataSource): CatalogNetworkDataSource
 }
 
 @Module

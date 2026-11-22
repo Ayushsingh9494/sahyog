@@ -60,7 +60,6 @@ fun SahyogApp(
                     }
                     is SessionState.SignedIn -> when (state.activeRole) {
                         UserRole.Customer -> CustomerShell(
-                            user = state.user,
                             darkTheme = darkTheme,
                             onThemeChange = onThemeChange,
                             showDeveloperOptions = showDeveloperOptions,

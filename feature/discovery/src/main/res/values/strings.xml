@@ -1,0 +1,58 @@
+<resources>
+    <!-- Home -->
+    <string name="discovery_home_greeting">Namaste, %1$s</string>
+    <string name="discovery_home_greeting_no_name">Namaste</string>
+    <string name="discovery_home_subtitle">What do you need help with today?</string>
+    <string name="discovery_home_services">Services</string>
+    <string name="discovery_home_top_rated">Top-rated workers</string>
+    <string name="discovery_home_error_title">Couldn\'t load services</string>
+    <string name="discovery_home_empty_title">No services listed yet</string>
+    <string name="discovery_home_empty_message">The cooperative hasn\'t listed any services yet. Pull down to check again.</string>
+
+    <!-- Search -->
+    <string name="discovery_search_title">Search</string>
+    <string name="discovery_search_hint">Search for a service or worker</string>
+    <string name="discovery_search_clear">Clear search</string>
+    <string name="discovery_search_browse">Browse by category</string>
+    <string name="discovery_search_no_results_title">No results for “%1$s”</string>
+    <string name="discovery_search_no_results_message">Try another word, such as “plumber” or “नल”.</string>
+    <plurals name="discovery_search_result_count">
+        <item quantity="one">%d worker found</item>
+        <item quantity="other">%d workers found</item>
+    </plurals>
+
+    <!-- Category -->
+    <string name="discovery_category_available_now">Available now</string>
+    <plurals name="discovery_category_worker_count">
+        <item quantity="one">%d worker</item>
+        <item quantity="other">%d workers</item>
+    </plurals>
+    <string name="discovery_category_none_available_title">No one is free right now</string>
+    <string name="discovery_category_none_available_message">Workers in this category are busy. Check back soon, or see everyone.</string>
+    <string name="discovery_category_show_all">Show all workers</string>
+    <string name="discovery_category_empty_title">No workers here yet</string>
+    <string name="discovery_category_empty_message">The cooperative is adding workers for this service.</string>
+
+    <!-- Shared -->
+    <string name="discovery_not_found_title">No longer available</string>
+    <string name="discovery_not_found_message">This listing has been removed.</string>
+
+    <!-- Worker profile -->
+    <string name="discovery_worker_verified">Verified by cooperative</string>
+    <string name="discovery_worker_busy">Busy right now</string>
+    <string name="discovery_worker_rating">Rating</string>
+    <string name="discovery_worker_jobs">Jobs done</string>
+    <string name="discovery_worker_experience">Experience</string>
+    <plurals name="discovery_worker_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+    <string name="discovery_worker_about">About</string>
+    <string name="discovery_worker_services">Services and prices</string>
+    <string name="discovery_worker_details">Details</string>
+    <string name="discovery_worker_area">Works in</string>
+    <string name="discovery_worker_languages">Speaks</string>
+    <string name="discovery_worker_price_note">Prices are starting rates. The final price is agreed before work begins.</string>
+    <!-- Screen-reader text for a stat cell, e.g. "Jobs done: 486" -->
+    <string name="discovery_worker_stat_description">%1$s: %2$s</string>
+</resources>

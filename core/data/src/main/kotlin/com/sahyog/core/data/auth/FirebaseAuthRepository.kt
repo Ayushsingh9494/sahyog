@@ -44,7 +44,7 @@ internal class FirebaseAuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val activityTracker: ForegroundActivityTracker,
     private val preferences: SahyogPreferencesDataSource,
-    @ApplicationScope private val appScope: CoroutineScope,
+    @param:ApplicationScope private val appScope: CoroutineScope,
 ) : AuthRepository {
 
     /** State of the last code request, needed to verify a code or re-send one. Memory-only by design. */

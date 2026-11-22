@@ -10,5 +10,8 @@ android {
 dependencies {
     api(project(":core:designsystem"))
     implementation(project(":core:common"))
+    implementation(project(":core:model"))
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    testImplementation(libs.junit)
 }

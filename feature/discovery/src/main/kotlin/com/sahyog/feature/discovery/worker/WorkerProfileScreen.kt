@@ -1,0 +1,293 @@
+package com.sahyog.feature.discovery.worker
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sahyog.core.designsystem.component.SahyogAvatar
+import com.sahyog.core.designsystem.component.SahyogCard
+import com.sahyog.core.designsystem.component.SahyogEmptyView
+import com.sahyog.core.designsystem.component.SahyogLoadingView
+import com.sahyog.core.designsystem.component.SahyogRatingSummary
+import com.sahyog.core.designsystem.component.SahyogStatusBadge
+import com.sahyog.core.designsystem.component.SahyogTopAppBar
+import com.sahyog.core.designsystem.component.StatusTone
+import com.sahyog.core.designsystem.icon.SahyogIcons
+import com.sahyog.core.designsystem.theme.SahyogSpacing
+import com.sahyog.core.designsystem.theme.SahyogTheme
+import com.sahyog.core.model.Paise
+import com.sahyog.core.model.PriceUnit
+import com.sahyog.core.model.ServiceCategory
+import com.sahyog.core.model.Worker
+import com.sahyog.core.model.WorkerService
+import com.sahyog.core.ui.catalog.categoryLabel
+import com.sahyog.core.ui.catalog.formatRupees
+import com.sahyog.core.ui.catalog.priceUnitSuffix
+import com.sahyog.feature.discovery.R
+
+@Composable
+fun WorkerProfileScreen(
+    viewModel: WorkerProfileViewModel,
+    onNavigateBack: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    WorkerProfileContent(uiState = uiState, onNavigateBack = onNavigateBack)
+}
+
+@Composable
+internal fun WorkerProfileContent(
+    uiState: WorkerProfileUiState,
+    onNavigateBack: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            SahyogTopAppBar(
+                title = (uiState as? WorkerProfileUiState.Ready)?.worker?.name.orEmpty(),
+                onNavigateBack = onNavigateBack,
+            )
+        },
+        containerColor = SahyogTheme.colors.surface,
+    ) { padding ->
+        val modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+        when (uiState) {
+            WorkerProfileUiState.Loading -> SahyogLoadingView(modifier)
+            WorkerProfileUiState.NotFound -> SahyogEmptyView(
+                title = stringResource(R.string.discovery_not_found_title),
+                message = stringResource(R.string.discovery_not_found_message),
+                modifier = modifier,
+            )
+            is WorkerProfileUiState.Ready -> WorkerProfile(uiState.worker, modifier)
+        }
+    }
+}
+
+@Composable
+private fun WorkerProfile(worker: Worker, modifier: Modifier) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            start = SahyogSpacing.screenGutter,
+            end = SahyogSpacing.screenGutter,
+            top = SahyogSpacing.sm,
+            bottom = SahyogSpacing.xxl,
+        ),
+        verticalArrangement = Arrangement.spacedBy(SahyogSpacing.lg),
+    ) {
+        item(key = "header") { ProfileHeader(worker) }
+        item(key = "stats") { StatsRow(worker) }
+        if (worker.about.isNotBlank()) {
+            item(key = "about") {
+                Section(stringResource(R.string.discovery_worker_about)) {
+                    Text(worker.about, style = SahyogTheme.typography.bodyLarge)
+                }
+            }
+        }
+        if (worker.services.isNotEmpty()) {
+            item(key = "services") {
+                Section(stringResource(R.string.discovery_worker_services)) {
+                    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+                        worker.services.forEachIndexed { index, service ->
+                            if (index > 0) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = SahyogSpacing.md),
+                                    color = SahyogTheme.colors.outlineVariant,
+                                )
+                            }
+                            ServiceRow(service)
+                        }
+                    }
+                    Spacer(Modifier.height(SahyogSpacing.sm))
+                    Text(
+                        text = stringResource(R.string.discovery_worker_price_note),
+                        style = SahyogTheme.typography.bodySmall,
+                        color = SahyogTheme.colors.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+        item(key = "details") {
+            Section(stringResource(R.string.discovery_worker_details)) {
+                DetailRow(stringResource(R.string.discovery_worker_area), worker.locality)
+                if (worker.languages.isNotEmpty()) {
+                    Spacer(Modifier.height(SahyogSpacing.sm))
+                    DetailRow(stringResource(R.string.discovery_worker_languages), worker.languages.joinToString(", "))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileHeader(worker: Worker) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        SahyogAvatar(name = worker.name, size = HeaderAvatarSize)
+        Spacer(Modifier.width(SahyogSpacing.lg))
+        Column(verticalArrangement = Arrangement.spacedBy(SahyogSpacing.xs)) {
+            Text(
+                text = worker.name,
+                style = SahyogTheme.typography.headlineSmall,
+                modifier = Modifier.semantics { heading() },
+            )
+            Text(
+                text = worker.categories.map { categoryLabel(it) }.joinToString(" · "),
+                style = SahyogTheme.typography.bodyMedium,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(SahyogSpacing.sm)) {
+                SahyogStatusBadge(
+                    text = stringResource(R.string.discovery_worker_verified),
+                    tone = StatusTone.Brand,
+                    icon = SahyogIcons.Verified,
+                )
+                if (!worker.isAvailable) {
+                    SahyogStatusBadge(text = stringResource(R.string.discovery_worker_busy), tone = StatusTone.Neutral)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatsRow(worker: Worker) {
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth()) {
+            StatCell(label = stringResource(R.string.discovery_worker_rating), modifier = Modifier.weight(1f)) {
+                SahyogRatingSummary(rating = worker.rating, reviewCount = worker.ratingCount)
+            }
+            StatCell(
+                label = stringResource(R.string.discovery_worker_jobs),
+                value = worker.jobsCompleted.toString(),
+                modifier = Modifier.weight(1f),
+            )
+            StatCell(
+                label = stringResource(R.string.discovery_worker_experience),
+                value = pluralStringResource(
+                    R.plurals.discovery_worker_years,
+                    worker.yearsExperience,
+                    worker.yearsExperience,
+                ),
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatCell(label: String, value: String, modifier: Modifier = Modifier) {
+    val description = stringResource(R.string.discovery_worker_stat_description, label, value)
+    StatCell(label, modifier.clearAndSetSemantics { contentDescription = description }) {
+        Text(value, style = SahyogTheme.typography.titleMedium)
+    }
+}
+
+@Composable
+private fun StatCell(label: String, modifier: Modifier = Modifier, value: @Composable () -> Unit) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        value()
+        Spacer(Modifier.height(SahyogSpacing.xs))
+        Text(
+            text = label,
+            style = SahyogTheme.typography.bodySmall,
+            color = SahyogTheme.colors.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun ServiceRow(service: WorkerService) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(service.name, style = SahyogTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Spacer(Modifier.width(SahyogSpacing.md))
+        Text(
+            text = formatRupees(service.startingPrice) + priceUnitSuffix(service.unit),
+            style = SahyogTheme.typography.labelLarge,
+            color = SahyogTheme.colors.primary,
+        )
+    }
+}
+
+@Composable
+private fun DetailRow(label: String, value: String) {
+    Row {
+        Text(
+            text = label,
+            style = SahyogTheme.typography.bodyMedium,
+            color = SahyogTheme.colors.onSurfaceVariant,
+            modifier = Modifier.width(DetailLabelWidth),
+        )
+        Text(value, style = SahyogTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun Section(title: String, content: @Composable () -> Unit) {
+    Column {
+        Text(
+            text = title,
+            style = SahyogTheme.typography.titleMedium,
+            modifier = Modifier
+                .padding(bottom = SahyogSpacing.sm)
+                .semantics { heading() },
+        )
+        content()
+    }
+}
+
+private val HeaderAvatarSize = 72.dp
+private val DetailLabelWidth = 112.dp
+
+@Preview
+@Composable
+private fun WorkerProfilePreview() {
+    SahyogTheme {
+        WorkerProfileContent(
+            uiState = WorkerProfileUiState.Ready(
+                Worker(
+                    id = "1",
+                    name = "Ramesh Kumar",
+                    categories = listOf(ServiceCategory("electrician", "Electrician")),
+                    rating = 4.8f,
+                    ratingCount = 212,
+                    jobsCompleted = 486,
+                    yearsExperience = 12,
+                    locality = "Model Town",
+                    about = "Licensed electrician handling house wiring and fittings.",
+                    languages = listOf("Hindi", "Punjabi"),
+                    services = listOf(
+                        WorkerService("Fan installation", Paise.rupees(199), PriceUnit.PerVisit),
+                        WorkerService("House wiring", Paise.rupees(299), PriceUnit.PerHour),
+                    ),
+                    isAvailable = true,
+                ),
+            ),
+            onNavigateBack = {},
+        )
+    }
+}

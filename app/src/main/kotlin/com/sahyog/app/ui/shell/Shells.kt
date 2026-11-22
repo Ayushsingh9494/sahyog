@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sahyog.app.R
-import com.sahyog.app.ui.placeholder.CustomerHomePlaceholder
 import com.sahyog.app.ui.placeholder.PlaceholderTab
 import com.sahyog.app.ui.placeholder.WorkerJobsPlaceholder
 import com.sahyog.core.designsystem.catalog.DesignSystemCatalog
@@ -13,11 +12,12 @@ import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.feature.account.AccountScreen
+import com.sahyog.feature.discovery.navigation.HomeRoute
+import com.sahyog.feature.discovery.navigation.SearchRoute
+import com.sahyog.feature.discovery.navigation.discoveryDestinations
 import kotlinx.serialization.Serializable
 
-// Customer tabs
-@Serializable internal data object CustomerHomeRoute
-@Serializable internal data object CustomerSearchRoute
+// Customer tabs (Home and Search routes come from feature:discovery)
 @Serializable internal data object CustomerBookingsRoute
 
 // Worker tabs
@@ -35,30 +35,24 @@ private val accountTab = TopLevelTab(
 
 @Composable
 internal fun CustomerShell(
-    user: User,
     darkTheme: Boolean,
     onThemeChange: (ThemePreference) -> Unit,
     showDeveloperOptions: Boolean,
 ) {
     RoleShell(
         tabs = listOf(
-            TopLevelTab(CustomerHomeRoute, R.string.tab_home, SahyogIcons.HomeOutlined, SahyogIcons.Home),
-            TopLevelTab(CustomerSearchRoute, R.string.tab_search, SahyogIcons.SearchOutlined, SahyogIcons.Search),
+            TopLevelTab(HomeRoute, R.string.tab_home, SahyogIcons.HomeOutlined, SahyogIcons.Home),
+            TopLevelTab(SearchRoute, R.string.tab_search, SahyogIcons.SearchOutlined, SahyogIcons.Search),
             TopLevelTab(
                 CustomerBookingsRoute, R.string.tab_bookings, SahyogIcons.BookingsOutlined, SahyogIcons.Bookings,
             ),
             accountTab,
         ),
     ) { navController ->
-        composable<CustomerHomeRoute> { CustomerHomePlaceholder(user) }
-        composable<CustomerSearchRoute> {
-            PlaceholderTab(
-                titleRes = R.string.tab_search,
-                emptyTitleRes = R.string.placeholder_search_title,
-                emptyMessageRes = R.string.placeholder_search_message,
-                icon = SahyogIcons.Search,
-            )
-        }
+        discoveryDestinations(
+            navController = navController,
+            onOpenSearchTab = { navController.navigateToTab(SearchRoute) },
+        )
         composable<CustomerBookingsRoute> {
             PlaceholderTab(
                 titleRes = R.string.tab_bookings,

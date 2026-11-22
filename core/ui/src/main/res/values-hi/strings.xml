@@ -7,4 +7,21 @@
     <string name="core_ui_error_server">हमारी ओर से कुछ गड़बड़ हुई। कृपया थोड़ी देर बाद फिर से कोशिश करें।</string>
     <string name="core_ui_error_unknown">कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।</string>
     <string name="core_ui_error_rate_limited">बहुत अधिक प्रयास हो गए। कृपया कुछ मिनट रुककर फिर से कोशिश करें।</string>
+
+    <!-- सेवा श्रेणियाँ -->
+    <string name="core_ui_category_electrician">इलेक्ट्रीशियन</string>
+    <string name="core_ui_category_plumber">प्लंबर</string>
+    <string name="core_ui_category_carpenter">बढ़ई</string>
+    <string name="core_ui_category_painter">पेंटर</string>
+    <string name="core_ui_category_cleaning">सफ़ाई</string>
+    <string name="core_ui_category_appliance_repair">उपकरण मरम्मत</string>
+    <string name="core_ui_category_ac_repair">एसी मरम्मत</string>
+    <string name="core_ui_category_pest_control">कीट नियंत्रण</string>
+
+    <string name="core_ui_price_from">%1$s से</string>
+    <string name="core_ui_price_per_visit">/विज़िट</string>
+    <string name="core_ui_price_per_hour">/घंटा</string>
+    <string name="core_ui_price_per_job">/काम</string>
+
+    <string name="core_ui_worker_available">उपलब्ध</string>
 </resources>

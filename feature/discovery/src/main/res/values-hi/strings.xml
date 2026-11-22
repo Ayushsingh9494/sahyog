@@ -1,0 +1,57 @@
+<resources>
+    <!-- होम -->
+    <string name="discovery_home_greeting">नमस्ते, %1$s</string>
+    <string name="discovery_home_greeting_no_name">नमस्ते</string>
+    <string name="discovery_home_subtitle">आज आपको किस काम में मदद चाहिए?</string>
+    <string name="discovery_home_services">सेवाएँ</string>
+    <string name="discovery_home_top_rated">सबसे अच्छी रेटिंग वाले कारीगर</string>
+    <string name="discovery_home_error_title">सेवाएँ लोड नहीं हो सकीं</string>
+    <string name="discovery_home_empty_title">अभी कोई सेवा उपलब्ध नहीं है</string>
+    <string name="discovery_home_empty_message">सहकारी समिति ने अभी कोई सेवा नहीं जोड़ी है। दोबारा देखने के लिए नीचे खींचें।</string>
+
+    <!-- खोज -->
+    <string name="discovery_search_title">खोजें</string>
+    <string name="discovery_search_hint">सेवा या कारीगर खोजें</string>
+    <string name="discovery_search_clear">खोज साफ़ करें</string>
+    <string name="discovery_search_browse">श्रेणी के अनुसार देखें</string>
+    <string name="discovery_search_no_results_title">“%1$s” के लिए कोई नतीजा नहीं</string>
+    <string name="discovery_search_no_results_message">कोई दूसरा शब्द आज़माएँ, जैसे “प्लंबर” या “नल”।</string>
+    <plurals name="discovery_search_result_count">
+        <item quantity="one">%d कारीगर मिला</item>
+        <item quantity="other">%d कारीगर मिले</item>
+    </plurals>
+
+    <!-- श्रेणी -->
+    <string name="discovery_category_available_now">अभी उपलब्ध</string>
+    <plurals name="discovery_category_worker_count">
+        <item quantity="one">%d कारीगर</item>
+        <item quantity="other">%d कारीगर</item>
+    </plurals>
+    <string name="discovery_category_none_available_title">अभी कोई खाली नहीं है</string>
+    <string name="discovery_category_none_available_message">इस श्रेणी के कारीगर अभी व्यस्त हैं। थोड़ी देर बाद देखें, या सभी को देखें।</string>
+    <string name="discovery_category_show_all">सभी कारीगर दिखाएँ</string>
+    <string name="discovery_category_empty_title">यहाँ अभी कोई कारीगर नहीं है</string>
+    <string name="discovery_category_empty_message">सहकारी समिति इस सेवा के लिए कारीगर जोड़ रही है।</string>
+
+    <!-- साझा -->
+    <string name="discovery_not_found_title">अब उपलब्ध नहीं</string>
+    <string name="discovery_not_found_message">यह लिस्टिंग हटा दी गई है।</string>
+
+    <!-- कारीगर प्रोफ़ाइल -->
+    <string name="discovery_worker_verified">सहकारी समिति द्वारा सत्यापित</string>
+    <string name="discovery_worker_busy">अभी व्यस्त</string>
+    <string name="discovery_worker_rating">रेटिंग</string>
+    <string name="discovery_worker_jobs">पूरे किए काम</string>
+    <string name="discovery_worker_experience">अनुभव</string>
+    <plurals name="discovery_worker_years">
+        <item quantity="one">%d साल</item>
+        <item quantity="other">%d साल</item>
+    </plurals>
+    <string name="discovery_worker_about">परिचय</string>
+    <string name="discovery_worker_services">सेवाएँ और दाम</string>
+    <string name="discovery_worker_details">विवरण</string>
+    <string name="discovery_worker_area">काम का इलाका</string>
+    <string name="discovery_worker_languages">भाषाएँ</string>
+    <string name="discovery_worker_price_note">ये शुरुआती दाम हैं। अंतिम दाम काम शुरू होने से पहले तय होता है।</string>
+    <string name="discovery_worker_stat_description">%1$s: %2$s</string>
+</resources>

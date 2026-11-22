@@ -17,6 +17,7 @@ dependencies {
     // Repository signatures use these types, so consumers get them transitively.
     api(project(":core:common"))
     api(project(":core:model"))
+    implementation(project(":core:database"))
     implementation(project(":core:datastore"))
 
     implementation(platform(libs.firebase.bom))

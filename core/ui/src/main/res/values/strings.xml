@@ -7,4 +7,22 @@
     <string name="core_ui_error_server">Something went wrong on our side. Please try again shortly.</string>
     <string name="core_ui_error_unknown">Something went wrong. Please try again.</string>
     <string name="core_ui_error_rate_limited">Too many attempts. Please wait a few minutes and try again.</string>
+
+    <!-- Service categories (labels for categories the app knows; others use the server name) -->
+    <string name="core_ui_category_electrician">Electrician</string>
+    <string name="core_ui_category_plumber">Plumber</string>
+    <string name="core_ui_category_carpenter">Carpenter</string>
+    <string name="core_ui_category_painter">Painter</string>
+    <string name="core_ui_category_cleaning">Cleaning</string>
+    <string name="core_ui_category_appliance_repair">Appliance repair</string>
+    <string name="core_ui_category_ac_repair">AC repair</string>
+    <string name="core_ui_category_pest_control">Pest control</string>
+
+    <!-- Prices. %1$s is a formatted amount such as ₹199 -->
+    <string name="core_ui_price_from">from %1$s</string>
+    <string name="core_ui_price_per_visit">/visit</string>
+    <string name="core_ui_price_per_hour">/hour</string>
+    <string name="core_ui_price_per_job">/job</string>
+
+    <string name="core_ui_worker_available">Available</string>
 </resources>

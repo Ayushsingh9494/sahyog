@@ -29,6 +29,7 @@ include(":app")
 
 include(":core:common")
 include(":core:data")
+include(":core:database")
 include(":core:datastore")
 include(":core:designsystem")
 include(":core:model")
@@ -37,4 +38,5 @@ include(":core:ui")
 
 include(":feature:account")
 include(":feature:auth")
+include(":feature:discovery")
 include(":feature:onboarding")

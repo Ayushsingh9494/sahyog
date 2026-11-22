@@ -83,7 +83,7 @@ internal fun RoleShell(
  * Standard bottom-nav behaviour: one copy of each tab on the stack, and each tab
  * keeps its own scroll/back-stack state when you switch away and back.
  */
-private fun NavHostController.navigateToTab(route: Any) {
+internal fun NavHostController.navigateToTab(route: Any) {
     navigate(route) {
         popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
