@@ -1,5 +1,6 @@
 package com.sahyog.core.data.worker
 
+import com.sahyog.core.data.booking.NetworkBooking
 import com.sahyog.core.data.catalog.NetworkWorkerService
 import kotlinx.serialization.Serializable
 
@@ -23,6 +24,24 @@ interface WorkerNetworkDataSource {
     suspend fun submitIdDocument(type: String, image: ByteArray, mimeType: String): NetworkWorkerProfile
 
     suspend fun setAvailability(available: Boolean): NetworkWorkerProfile
+
+    /** Every booking assigned to this worker, in any status. */
+    suspend fun fetchJobs(): List<NetworkBooking>
+
+    /** Requested -> Accepted; issues the customer's start code. */
+    suspend fun acceptJob(jobId: String): NetworkBooking
+
+    /** Requested -> Rejected. */
+    suspend fun declineJob(jobId: String): NetworkBooking
+
+    /** Accepted -> WorkerEnRoute, from `JOB_START_WINDOW_HOURS` before the visit. */
+    suspend fun startTrip(jobId: String): NetworkBooking
+
+    /** WorkerEnRoute -> InProgress, only with the code the customer reads out. */
+    suspend fun startJob(jobId: String, startCode: String): NetworkBooking
+
+    /** InProgress -> Completed. */
+    suspend fun completeJob(jobId: String): NetworkBooking
 }
 
 /** Field names used in `AppError.Validation` for worker requests. */
@@ -31,6 +50,10 @@ object WorkerErrorFields {
     const val DOCUMENT = "document"
     const val DOCUMENT_TOO_LARGE = "document_too_large"
     const val NO_PROFILE = "no_profile"
+    const val START_CODE = "start_code"
+
+    /** Trips and jobs can't start long before the booked visit. */
+    const val TOO_EARLY = "too_early"
 }
 
 /**

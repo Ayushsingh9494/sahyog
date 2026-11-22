@@ -68,4 +68,74 @@
     <string name="worker_id_error_photo">We couldn\'t read that photo. Please choose it again.</string>
     <string name="worker_id_error_too_large">That photo is too large. Please choose one under 10 MB.</string>
     <string name="worker_id_error_profile">Please save your worker profile first.</string>
+
+    <!-- Jobs on the home tab -->
+    <string name="worker_section_requests">New requests</string>
+    <string name="worker_section_active">In progress</string>
+    <string name="worker_section_upcoming">Coming up</string>
+    <string name="worker_accept">Accept</string>
+    <string name="worker_customer_unknown">Customer</string>
+
+    <!-- Job detail -->
+    <string name="worker_job_title">Job %1$s</string>
+    <string name="worker_job_requested">New request from %1$s</string>
+    <string name="worker_job_accepted">Accepted. Head out in time for the visit.</string>
+    <string name="worker_job_en_route">On your way to %1$s</string>
+    <string name="worker_job_in_progress">Job in progress</string>
+    <string name="worker_job_completed">Job completed</string>
+    <string name="worker_job_cancelled">The customer cancelled this booking</string>
+    <string name="worker_job_rejected">You declined this request</string>
+    <string name="worker_job_expired">This request expired</string>
+    <string name="worker_job_customer">Customer</string>
+    <string name="worker_job_service">Service</string>
+    <string name="worker_job_price">Price</string>
+    <string name="worker_job_when">When</string>
+    <string name="worker_job_address">Address</string>
+    <string name="worker_job_note">Note</string>
+    <string name="worker_job_decline">Decline</string>
+    <string name="worker_job_start_trip">I\'m on my way</string>
+    <string name="worker_job_start_job">Start job</string>
+    <string name="worker_job_complete">Mark as completed</string>
+    <string name="worker_job_earned">You earned %1$s for this job</string>
+    <string name="worker_decline_confirm_title">Decline this request?</string>
+    <string name="worker_decline_confirm_body">%1$s will be told you can\'t take it, so they can book someone else.</string>
+    <string name="worker_complete_confirm_title">Mark the job as completed?</string>
+    <string name="worker_complete_confirm_body">Only do this when the work is finished and the customer is satisfied.</string>
+    <string name="worker_cancel">Not now</string>
+    <string name="worker_code_title">Enter the start code</string>
+    <string name="worker_code_body">Ask the customer for the 4-digit code shown in their app.</string>
+    <string name="worker_code_error">That code doesn\'t match. Please check with the customer.</string>
+    <string name="worker_job_status_changed">This job changed. Showing the latest status.</string>
+    <string name="worker_done_accept">Job accepted</string>
+    <string name="worker_done_decline">Request declined</string>
+    <string name="worker_done_trip">Customer notified that you\'re on your way</string>
+    <string name="worker_done_start">Job started</string>
+    <string name="worker_done_complete">Job completed. Well done!</string>
+
+    <!-- Schedule -->
+    <string name="worker_schedule_title">Schedule</string>
+    <string name="worker_schedule_empty_title">Nothing scheduled</string>
+    <string name="worker_schedule_empty_message">Jobs you accept will appear here, day by day.</string>
+
+    <!-- Earnings -->
+    <string name="worker_earnings_title">Earnings</string>
+    <string name="worker_earnings_week">This week</string>
+    <string name="worker_earnings_month">This month</string>
+    <string name="worker_earnings_all">All time</string>
+    <plurals name="worker_earnings_jobs">
+        <item quantity="one">%d job</item>
+        <item quantity="other">%d jobs</item>
+    </plurals>
+    <string name="worker_earnings_completed">Completed jobs</string>
+    <string name="worker_earnings_note">Based on your starting prices. Online payments arrive in a later update.</string>
+    <string name="worker_earnings_empty_title">No earnings yet</string>
+    <string name="worker_earnings_empty_message">Completed jobs and what you earned will show here.</string>
+    <!-- e.g. "Tomorrow · 11 AM – 1 PM" -->
+    <string name="worker_when">%1$s · %2$s</string>
+    <string name="worker_code_label">Start code</string>
+    <string name="worker_job_too_early">It\'s too early. You can set off from 3 hours before the visit.</string>
+    <!-- Short status badges on the worker home -->
+    <string name="worker_badge_pending">Under review</string>
+    <string name="worker_badge_verified">Verified</string>
+    <string name="worker_badge_action_needed">Action needed</string>
 </resources>

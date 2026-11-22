@@ -11,9 +11,5 @@
     <!-- Customer -->
 
     <!-- Worker -->
-    <string name="placeholder_schedule_title">आपकी समय-सारणी खाली है</string>
-    <string name="placeholder_schedule_message">अपनी उपलब्धता तय करें और आने वाले काम यहाँ देखें।</string>
-    <string name="placeholder_earnings_title">अभी कोई कमाई नहीं</string>
-    <string name="placeholder_earnings_message">पूरे किए गए कामों के भुगतान यहाँ दिखेंगे।</string>
 
 </resources>

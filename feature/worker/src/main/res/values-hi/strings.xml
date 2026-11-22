@@ -68,4 +68,72 @@
     <string name="worker_id_error_photo">यह फ़ोटो पढ़ी नहीं जा सकी। कृपया दोबारा चुनें।</string>
     <string name="worker_id_error_too_large">यह फ़ोटो बहुत बड़ी है। कृपया 10 MB से छोटी फ़ोटो चुनें।</string>
     <string name="worker_id_error_profile">कृपया पहले अपनी कारीगर प्रोफ़ाइल सेव करें।</string>
+
+    <!-- होम टैब पर काम -->
+    <string name="worker_section_requests">नए अनुरोध</string>
+    <string name="worker_section_active">काम जारी</string>
+    <string name="worker_section_upcoming">आने वाले काम</string>
+    <string name="worker_accept">स्वीकार करें</string>
+    <string name="worker_customer_unknown">ग्राहक</string>
+
+    <!-- काम का विवरण -->
+    <string name="worker_job_title">काम %1$s</string>
+    <string name="worker_job_requested">%1$s का नया अनुरोध</string>
+    <string name="worker_job_accepted">स्वीकार किया। विज़िट के समय से पहले निकलें।</string>
+    <string name="worker_job_en_route">%1$s के पास जा रहे हैं</string>
+    <string name="worker_job_in_progress">काम जारी है</string>
+    <string name="worker_job_completed">काम पूरा हुआ</string>
+    <string name="worker_job_cancelled">ग्राहक ने यह बुकिंग रद्द कर दी</string>
+    <string name="worker_job_rejected">आपने यह अनुरोध अस्वीकार किया</string>
+    <string name="worker_job_expired">इस अनुरोध का समय समाप्त हो गया</string>
+    <string name="worker_job_customer">ग्राहक</string>
+    <string name="worker_job_service">सेवा</string>
+    <string name="worker_job_price">दाम</string>
+    <string name="worker_job_when">कब</string>
+    <string name="worker_job_address">पता</string>
+    <string name="worker_job_note">नोट</string>
+    <string name="worker_job_decline">अस्वीकार करें</string>
+    <string name="worker_job_start_trip">मैं निकल गया हूँ</string>
+    <string name="worker_job_start_job">काम शुरू करें</string>
+    <string name="worker_job_complete">काम पूरा हुआ</string>
+    <string name="worker_job_earned">इस काम से आपकी कमाई %1$s</string>
+    <string name="worker_decline_confirm_title">यह अनुरोध अस्वीकार करें?</string>
+    <string name="worker_decline_confirm_body">%1$s को बताया जाएगा कि आप यह काम नहीं ले सकते, ताकि वे किसी और को बुक कर सकें।</string>
+    <string name="worker_complete_confirm_title">काम पूरा हुआ चिह्नित करें?</string>
+    <string name="worker_complete_confirm_body">ऐसा तभी करें जब काम पूरा हो जाए और ग्राहक संतुष्ट हो।</string>
+    <string name="worker_cancel">अभी नहीं</string>
+    <string name="worker_code_title">शुरुआती कोड डालें</string>
+    <string name="worker_code_body">ग्राहक से उनके ऐप में दिखा 4 अंकों का कोड पूछें।</string>
+    <string name="worker_code_error">यह कोड मेल नहीं खाता। कृपया ग्राहक से दोबारा पूछें।</string>
+    <string name="worker_job_status_changed">इस काम में बदलाव हुआ है। नई स्थिति दिखाई जा रही है।</string>
+    <string name="worker_done_accept">काम स्वीकार किया</string>
+    <string name="worker_done_decline">अनुरोध अस्वीकार किया</string>
+    <string name="worker_done_trip">ग्राहक को बता दिया गया कि आप आ रहे हैं</string>
+    <string name="worker_done_start">काम शुरू हुआ</string>
+    <string name="worker_done_complete">काम पूरा हुआ। शाबाश!</string>
+
+    <!-- शेड्यूल -->
+    <string name="worker_schedule_title">शेड्यूल</string>
+    <string name="worker_schedule_empty_title">कुछ भी तय नहीं है</string>
+    <string name="worker_schedule_empty_message">आपके स्वीकार किए काम यहाँ दिन के हिसाब से दिखेंगे।</string>
+
+    <!-- कमाई -->
+    <string name="worker_earnings_title">कमाई</string>
+    <string name="worker_earnings_week">इस हफ़्ते</string>
+    <string name="worker_earnings_month">इस महीने</string>
+    <string name="worker_earnings_all">अब तक</string>
+    <plurals name="worker_earnings_jobs">
+        <item quantity="one">%d काम</item>
+        <item quantity="other">%d काम</item>
+    </plurals>
+    <string name="worker_earnings_completed">पूरे किए काम</string>
+    <string name="worker_earnings_note">आपके शुरुआती दामों के आधार पर। ऑनलाइन भुगतान आगे के अपडेट में आएगा।</string>
+    <string name="worker_earnings_empty_title">अभी कोई कमाई नहीं</string>
+    <string name="worker_earnings_empty_message">पूरे किए काम और उनकी कमाई यहाँ दिखेगी।</string>
+    <string name="worker_when">%1$s · %2$s</string>
+    <string name="worker_code_label">शुरुआती कोड</string>
+    <string name="worker_job_too_early">अभी बहुत जल्दी है। आप विज़िट से 3 घंटे पहले से निकल सकते हैं।</string>
+    <string name="worker_badge_pending">जाँच जारी</string>
+    <string name="worker_badge_verified">सत्यापित</string>
+    <string name="worker_badge_action_needed">कार्रवाई ज़रूरी</string>
 </resources>

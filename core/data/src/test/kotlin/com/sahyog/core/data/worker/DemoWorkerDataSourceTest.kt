@@ -19,6 +19,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import java.time.LocalDateTime
 
 class DemoWorkerDataSourceTest {
 
@@ -130,6 +131,77 @@ class DemoWorkerDataSourceTest {
         env.bookings.createBooking(request)
         env.now = env.now.plusSeconds(DemoServer.AUTO_ACCEPT_SECONDS * 10)
         assertEquals("Requested", env.bookings.fetchBookings().single().status)
+    }
+
+    /** Ravi verified and listed; Asha books him; ends signed in as Ravi. Returns the job id. */
+    private suspend fun DemoTestEnvironment.bookedJob(): String {
+        workers.saveProfile(input)
+        workers.submitIdDocument("Aadhaar", photo, "image/jpeg")
+        now = now.plusSeconds(DemoServer.AUTO_VERIFY_SECONDS)
+        workers.fetchMyProfile()
+        signIn("asha", "Asha Devi")
+        val booking = bookings.createBooking(
+            NetworkBookingRequest("ravi", "Fan installation", "2026-11-24", 11, "12 Main Road, Model Town"),
+        )
+        signIn("ravi", "Ravi Kumar", setOf(UserRole.Customer, UserRole.Worker))
+        return booking.id
+    }
+
+    @Test
+    fun `full job lifecycle, visible to the customer at every step`() = runTest {
+        val env = env()
+        val jobId = env.bookedJob()
+
+        val request = env.workers.fetchJobs().single()
+        assertEquals("Asha Devi", request.customerName)
+        assertEquals("Requested", request.status)
+
+        val code = env.workers.acceptJob(jobId).startCode!!
+        assertEquals(AppError.Validation(BookingErrorFields.STATUS), errorOf { env.workers.startJob(jobId, code) })
+        // The visit is tomorrow at 11: setting off a day early is refused, 3 hours before is fine.
+        assertEquals(AppError.Validation(WorkerErrorFields.TOO_EARLY), errorOf { env.workers.startTrip(jobId) })
+        env.now = LocalDateTime.of(2026, 11, 24, 8, 0)
+        env.workers.startTrip(jobId)
+        assertEquals(
+            AppError.Validation(WorkerErrorFields.START_CODE),
+            errorOf { env.workers.startJob(jobId, if (code == "1111") "2222" else "1111") },
+        )
+        assertEquals("InProgress", env.workers.startJob(jobId, " $code ").status)
+        env.now = env.now.plusHours(1)
+        val done = env.workers.completeJob(jobId)
+        assertEquals("Completed", done.status)
+        assertEquals(env.clock.millis(), done.completedAtMillis)
+
+        env.signIn("asha", "Asha Devi")
+        assertEquals("Completed", env.bookings.fetchBookings().single().status)
+    }
+
+    @Test
+    fun `customer cannot cancel once the worker is on the way`() = runTest {
+        val env = env()
+        val jobId = env.bookedJob()
+        env.workers.acceptJob(jobId)
+        env.now = LocalDateTime.of(2026, 11, 24, 10, 0)
+        env.workers.startTrip(jobId)
+        env.signIn("asha", "Asha Devi")
+        assertEquals(AppError.Validation(BookingErrorFields.STATUS), errorOf { env.bookings.cancelBooking(jobId) })
+    }
+
+    @Test
+    fun `declined or cancelled jobs can't be accepted`() = runTest {
+        val env = env()
+        val jobId = env.bookedJob()
+        assertEquals("Rejected", env.workers.declineJob(jobId).status)
+        assertEquals(AppError.Validation(BookingErrorFields.STATUS), errorOf { env.workers.acceptJob(jobId) })
+    }
+
+    @Test
+    fun `workers only see and act on their own jobs`() = runTest {
+        val env = env()
+        val jobId = env.bookedJob()
+        env.signIn("other", "Other Worker", setOf(UserRole.Worker))
+        assertTrue(env.workers.fetchJobs().isEmpty())
+        assertEquals(AppError.NotFound, errorOf { env.workers.acceptJob(jobId) })
     }
 
     @Test

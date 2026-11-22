@@ -14,9 +14,5 @@
     <!-- Customer -->
 
     <!-- Worker -->
-    <string name="placeholder_schedule_title">Your schedule is empty</string>
-    <string name="placeholder_schedule_message">Set your availability and see upcoming jobs here.</string>
-    <string name="placeholder_earnings_title">No earnings yet</string>
-    <string name="placeholder_earnings_message">Payments for completed jobs will show up here.</string>
 
 </resources>

@@ -114,7 +114,7 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [ ] Push notifications instead of polling: M11
 - [ ] Payment after completion: M12
 
-## M7: Worker side
+## M7: Worker side ✅
 ### M7a: Worker profile and verification ✅
 - [x] `DemoServer`: one shared pretend backend (single JSON state) behind the demo catalog, booking
       and worker sources; time-based behaviour (sample workers auto-accept, real workers don't;
@@ -131,9 +131,24 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [x] Verified: 136 unit tests, lint 0 errors
 - [x] Verified on device: set up profile → ID via Photo Picker → pending → verified (auto) →
       found in customer search with "New" badge
-### M7b: Jobs
-- [ ] Job requests (accept / decline), active job (on the way → start code → complete)
-- [ ] Schedule tab, Earnings tab
+### M7b: Jobs ✅
+- [x] `core:model`: Job, JobAction + `allowedJobActions()` (lifecycle rules), EarningsSummary,
+      `JOB_START_WINDOW_HOURS` (can't set off or start more than 3 h before the visit)
+- [x] Demo server job API: accept (issues start code), decline, start trip, start job (code must
+      match), complete (records completion time); workers only see their own jobs
+- [x] `core:database` v3: `jobs` table via AutoMigration 2→3; migration tests 1→3 and 2→3
+- [x] `JobRepository` (server-confirmed writes, cached reads, cleared on sign-out)
+- [x] Jobs tab: new requests with inline Accept, in progress, coming up; auto-refresh while visible
+- [x] Job detail: one primary action per step, decline / complete confirmations, start-code dialog
+      (wrong code stays in the dialog), status-changed and too-early messages
+- [x] Schedule tab (by day) and Earnings tab (week / month / all time, completed jobs)
+- [x] All placeholder tabs removed
+- [x] Verified: 149 unit tests, 9 device tests (DAO + migrations), lint 0 errors
+- [x] Verified on device with two accounts: customer books worker → worker accepts → on the way →
+      wrong code refused → right code → complete → earnings ₹300 → customer sees full timeline;
+      starting a next-day job early is refused
+- [ ] Worker availability calendar (fixed 9 AM–9 PM slots for now)
+- [ ] Rejected-verification flow needs the admin side (cooperative dashboard)
 
 ## M8: Location
 - [ ] Permission flow, Maps (key via secrets plugin, restricted), nearby matching

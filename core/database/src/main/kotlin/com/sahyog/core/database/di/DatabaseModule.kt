@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.sahyog.core.database.SahyogDatabase
 import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.dao.CatalogDao
+import com.sahyog.core.database.dao.JobDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +27,7 @@ internal object DatabaseModule {
 
     @Provides
     fun providesBookingDao(database: SahyogDatabase): BookingDao = database.bookingDao()
+
+    @Provides
+    fun providesJobDao(database: SahyogDatabase): JobDao = database.jobDao()
 }

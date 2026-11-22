@@ -9,6 +9,7 @@ import com.sahyog.core.data.catalog.CatalogNetworkDataSource
 import com.sahyog.core.data.catalog.DemoCatalogDataSource
 import com.sahyog.core.data.catalog.OfflineFirstCatalogRepository
 import com.sahyog.core.data.repository.CatalogRepository
+import com.sahyog.core.data.repository.JobRepository
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.data.repository.LocalProfileUserRepository
@@ -18,6 +19,7 @@ import com.sahyog.core.data.repository.UserRepository
 import com.sahyog.core.data.repository.WorkerProfileRepository
 import com.sahyog.core.data.worker.DefaultWorkerProfileRepository
 import com.sahyog.core.data.worker.DemoWorkerDataSource
+import com.sahyog.core.data.worker.OfflineFirstJobRepository
 import com.sahyog.core.data.worker.WorkerNetworkDataSource
 import com.sahyog.core.data.session.UserDataCleaner
 import dagger.Binds
@@ -74,6 +76,14 @@ internal interface DataModule {
     @Binds
     @IntoSet
     fun bindsWorkerProfileCleaner(impl: DefaultWorkerProfileRepository): UserDataCleaner
+
+    @Binds
+    fun bindsJobRepository(impl: OfflineFirstJobRepository): JobRepository
+
+    /** Cached jobs hold customers' names and addresses: cleared on sign-out. */
+    @Binds
+    @IntoSet
+    fun bindsJobCleaner(impl: OfflineFirstJobRepository): UserDataCleaner
 }
 
 @Module

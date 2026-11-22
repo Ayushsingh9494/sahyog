@@ -12,6 +12,7 @@ import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.testing.MainDispatcherRule
 import com.sahyog.core.testing.TestCatalog
 import com.sahyog.core.testing.TestCatalogRepository
+import com.sahyog.core.testing.TestJobRepository
 import com.sahyog.core.testing.TestWorkerProfileRepository
 import com.sahyog.core.testing.TestWorkerProfiles
 import com.sahyog.feature.worker.home.WorkerHomeUiState
@@ -28,19 +29,24 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 class WorkerOnboardingViewModelsTest {
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     private val workers = TestWorkerProfileRepository()
+    private val jobs = TestJobRepository()
+    private val clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)
     private val catalog = TestCatalogRepository().apply { setCatalog(TestCatalog.categories, emptyList()) }
 
     // --- Home ---
 
     @Test
     fun `home asks a new worker to set up a profile`() = runTest {
-        WorkerHomeViewModel(workers).uiState.test {
+        WorkerHomeViewModel(workers, jobs, clock).uiState.test {
             assertEquals(WorkerHomeUiState.NeedsProfile, awaitNot(WorkerHomeUiState.Loading))
         }
     }
@@ -48,7 +54,7 @@ class WorkerOnboardingViewModelsTest {
     @Test
     fun `home shows the profile and toggles availability`() = runTest {
         workers.serverProfile = TestWorkerProfiles.verified
-        val viewModel = WorkerHomeViewModel(workers)
+        val viewModel = WorkerHomeViewModel(workers, jobs, clock)
         viewModel.uiState.test {
             val ready = awaitNot(WorkerHomeUiState.Loading) as WorkerHomeUiState.Ready
             assertTrue(ready.profile.isAvailable)
@@ -62,7 +68,7 @@ class WorkerOnboardingViewModelsTest {
     @Test
     fun `home load failure shows an error, retry recovers`() = runTest {
         workers.refreshResult = AppResult.Failure(AppError.Network)
-        val viewModel = WorkerHomeViewModel(workers)
+        val viewModel = WorkerHomeViewModel(workers, jobs, clock)
         viewModel.uiState.test {
             assertEquals(WorkerHomeUiState.Error(AppError.Network), awaitNot(WorkerHomeUiState.Loading))
             workers.refreshResult = AppResult.Success(Unit)

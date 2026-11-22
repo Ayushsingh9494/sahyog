@@ -5,6 +5,7 @@ import com.sahyog.core.model.AuthSession
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.IdDocumentType
+import com.sahyog.core.model.Job
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
@@ -145,4 +146,29 @@ interface WorkerProfileRepository {
 
     /** "Accepting jobs" switch, shown to customers as availability. */
     suspend fun setAvailability(available: Boolean): AppResult<WorkerProfile>
+}
+
+/**
+ * Jobs assigned to the signed-in worker. Each action is one step of the job lifecycle;
+ * the server refuses steps the current status doesn't allow (`AppError.Validation`
+ * with `BookingErrorFields.STATUS`), e.g. accepting a job the customer just cancelled.
+ */
+interface JobRepository {
+    /** Soonest visit first. */
+    val jobs: Flow<List<Job>>
+
+    fun job(id: String): Flow<Job?>
+
+    suspend fun refresh(): AppResult<Unit>
+
+    suspend fun accept(jobId: String): AppResult<Job>
+
+    suspend fun decline(jobId: String): AppResult<Job>
+
+    suspend fun startTrip(jobId: String): AppResult<Job>
+
+    /** Fails with `WorkerErrorFields.START_CODE` if the code doesn't match. */
+    suspend fun startJob(jobId: String, startCode: String): AppResult<Job>
+
+    suspend fun complete(jobId: String): AppResult<Job>
 }

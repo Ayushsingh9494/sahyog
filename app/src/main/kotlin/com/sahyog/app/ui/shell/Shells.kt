@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sahyog.app.R
-import com.sahyog.app.ui.placeholder.PlaceholderTab
 import com.sahyog.core.designsystem.catalog.DesignSystemCatalog
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.ThemePreference
@@ -17,15 +16,15 @@ import com.sahyog.feature.discovery.navigation.HomeRoute
 import com.sahyog.feature.discovery.navigation.SearchRoute
 import com.sahyog.feature.discovery.navigation.discoveryDestinations
 import com.sahyog.feature.discovery.navigation.navigateToWorkerProfile
+import com.sahyog.feature.worker.navigation.WorkerEarningsRoute
 import com.sahyog.feature.worker.navigation.WorkerHomeRoute
+import com.sahyog.feature.worker.navigation.WorkerScheduleRoute
 import com.sahyog.feature.worker.navigation.workerDestinations
 import kotlinx.serialization.Serializable
 
 // Customer tabs come from the features: Home/Search (discovery) and Bookings (booking).
 
-// Worker tabs (Jobs comes from feature:worker)
-@Serializable internal data object WorkerScheduleRoute
-@Serializable internal data object WorkerEarningsRoute
+// Worker tabs come from feature:worker.
 
 // Shared
 @Serializable internal data object AccountRoute
@@ -80,22 +79,6 @@ internal fun WorkerShell(
         ),
     ) { navController ->
         workerDestinations(navController)
-        composable<WorkerScheduleRoute> {
-            PlaceholderTab(
-                titleRes = R.string.tab_schedule,
-                emptyTitleRes = R.string.placeholder_schedule_title,
-                emptyMessageRes = R.string.placeholder_schedule_message,
-                icon = SahyogIcons.Bookings,
-            )
-        }
-        composable<WorkerEarningsRoute> {
-            PlaceholderTab(
-                titleRes = R.string.tab_earnings,
-                emptyTitleRes = R.string.placeholder_earnings_title,
-                emptyMessageRes = R.string.placeholder_earnings_message,
-                icon = SahyogIcons.Star,
-            )
-        }
         sharedDestinations(navController, darkTheme, onThemeChange, showDeveloperOptions)
     }
 }
