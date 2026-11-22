@@ -34,6 +34,7 @@ UI (Compose)  --actions-->  ViewModel  -->  UseCase (only when real logic)  --> 
 | `feature:auth`, `:onboarding`, `:account` | Android lib | Sign-in, first-run profile, account settings | M3 |
 | `feature:discovery` | Android lib | Customer Home, Search, Category, Worker profile | M5 |
 | `feature:booking` | Android lib | Book a service, Bookings tab, Booking detail | M6 |
+| `feature:worker` | Android lib | Worker profile setup, ID verification, Jobs/Schedule/Earnings | M7 |
 | `feature:*` | Android lib | One per feature; never depend on each other (`sahyog.android.feature`) | M3+ |
 
 Modules are created when they first get real content, not as empty shells.
@@ -120,9 +121,13 @@ Room: categories · workers · worker_categories · worker_services
   `@IntoSet`; `FirebaseAuthRepository.signOut()` runs them all (via `dagger.Lazy`, which breaks the
   auth ↔ booking dependency cycle).
 - **Time** comes from an injected `java.time.Clock`, so slot rules are testable.
-- **Demo server** (`DemoBookingDataSource`): per-uid JSON file in app storage that survives sign-out,
-  validates like the real API should, prevents double-booking a worker, auto-accepts after 20 s.
-  Replaced by Retrofit in M10.
+- **Demo server** (`core:data/demo/DemoServer`): one JSON state file in app storage (survives
+  sign-out, like a server DB) shared by the demo catalog, booking and worker sources. Users' names
+  and roles stay in `LocalProfileDataSource`. It validates like the real API should, prevents
+  double-booking, auto-accepts requests for *sample* workers after 20 s (real workers answer
+  themselves), and auto-verifies a worker 30 s after they submit an ID. Replaced by Retrofit in M10.
+- **Identity documents** are never stored by the app or the demo: the picked image is read once,
+  checked, and discarded. Real storage must be server-side, encrypted and access-controlled (M10).
 - **Database migrations:** bump the version, add an `AutoMigration` (or a manual `Migration`),
   and extend `MigrationTest`. Exported schemas live in `core/database/schemas`.
 

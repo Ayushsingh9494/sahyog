@@ -1,5 +1,7 @@
 package com.sahyog.core.data.catalog
 
+import kotlinx.serialization.Serializable
+
 /**
  * Where the service catalog comes from. Implemented by [DemoCatalogDataSource] until
  * the Spring Boot API exists (Milestone 10), when a Retrofit implementation replaces it.
@@ -40,6 +42,7 @@ data class NetworkWorker(
 )
 
 /** @property unit "PerVisit", "PerHour" or "PerJob". */
+@Serializable
 data class NetworkWorkerService(
     val name: String,
     val pricePaise: Long,

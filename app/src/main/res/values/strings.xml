@@ -14,18 +14,9 @@
     <!-- Customer -->
 
     <!-- Worker -->
-    <string name="placeholder_jobs_title">No job requests yet</string>
-    <string name="placeholder_jobs_message">New requests from customers near you will appear here.</string>
     <string name="placeholder_schedule_title">Your schedule is empty</string>
     <string name="placeholder_schedule_message">Set your availability and see upcoming jobs here.</string>
     <string name="placeholder_earnings_title">No earnings yet</string>
     <string name="placeholder_earnings_message">Payments for completed jobs will show up here.</string>
 
-    <!-- Worker verification -->
-    <string name="verification_not_submitted">Verification needed</string>
-    <string name="verification_not_submitted_body">Upload your ID and skill details so the cooperative can verify you. You\'ll start getting jobs once verified.</string>
-    <string name="verification_pending">Verification in progress</string>
-    <string name="verification_pending_body">The cooperative is reviewing your documents. This usually takes 1–2 days.</string>
-    <string name="verification_rejected">Verification unsuccessful</string>
-    <string name="verification_rejected_body">Please check the feedback and resubmit your documents.</string>
 </resources>

@@ -6,11 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.sahyog.app.R
 import com.sahyog.app.ui.placeholder.PlaceholderTab
-import com.sahyog.app.ui.placeholder.WorkerJobsPlaceholder
 import com.sahyog.core.designsystem.catalog.DesignSystemCatalog
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.ThemePreference
-import com.sahyog.core.model.User
 import com.sahyog.feature.account.AccountScreen
 import com.sahyog.feature.booking.navigation.BookingsRoute
 import com.sahyog.feature.booking.navigation.bookingDestinations
@@ -19,12 +17,13 @@ import com.sahyog.feature.discovery.navigation.HomeRoute
 import com.sahyog.feature.discovery.navigation.SearchRoute
 import com.sahyog.feature.discovery.navigation.discoveryDestinations
 import com.sahyog.feature.discovery.navigation.navigateToWorkerProfile
+import com.sahyog.feature.worker.navigation.WorkerHomeRoute
+import com.sahyog.feature.worker.navigation.workerDestinations
 import kotlinx.serialization.Serializable
 
 // Customer tabs come from the features: Home/Search (discovery) and Bookings (booking).
 
-// Worker tabs
-@Serializable internal data object WorkerJobsRoute
+// Worker tabs (Jobs comes from feature:worker)
 @Serializable internal data object WorkerScheduleRoute
 @Serializable internal data object WorkerEarningsRoute
 
@@ -66,14 +65,13 @@ internal fun CustomerShell(
 
 @Composable
 internal fun WorkerShell(
-    user: User,
     darkTheme: Boolean,
     onThemeChange: (ThemePreference) -> Unit,
     showDeveloperOptions: Boolean,
 ) {
     RoleShell(
         tabs = listOf(
-            TopLevelTab(WorkerJobsRoute, R.string.tab_jobs, SahyogIcons.Jobs, SahyogIcons.Jobs),
+            TopLevelTab(WorkerHomeRoute, R.string.tab_jobs, SahyogIcons.Jobs, SahyogIcons.Jobs),
             TopLevelTab(
                 WorkerScheduleRoute, R.string.tab_schedule, SahyogIcons.BookingsOutlined, SahyogIcons.Bookings,
             ),
@@ -81,7 +79,7 @@ internal fun WorkerShell(
             accountTab,
         ),
     ) { navController ->
-        composable<WorkerJobsRoute> { WorkerJobsPlaceholder(user) }
+        workerDestinations(navController)
         composable<WorkerScheduleRoute> {
             PlaceholderTab(
                 titleRes = R.string.tab_schedule,

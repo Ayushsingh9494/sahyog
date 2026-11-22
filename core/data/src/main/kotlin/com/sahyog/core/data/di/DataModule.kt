@@ -15,6 +15,10 @@ import com.sahyog.core.data.repository.LocalProfileUserRepository
 import com.sahyog.core.data.repository.OfflineUserPreferencesRepository
 import com.sahyog.core.data.repository.UserPreferencesRepository
 import com.sahyog.core.data.repository.UserRepository
+import com.sahyog.core.data.repository.WorkerProfileRepository
+import com.sahyog.core.data.worker.DefaultWorkerProfileRepository
+import com.sahyog.core.data.worker.DemoWorkerDataSource
+import com.sahyog.core.data.worker.WorkerNetworkDataSource
 import com.sahyog.core.data.session.UserDataCleaner
 import dagger.Binds
 import dagger.Module
@@ -59,6 +63,17 @@ internal interface DataModule {
     @Binds
     @IntoSet
     fun bindsBookingCleaner(impl: OfflineFirstBookingRepository): UserDataCleaner
+
+    @Binds
+    fun bindsWorkerProfileRepository(impl: DefaultWorkerProfileRepository): WorkerProfileRepository
+
+    /** Demo server until the Spring Boot API exists (M10). */
+    @Binds
+    fun bindsWorkerNetworkDataSource(impl: DemoWorkerDataSource): WorkerNetworkDataSource
+
+    @Binds
+    @IntoSet
+    fun bindsWorkerProfileCleaner(impl: DefaultWorkerProfileRepository): UserDataCleaner
 }
 
 @Module

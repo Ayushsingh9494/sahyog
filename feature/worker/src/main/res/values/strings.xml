@@ -1,0 +1,71 @@
+<resources>
+    <!-- Worker home (Jobs tab) -->
+    <string name="worker_home_title">Jobs</string>
+    <string name="worker_home_error_title">Couldn\'t load your worker profile</string>
+    <string name="worker_setup_title">Set up your worker profile</string>
+    <string name="worker_setup_body">Tell customers what you do and what you charge. Then add an ID so the cooperative can verify you.</string>
+    <string name="worker_setup_action">Set up profile</string>
+    <string name="worker_verify_needed_title">Add your ID to get verified</string>
+    <string name="worker_verify_needed_body">Customers can only find you after the cooperative checks your identity.</string>
+    <string name="worker_verify_needed_action">Add ID</string>
+    <string name="worker_verify_pending_title">Verification in progress</string>
+    <string name="worker_verify_pending_body">The cooperative is checking your ID. This page updates by itself.</string>
+    <string name="worker_verify_rejected_title">Verification unsuccessful</string>
+    <string name="worker_verify_rejected_body">Please submit a clear photo of a valid ID.</string>
+    <string name="worker_verified_title">You\'re verified</string>
+    <string name="worker_verified_body">Customers can now find and book you.</string>
+    <string name="worker_accepting_jobs">Accepting jobs</string>
+    <string name="worker_accepting_jobs_on">Customers see you as available.</string>
+    <string name="worker_accepting_jobs_off">You\'re shown as busy. You can still be booked for later days.</string>
+    <string name="worker_edit_profile">Edit profile and prices</string>
+    <string name="worker_no_jobs_title">No job requests yet</string>
+    <string name="worker_no_jobs_message">New requests from customers will appear here.</string>
+
+    <!-- Worker profile form -->
+    <string name="worker_form_setup_title">Your worker profile</string>
+    <string name="worker_form_edit_title">Edit profile</string>
+    <string name="worker_form_categories">What kind of work do you do?</string>
+    <string name="worker_form_categories_error">Choose 1 to 4 kinds of work.</string>
+    <string name="worker_form_services">Services and starting prices</string>
+    <string name="worker_form_services_hint">Customers see these prices. The final price is agreed before work begins.</string>
+    <string name="worker_form_service_name">Service</string>
+    <string name="worker_form_service_name_placeholder">e.g. Fan installation</string>
+    <string name="worker_form_service_price">Price (₹)</string>
+    <string name="worker_form_service_error">Enter a name (3–40 letters) and a price from ₹50 to ₹50,000. Names must be different.</string>
+    <string name="worker_form_add_service">Add another service</string>
+    <string name="worker_form_remove_service">Remove service</string>
+    <string name="worker_form_unit_visit">Per visit</string>
+    <string name="worker_form_unit_hour">Per hour</string>
+    <string name="worker_form_unit_job">Per job</string>
+    <string name="worker_form_about">About you (optional)</string>
+    <string name="worker_form_about_placeholder">Your experience, specialities, tools you bring</string>
+    <string name="worker_form_locality">Area you work from</string>
+    <string name="worker_form_locality_placeholder">e.g. Model Town</string>
+    <string name="worker_form_locality_error">Enter your area (at least 3 letters).</string>
+    <string name="worker_form_languages">Languages you speak</string>
+    <string name="worker_form_languages_error">Choose at least one language.</string>
+    <string name="worker_form_years">Years of experience</string>
+    <string name="worker_form_years_error">Enter a number from 0 to 60.</string>
+    <string name="worker_form_save">Save and continue</string>
+    <string name="worker_form_save_edit">Save changes</string>
+    <string name="worker_form_saved">Profile saved</string>
+
+    <!-- ID verification -->
+    <string name="worker_id_title">Verify your identity</string>
+    <string name="worker_id_intro">Add a clear photo of one ID. The cooperative uses it only to confirm who you are.</string>
+    <string name="worker_id_type">Which ID?</string>
+    <string name="worker_id_aadhaar">Aadhaar card</string>
+    <string name="worker_id_voter">Voter ID</string>
+    <string name="worker_id_driving">Driving licence</string>
+    <string name="worker_id_pan">PAN card</string>
+    <string name="worker_id_photo">Photo of the ID</string>
+    <string name="worker_id_choose_photo">Choose photo</string>
+    <string name="worker_id_change_photo">Change photo</string>
+    <string name="worker_id_photo_added">Photo added</string>
+    <string name="worker_id_aadhaar_tip">Tip: For Aadhaar, you can cover the first 8 digits. Only the last 4 are needed.</string>
+    <string name="worker_id_submit">Submit for verification</string>
+    <string name="worker_id_submitted">ID submitted for verification</string>
+    <string name="worker_id_error_photo">We couldn\'t read that photo. Please choose it again.</string>
+    <string name="worker_id_error_too_large">That photo is too large. Please choose one under 10 MB.</string>
+    <string name="worker_id_error_profile">Please save your worker profile first.</string>
+</resources>

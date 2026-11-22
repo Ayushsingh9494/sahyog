@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":feature:booking"))
     implementation(project(":feature:discovery"))
     implementation(project(":feature:onboarding"))
+    implementation(project(":feature:worker"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)

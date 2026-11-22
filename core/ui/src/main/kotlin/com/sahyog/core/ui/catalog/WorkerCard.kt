@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sahyog.core.designsystem.component.SahyogAvatar
 import com.sahyog.core.designsystem.component.SahyogCard
-import com.sahyog.core.designsystem.component.SahyogRatingSummary
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.StatusTone
 import com.sahyog.core.designsystem.icon.SahyogIcons
@@ -60,7 +59,7 @@ fun WorkerCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                SahyogRatingSummary(rating = worker.rating, reviewCount = worker.ratingCount)
+                WorkerRating(worker)
             }
             if (worker.isAvailable) {
                 Spacer(Modifier.width(SahyogSpacing.sm))

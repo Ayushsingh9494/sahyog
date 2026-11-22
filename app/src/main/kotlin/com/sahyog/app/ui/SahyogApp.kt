@@ -65,7 +65,6 @@ fun SahyogApp(
                             showDeveloperOptions = showDeveloperOptions,
                         )
                         UserRole.Worker -> WorkerShell(
-                            user = state.user,
                             darkTheme = darkTheme,
                             onThemeChange = onThemeChange,
                             showDeveloperOptions = showDeveloperOptions,

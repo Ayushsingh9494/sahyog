@@ -35,7 +35,6 @@ import com.sahyog.core.designsystem.component.SahyogButton
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogLoadingView
-import com.sahyog.core.designsystem.component.SahyogRatingSummary
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.component.StatusTone
@@ -48,6 +47,7 @@ import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerService
+import com.sahyog.core.ui.catalog.WorkerRating
 import com.sahyog.core.ui.catalog.categoryLabel
 import com.sahyog.core.ui.catalog.formatRupees
 import com.sahyog.core.ui.catalog.priceUnitSuffix
@@ -199,7 +199,7 @@ private fun StatsRow(worker: Worker) {
     SahyogCard(modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth()) {
             StatCell(label = stringResource(R.string.discovery_worker_rating), modifier = Modifier.weight(1f)) {
-                SahyogRatingSummary(rating = worker.rating, reviewCount = worker.ratingCount)
+                WorkerRating(worker)
             }
             StatCell(
                 label = stringResource(R.string.discovery_worker_jobs),

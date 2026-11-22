@@ -1,15 +1,9 @@
 package com.sahyog.core.data.booking
 
 import com.sahyog.core.common.result.AppError
-import com.sahyog.core.data.catalog.CatalogNetworkDataSource
-import com.sahyog.core.data.catalog.NetworkCatalog
-import com.sahyog.core.data.catalog.NetworkCategory
-import com.sahyog.core.data.catalog.NetworkWorker
-import com.sahyog.core.data.catalog.NetworkWorkerService
+import com.sahyog.core.data.demo.DemoServer
+import com.sahyog.core.data.demo.DemoTestEnvironment
 import com.sahyog.core.data.network.ApiException
-import com.sahyog.core.model.AuthSession
-import com.sahyog.core.testing.TestAuthRepository
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,44 +12,15 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.time.Clock
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import kotlin.random.Random
 
 class DemoBookingDataSourceTest {
 
     @get:Rule val tmp = TemporaryFolder()
 
-    private val testZone: ZoneId = ZoneOffset.UTC
-    private var now: LocalDateTime = LocalDateTime.of(2026, 11, 23, 8, 0)
-    private val clock = object : Clock() {
-        override fun getZone(): ZoneId = testZone
-        override fun withZone(zone: ZoneId?): Clock = this
-        override fun instant(): Instant = now.toInstant(ZoneOffset.UTC)
-    }
-
-    private val auth = TestAuthRepository().apply { setSession(AuthSession("u1", "9876543210")) }
-
-    private val catalog = object : CatalogNetworkDataSource {
-        override suspend fun fetchCatalog() = NetworkCatalog(
-            categories = listOf(NetworkCategory("electrician", "Electrician", emptyList())),
-            workers = listOf(
-                NetworkWorker(
-                    id = "w1", name = "Ramesh Kumar", categoryIds = listOf("electrician"),
-                    rating = 4.8f, ratingCount = 1, jobsCompleted = 1, yearsExperience = 1,
-                    locality = "Model Town", about = "", languages = emptyList(),
-                    services = listOf(NetworkWorkerService("Fan installation", 19_900, "PerVisit")),
-                    isAvailable = true,
-                ),
-            ),
-        )
-    }
-
+    /** Fictional catalog worker "Ramesh Kumar" (w-ramesh) offers "Fan installation" at ₹199. */
     private val request = NetworkBookingRequest(
-        workerId = "w1",
+        workerId = "w-ramesh",
         serviceName = "Fan installation",
         slotDate = "2026-11-23",
         slotStartHour = 11,
@@ -63,51 +28,45 @@ class DemoBookingDataSourceTest {
         note = "  ",
     )
 
-    private fun TestScope.source() = DemoBookingDataSource(
-        storeFile = tmp.root.resolve("bookings.json"),
-        authRepository = auth,
-        catalog = catalog,
-        clock = clock,
-        ioDispatcher = StandardTestDispatcher(testScheduler),
-        random = Random(42),
-        latencyMs = 0,
-    )
+    private suspend fun TestScope.env() = DemoTestEnvironment(tmp, this).apply { signIn("u1", "Asha Devi") }
 
     @Test
-    fun `creates a requested booking with the server price, trimmed input and no blank note`() = runTest {
-        val booking = source().createBooking(request)
+    fun `creates a requested booking with the server price, trimmed input and the customer name`() = runTest {
+        val env = env()
+        val booking = env.bookings.createBooking(request)
         assertEquals("Requested", booking.status)
         assertEquals(19_900, booking.pricePaise)
         assertEquals("12 Main Road, Model Town", booking.address)
+        assertEquals("Asha Devi", booking.customerName)
         assertNull(booking.note)
-        assertEquals(listOf(booking), source().fetchBookings())
+        assertEquals(listOf(booking), env.bookings.fetchBookings())
     }
 
     @Test
-    fun `worker accepts after the delay and a start code is issued`() = runTest {
-        val source = source()
-        source.createBooking(request)
-        now = now.plusSeconds(DemoBookingDataSource.AUTO_ACCEPT_SECONDS - 1)
-        assertEquals("Requested", source.fetchBookings().single().status)
+    fun `sample worker accepts after the delay and a start code is issued`() = runTest {
+        val env = env()
+        env.bookings.createBooking(request)
+        env.now = env.now.plusSeconds(DemoServer.AUTO_ACCEPT_SECONDS - 1)
+        assertEquals("Requested", env.bookings.fetchBookings().single().status)
 
-        now = now.plusSeconds(1)
-        val accepted = source.fetchBookings().single()
+        env.now = env.now.plusSeconds(1)
+        val accepted = env.bookings.fetchBookings().single()
         assertEquals("Accepted", accepted.status)
         assertEquals(4, accepted.startCode?.length)
     }
 
     @Test
     fun `unaccepted request expires once its slot starts`() = runTest {
-        val source = source()
-        source.createBooking(request.copy(slotStartHour = 9))
+        val env = env()
+        env.bookings.createBooking(request.copy(slotStartHour = 9))
         // Nobody read it (so nothing accepted it) before the visit was due.
-        now = LocalDateTime.of(2026, 11, 23, 9, 0)
-        assertEquals("Expired", source.fetchBookings().single().status)
+        env.now = LocalDateTime.of(2026, 11, 23, 9, 0)
+        assertEquals("Expired", env.bookings.fetchBookings().single().status)
     }
 
     @Test
     fun `rejects unknown worker, unknown service, past slot and short address`() = runTest {
-        val source = source()
+        val source = env().bookings
         assertValidation(BookingErrorFields.WORKER) { source.createBooking(request.copy(workerId = "nobody")) }
         assertValidation(BookingErrorFields.SERVICE) { source.createBooking(request.copy(serviceName = "Painting")) }
         assertValidation(BookingErrorFields.SLOT) { source.createBooking(request.copy(slotStartHour = 7)) }
@@ -117,43 +76,49 @@ class DemoBookingDataSourceTest {
 
     @Test
     fun `a worker cannot be double booked, even by another customer`() = runTest {
-        source().createBooking(request)
-        auth.setSession(AuthSession("u2", "9123456789"))
-        assertValidation(BookingErrorFields.SLOT_TAKEN) { source().createBooking(request) }
+        val env = env()
+        env.bookings.createBooking(request)
+        env.signIn("u2")
+        assertValidation(BookingErrorFields.SLOT_TAKEN) { env.bookings.createBooking(request) }
     }
 
     @Test
     fun `bookings are private to each user`() = runTest {
-        source().createBooking(request)
-        auth.setSession(AuthSession("u2", "9123456789"))
-        assertEquals(emptyList<NetworkBooking>(), source().fetchBookings())
+        val env = env()
+        env.bookings.createBooking(request)
+        env.signIn("u2")
+        assertEquals(emptyList<NetworkBooking>(), env.bookings.fetchBookings())
     }
 
     @Test
-    fun `cancel is allowed while requested, then refused`() = runTest {
-        val source = source()
+    fun `cancel is allowed while requested, then refused, and frees the slot`() = runTest {
+        val source = env().bookings
         val booking = source.createBooking(request)
         assertEquals("Cancelled", source.cancelBooking(booking.id).status)
         assertValidation(BookingErrorFields.STATUS) { source.cancelBooking(booking.id) }
-        // Cancelling frees the slot for others.
         assertNotNull(source.createBooking(request))
     }
 
     @Test
-    fun `cancelling an unknown booking is not found`() = runTest {
-        val error = runCatching { source().cancelBooking("SH-NOPE") }.exceptionOrNull() as ApiException
-        assertEquals(AppError.NotFound, error.error)
+    fun `cancelling someone else's or an unknown booking is not found`() = runTest {
+        val env = env()
+        val booking = env.bookings.createBooking(request)
+        env.signIn("u2")
+        assertEquals(AppError.NotFound, errorOf { env.bookings.cancelBooking(booking.id) })
+        assertEquals(AppError.NotFound, errorOf { env.bookings.cancelBooking("SH-NOPE") })
     }
 
     @Test
     fun `signed out requests are unauthorized`() = runTest {
-        auth.setSession(null)
-        val error = runCatching { source().fetchBookings() }.exceptionOrNull() as ApiException
-        assertEquals(AppError.Unauthorized, error.error)
+        val env = env()
+        env.signOut()
+        assertEquals(AppError.Unauthorized, errorOf { env.bookings.fetchBookings() })
     }
 
+    private suspend fun errorOf(block: suspend () -> Unit): AppError =
+        (runCatching { block() }.exceptionOrNull() as ApiException).error
+
     private suspend fun assertValidation(field: String, block: suspend () -> Unit) {
-        val error = runCatching { block() }.exceptionOrNull()
-        assertEquals(AppError.Validation(field), (error as ApiException).error)
+        assertEquals(AppError.Validation(field), errorOf(block))
     }
 }

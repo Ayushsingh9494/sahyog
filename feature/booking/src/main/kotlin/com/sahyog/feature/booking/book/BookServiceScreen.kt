@@ -47,7 +47,6 @@ import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogFilterChip
 import com.sahyog.core.designsystem.component.SahyogLoadingView
-import com.sahyog.core.designsystem.component.SahyogRatingSummary
 import com.sahyog.core.designsystem.component.SahyogTextField
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.theme.SahyogElevation
@@ -58,6 +57,7 @@ import com.sahyog.core.model.WorkerService
 import com.sahyog.core.ui.ObserveAsEvents
 import com.sahyog.core.ui.booking.formatBookingDate
 import com.sahyog.core.ui.booking.formatSlotTime
+import com.sahyog.core.ui.catalog.WorkerRating
 import com.sahyog.core.ui.catalog.formatRupees
 import com.sahyog.core.ui.catalog.priceUnitSuffix
 import com.sahyog.feature.booking.R
@@ -155,7 +155,7 @@ private fun BookingForm(form: BookServiceUiState.Form, actions: BookServiceActio
                 Spacer(Modifier.width(SahyogSpacing.md))
                 Column {
                     Text(form.worker.name, style = SahyogTheme.typography.titleMedium)
-                    SahyogRatingSummary(rating = form.worker.rating, reviewCount = form.worker.ratingCount)
+                    WorkerRating(form.worker)
                 }
             }
         }

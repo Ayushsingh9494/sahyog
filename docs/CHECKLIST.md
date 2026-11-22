@@ -115,7 +115,25 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [ ] Payment after completion: M12
 
 ## M7: Worker side
-- [ ] Onboarding / skills, document upload, availability, job requests, active job, earnings
+### M7a: Worker profile and verification ✅
+- [x] `DemoServer`: one shared pretend backend (single JSON state) behind the demo catalog, booking
+      and worker sources; time-based behaviour (sample workers auto-accept, real workers don't;
+      auto-verify 30 s after an ID is submitted; unaccepted requests expire)
+- [x] `core:model`: WorkerProfile, WorkerProfileInput (validation shared by form and server), IdDocumentType
+- [x] `WorkerProfileRepository` (+ `UserDataCleaner`), `WorkerNetworkDataSource`, `DemoWorkerDataSource`
+- [x] ID photo via system Photo Picker (no storage permission); validated (image, ≤ 10 MB) then
+      discarded — the demo never stores identity documents
+- [x] Verified real workers appear in the customer catalog; unreviewed workers show "New", not 0.0
+- [x] Workers can't book themselves
+- [x] `feature:worker`: Jobs tab (setup / verification states, auto-refresh while pending, "Accepting
+      jobs" switch), profile form (categories, services and prices, area, experience, languages,
+      about), ID verification
+- [x] Verified: 136 unit tests, lint 0 errors
+- [x] Verified on device: set up profile → ID via Photo Picker → pending → verified (auto) →
+      found in customer search with "New" badge
+### M7b: Jobs
+- [ ] Job requests (accept / decline), active job (on the way → start code → complete)
+- [ ] Schedule tab, Earnings tab
 
 ## M8: Location
 - [ ] Permission flow, Maps (key via secrets plugin, restricted), nearby matching

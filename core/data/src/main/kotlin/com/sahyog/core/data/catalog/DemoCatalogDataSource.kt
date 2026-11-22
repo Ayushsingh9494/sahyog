@@ -1,23 +1,49 @@
 package com.sahyog.core.data.catalog
 
+import com.sahyog.core.data.demo.DemoServer
+import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.CategoryIds
-import kotlinx.coroutines.delay
+import com.sahyog.core.model.WorkerVerificationStatus
 import javax.inject.Inject
 
 /**
- * TEMPORARY catalog source with realistic sample data, standing in for the backend
- * until Milestone 10. It simulates network latency so loading states are exercised.
- * All people and numbers here are fictional.
+ * TEMPORARY catalog source, standing in for the backend until Milestone 10.
+ *
+ * Returns fictional sample workers plus every real user whose worker profile the
+ * (demo) cooperative has verified, so a worker account set up in the app can be
+ * found and booked by customers. All sample people and numbers are fictional.
  */
-internal class DemoCatalogDataSource @Inject constructor() : CatalogNetworkDataSource {
+internal class DemoCatalogDataSource @Inject constructor(
+    private val server: DemoServer,
+) : CatalogNetworkDataSource {
 
-    override suspend fun fetchCatalog(): NetworkCatalog {
-        delay(SIMULATED_LATENCY_MS)
-        return NetworkCatalog(categories = categories, workers = workers)
+    override suspend fun fetchCatalog(): NetworkCatalog = server.publicCall {
+        val realWorkers = state.workers
+            .filterValues { it.status == WorkerVerificationStatus.Verified.name }
+            .mapNotNull { (uid, profile) ->
+                val name = userName(uid) ?: return@mapNotNull null
+                NetworkWorker(
+                    id = uid,
+                    name = name,
+                    categoryIds = profile.categoryIds,
+                    // Ratings arrive with reviews (M9); new members start unrated.
+                    rating = 0f,
+                    ratingCount = 0,
+                    jobsCompleted = state.bookings.count {
+                        it.booking.workerId == uid && it.booking.status == BookingStatus.Completed.name
+                    },
+                    yearsExperience = profile.yearsExperience,
+                    locality = profile.locality,
+                    about = profile.about,
+                    languages = profile.languages,
+                    services = profile.services,
+                    isAvailable = profile.isAvailable,
+                )
+            }
+        NetworkCatalog(categories = categories, workers = sampleWorkers + realWorkers)
     }
 
     private companion object {
-        const val SIMULATED_LATENCY_MS = 700L
 
         val categories = listOf(
             NetworkCategory(
@@ -57,7 +83,7 @@ internal class DemoCatalogDataSource @Inject constructor() : CatalogNetworkDataS
         private fun service(name: String, rupees: Long, unit: String = "PerVisit") =
             NetworkWorkerService(name, rupees * 100, unit)
 
-        val workers = listOf(
+        val sampleWorkers = listOf(
             NetworkWorker(
                 id = "w-ramesh", name = "Ramesh Kumar",
                 categoryIds = listOf(CategoryIds.ELECTRICIAN, CategoryIds.APPLIANCE_REPAIR),

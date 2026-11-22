@@ -39,4 +39,5 @@
     <string name="core_ui_booking_status_cancelled">रद्द</string>
     <string name="core_ui_booking_status_rejected">अस्वीकार</string>
     <string name="core_ui_booking_status_expired">समय समाप्त</string>
+    <string name="core_ui_worker_new">नया</string>
 </resources>

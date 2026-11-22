@@ -41,4 +41,6 @@
     <string name="core_ui_booking_status_cancelled">Cancelled</string>
     <string name="core_ui_booking_status_rejected">Declined</string>
     <string name="core_ui_booking_status_expired">Expired</string>
+    <!-- Badge for a worker with no reviews yet -->
+    <string name="core_ui_worker_new">New</string>
 </resources>

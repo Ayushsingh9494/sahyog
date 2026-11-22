@@ -54,6 +54,14 @@ class LocalProfileDataSource @Inject constructor(
         }
     }
 
+    /** The cooperative's verification decision for a worker (set by the demo server). */
+    suspend fun updateWorkerStatus(uid: String, status: WorkerVerificationStatus) {
+        val keys = Keys(uid)
+        dataStore.edit { prefs ->
+            if (prefs[keys.name] != null) prefs[keys.workerStatus] = status.name
+        }
+    }
+
     private class Keys(uid: String) {
         val name = stringPreferencesKey("$uid.name")
         val roles = stringSetPreferencesKey("$uid.roles")

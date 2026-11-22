@@ -1,0 +1,71 @@
+<resources>
+    <!-- कारीगर होम (काम टैब) -->
+    <string name="worker_home_title">काम</string>
+    <string name="worker_home_error_title">आपकी कारीगर प्रोफ़ाइल लोड नहीं हो सकी</string>
+    <string name="worker_setup_title">अपनी कारीगर प्रोफ़ाइल बनाएँ</string>
+    <string name="worker_setup_body">ग्राहकों को बताएँ कि आप क्या काम करते हैं और कितना लेते हैं। फिर पहचान पत्र जोड़ें ताकि सहकारी समिति आपको सत्यापित कर सके।</string>
+    <string name="worker_setup_action">प्रोफ़ाइल बनाएँ</string>
+    <string name="worker_verify_needed_title">सत्यापन के लिए अपना पहचान पत्र जोड़ें</string>
+    <string name="worker_verify_needed_body">सहकारी समिति आपकी पहचान जाँचने के बाद ही ग्राहक आपको ढूँढ पाएँगे।</string>
+    <string name="worker_verify_needed_action">पहचान पत्र जोड़ें</string>
+    <string name="worker_verify_pending_title">सत्यापन जारी है</string>
+    <string name="worker_verify_pending_body">सहकारी समिति आपका पहचान पत्र जाँच रही है। यह पेज अपने-आप अपडेट होता है।</string>
+    <string name="worker_verify_rejected_title">सत्यापन सफल नहीं हुआ</string>
+    <string name="worker_verify_rejected_body">कृपया किसी मान्य पहचान पत्र की साफ़ फ़ोटो भेजें।</string>
+    <string name="worker_verified_title">आप सत्यापित हैं</string>
+    <string name="worker_verified_body">अब ग्राहक आपको ढूँढकर बुक कर सकते हैं।</string>
+    <string name="worker_accepting_jobs">काम ले रहे हैं</string>
+    <string name="worker_accepting_jobs_on">ग्राहकों को आप उपलब्ध दिखते हैं।</string>
+    <string name="worker_accepting_jobs_off">आप व्यस्त दिख रहे हैं। आगे के दिनों के लिए अब भी बुक किए जा सकते हैं।</string>
+    <string name="worker_edit_profile">प्रोफ़ाइल और दाम बदलें</string>
+    <string name="worker_no_jobs_title">अभी कोई काम का अनुरोध नहीं</string>
+    <string name="worker_no_jobs_message">ग्राहकों के नए अनुरोध यहाँ दिखेंगे।</string>
+
+    <!-- कारीगर प्रोफ़ाइल फ़ॉर्म -->
+    <string name="worker_form_setup_title">आपकी कारीगर प्रोफ़ाइल</string>
+    <string name="worker_form_edit_title">प्रोफ़ाइल बदलें</string>
+    <string name="worker_form_categories">आप किस तरह का काम करते हैं?</string>
+    <string name="worker_form_categories_error">1 से 4 तरह के काम चुनें।</string>
+    <string name="worker_form_services">सेवाएँ और शुरुआती दाम</string>
+    <string name="worker_form_services_hint">ग्राहक ये दाम देखते हैं। अंतिम दाम काम शुरू होने से पहले तय होता है।</string>
+    <string name="worker_form_service_name">सेवा</string>
+    <string name="worker_form_service_name_placeholder">जैसे: पंखा लगाना</string>
+    <string name="worker_form_service_price">दाम (₹)</string>
+    <string name="worker_form_service_error">नाम (3–40 अक्षर) और ₹50 से ₹50,000 तक का दाम लिखें। सभी नाम अलग होने चाहिए।</string>
+    <string name="worker_form_add_service">एक और सेवा जोड़ें</string>
+    <string name="worker_form_remove_service">सेवा हटाएँ</string>
+    <string name="worker_form_unit_visit">प्रति विज़िट</string>
+    <string name="worker_form_unit_hour">प्रति घंटा</string>
+    <string name="worker_form_unit_job">प्रति काम</string>
+    <string name="worker_form_about">आपके बारे में (वैकल्पिक)</string>
+    <string name="worker_form_about_placeholder">आपका अनुभव, खासियत, साथ लाए जाने वाले औज़ार</string>
+    <string name="worker_form_locality">आप किस इलाके से काम करते हैं</string>
+    <string name="worker_form_locality_placeholder">जैसे: मॉडल टाउन</string>
+    <string name="worker_form_locality_error">अपना इलाका लिखें (कम से कम 3 अक्षर)।</string>
+    <string name="worker_form_languages">आप कौन-सी भाषाएँ बोलते हैं</string>
+    <string name="worker_form_languages_error">कम से कम एक भाषा चुनें।</string>
+    <string name="worker_form_years">अनुभव (साल)</string>
+    <string name="worker_form_years_error">0 से 60 के बीच कोई संख्या लिखें।</string>
+    <string name="worker_form_save">सेव करें और आगे बढ़ें</string>
+    <string name="worker_form_save_edit">बदलाव सेव करें</string>
+    <string name="worker_form_saved">प्रोफ़ाइल सेव हो गई</string>
+
+    <!-- पहचान सत्यापन -->
+    <string name="worker_id_title">अपनी पहचान सत्यापित करें</string>
+    <string name="worker_id_intro">किसी एक पहचान पत्र की साफ़ फ़ोटो जोड़ें। सहकारी समिति इसका उपयोग सिर्फ़ आपकी पहचान की पुष्टि के लिए करती है।</string>
+    <string name="worker_id_type">कौन-सा पहचान पत्र?</string>
+    <string name="worker_id_aadhaar">आधार कार्ड</string>
+    <string name="worker_id_voter">वोटर आईडी</string>
+    <string name="worker_id_driving">ड्राइविंग लाइसेंस</string>
+    <string name="worker_id_pan">पैन कार्ड</string>
+    <string name="worker_id_photo">पहचान पत्र की फ़ोटो</string>
+    <string name="worker_id_choose_photo">फ़ोटो चुनें</string>
+    <string name="worker_id_change_photo">फ़ोटो बदलें</string>
+    <string name="worker_id_photo_added">फ़ोटो जुड़ गई</string>
+    <string name="worker_id_aadhaar_tip">सुझाव: आधार के पहले 8 अंक ढक सकते हैं। सिर्फ़ आखिरी 4 अंक चाहिए।</string>
+    <string name="worker_id_submit">सत्यापन के लिए भेजें</string>
+    <string name="worker_id_submitted">पहचान पत्र सत्यापन के लिए भेज दिया गया</string>
+    <string name="worker_id_error_photo">यह फ़ोटो पढ़ी नहीं जा सकी। कृपया दोबारा चुनें।</string>
+    <string name="worker_id_error_too_large">यह फ़ोटो बहुत बड़ी है। कृपया 10 MB से छोटी फ़ोटो चुनें।</string>
+    <string name="worker_id_error_profile">कृपया पहले अपनी कारीगर प्रोफ़ाइल सेव करें।</string>
+</resources>

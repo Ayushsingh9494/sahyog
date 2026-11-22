@@ -30,6 +30,7 @@ object BookingErrorFields {
 /**
  * @property slotDate ISO date, e.g. "2026-11-24".
  * @property createdAtMillis Server time the booking was created.
+ * @property customerName Shown to the worker; null in older records.
  */
 @Serializable
 data class NetworkBooking(
@@ -46,6 +47,7 @@ data class NetworkBooking(
     val status: String,
     val startCode: String? = null,
     val createdAtMillis: Long,
+    val customerName: String? = null,
 )
 
 @Serializable

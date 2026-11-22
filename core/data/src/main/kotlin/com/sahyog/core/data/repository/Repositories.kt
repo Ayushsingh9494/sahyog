@@ -4,13 +4,17 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.model.AuthSession
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.IdDocumentType
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
 import com.sahyog.core.model.UserRole
 import com.sahyog.core.model.Worker
+import com.sahyog.core.model.WorkerProfile
+import com.sahyog.core.model.WorkerProfileInput
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /** Outcome of asking for a verification code. */
 sealed interface OtpRequestResult {
@@ -111,4 +115,34 @@ interface BookingRepository {
 
     /** Address from the most recent booking, to pre-fill the next one. */
     suspend fun lastUsedAddress(): String?
+}
+
+sealed interface WorkerProfileState {
+    /** Not fetched yet in this session. */
+    data object NotLoaded : WorkerProfileState
+
+    /** The user holds the Worker role but never filled in a worker profile. */
+    data object NotSetUp : WorkerProfileState
+
+    data class Ready(val profile: WorkerProfile) : WorkerProfileState
+}
+
+/** The signed-in worker's own profile and verification. */
+interface WorkerProfileRepository {
+    val profile: StateFlow<WorkerProfileState>
+
+    /** Fetches the profile; also how the app learns that verification finished. */
+    suspend fun refresh(): AppResult<Unit>
+
+    /** Creates or updates the profile. Fails with `AppError.Validation` if the server rejects it. */
+    suspend fun saveProfile(input: WorkerProfileInput): AppResult<WorkerProfile>
+
+    /**
+     * Uploads a photo of an ID (a Photo Picker content URI) and starts verification.
+     * Requires a saved profile.
+     */
+    suspend fun submitIdDocument(type: IdDocumentType, imageUri: String): AppResult<WorkerProfile>
+
+    /** "Accepting jobs" switch, shown to customers as availability. */
+    suspend fun setAvailability(available: Boolean): AppResult<WorkerProfile>
 }
