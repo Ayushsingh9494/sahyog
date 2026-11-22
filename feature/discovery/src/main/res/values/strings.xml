@@ -55,4 +55,5 @@
     <string name="discovery_worker_price_note">Prices are starting rates. The final price is agreed before work begins.</string>
     <!-- Screen-reader text for a stat cell, e.g. "Jobs done: 486" -->
     <string name="discovery_worker_stat_description">%1$s: %2$s</string>
+    <string name="discovery_worker_book">Book now</string>
 </resources>

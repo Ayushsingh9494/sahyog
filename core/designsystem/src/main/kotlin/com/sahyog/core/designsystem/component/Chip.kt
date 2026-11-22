@@ -19,11 +19,13 @@ fun SahyogFilterChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: ImageVector? = null,
+    enabled: Boolean = true,
 ) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         label = { Text(label, style = SahyogTheme.typography.labelLarge) },
         leadingIcon = leadingIcon?.let {
             { Icon(it, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }

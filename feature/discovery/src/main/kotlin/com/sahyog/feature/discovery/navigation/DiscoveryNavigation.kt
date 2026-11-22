@@ -35,10 +35,12 @@ fun NavController.navigateToWorkerProfile(workerId: String) = navigate(WorkerPro
  * Registers all discovery destinations.
  *
  * @param onOpenSearchTab Switches to the Search tab; the shell owns tab switching.
+ * @param onBookWorker Starts a booking (owned by feature:booking, wired in :app).
  */
 fun NavGraphBuilder.discoveryDestinations(
     navController: NavController,
     onOpenSearchTab: () -> Unit,
+    onBookWorker: (workerId: String) -> Unit,
 ) {
     composable<HomeRoute> {
         HomeScreen(
@@ -71,6 +73,7 @@ fun NavGraphBuilder.discoveryDestinations(
                 creationCallback = { factory -> factory.create(route.workerId) },
             ),
             onNavigateBack = navController::navigateUp,
+            onBook = onBookWorker,
         )
     }
 }

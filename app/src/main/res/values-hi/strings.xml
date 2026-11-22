@@ -9,8 +9,6 @@
     <string name="tab_earnings">कमाई</string>
 
     <!-- Customer -->
-    <string name="placeholder_bookings_title">अभी कोई बुकिंग नहीं</string>
-    <string name="placeholder_bookings_message">आपकी बुक की गई सेवाएँ यहाँ दिखेंगी।</string>
 
     <!-- Worker -->
     <string name="placeholder_jobs_title">अभी कोई काम का अनुरोध नहीं</string>

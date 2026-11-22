@@ -1,0 +1,64 @@
+<resources>
+    <!-- सेवा बुक करें -->
+    <string name="booking_book_title">सेवा बुक करें</string>
+    <string name="booking_book_service">सेवा चुनें</string>
+    <string name="booking_book_day">दिन चुनें</string>
+    <string name="booking_book_time">समय चुनें</string>
+    <string name="booking_book_time_none_left">इस दिन कोई समय नहीं बचा है। कृपया दूसरा दिन चुनें।</string>
+    <string name="booking_book_address">पता</string>
+    <string name="booking_book_address_label">मकान नंबर, गली और इलाका</string>
+    <string name="booking_book_address_hint">ताकि कारीगर आप तक पहुँच सके। कम से कम 10 अक्षर।</string>
+    <string name="booking_book_note_label">कारीगर के लिए नोट (वैकल्पिक)</string>
+    <string name="booking_book_note_hint">जैसे: घंटी दो बार बजाएँ, पंखा बेडरूम में है</string>
+    <string name="booking_book_confirm">बुकिंग पक्की करें</string>
+    <string name="booking_book_price_note">शुरुआती दाम</string>
+    <string name="booking_book_success">बुकिंग का अनुरोध भेजा गया</string>
+    <string name="booking_error_slot_taken">यह समय अभी किसी और ने बुक कर लिया। कृपया दूसरा समय चुनें।</string>
+    <string name="booking_error_slot_unavailable">यह समय अब उपलब्ध नहीं है। कृपया दूसरा समय चुनें।</string>
+    <string name="booking_error_worker_gone">यह कारीगर अब बुकिंग नहीं ले रहा है।</string>
+
+    <!-- बुकिंग सूची -->
+    <string name="booking_list_title">बुकिंग</string>
+    <string name="booking_tab_upcoming">आने वाली</string>
+    <string name="booking_tab_past">पिछली</string>
+    <string name="booking_list_empty_upcoming_title">कोई आने वाली बुकिंग नहीं</string>
+    <string name="booking_list_empty_upcoming_message">सहकारी समिति के भरोसेमंद कारीगर को कुछ ही टैप में बुक करें।</string>
+    <string name="booking_list_empty_past_title">अभी कोई पिछली बुकिंग नहीं</string>
+    <string name="booking_list_empty_past_message">पूरी और रद्द की गई बुकिंग यहाँ दिखेंगी।</string>
+    <string name="booking_list_find_service">सेवा खोजें</string>
+    <string name="booking_when">%1$s · %2$s</string>
+
+    <!-- बुकिंग विवरण -->
+    <string name="booking_detail_title">बुकिंग %1$s</string>
+    <string name="booking_detail_requested">%1$s के स्वीकार करने का इंतज़ार</string>
+    <string name="booking_detail_accepted">%1$s ने आपकी बुकिंग स्वीकार की</string>
+    <string name="booking_detail_en_route">%1$s रास्ते में हैं</string>
+    <string name="booking_detail_in_progress">काम जारी है</string>
+    <string name="booking_detail_completed">काम पूरा हुआ</string>
+    <string name="booking_detail_cancelled">यह बुकिंग रद्द कर दी गई</string>
+    <string name="booking_detail_rejected">%1$s यह बुकिंग नहीं ले सके</string>
+    <string name="booking_detail_expired">स्वीकार होने से पहले इस अनुरोध का समय समाप्त हो गया</string>
+    <string name="booking_detail_requested_body">कारीगर आमतौर पर कुछ ही मिनटों में जवाब देते हैं। यह पेज अपने-आप अपडेट होता है।</string>
+    <string name="booking_start_code">शुरुआती कोड</string>
+    <string name="booking_start_code_body">यह कोड %1$s को तभी बताएँ जब वे आपके पास पहुँच जाएँ। काम शुरू करने के लिए उन्हें इसकी ज़रूरत होगी।</string>
+    <string name="booking_start_code_description">शुरुआती कोड %1$s</string>
+    <string name="booking_detail_progress">प्रगति</string>
+    <string name="booking_detail_details">विवरण</string>
+    <string name="booking_detail_service">सेवा</string>
+    <string name="booking_detail_price">दाम</string>
+    <string name="booking_detail_when">कब</string>
+    <string name="booking_detail_address">पता</string>
+    <string name="booking_detail_note">नोट</string>
+    <string name="booking_detail_view_profile">प्रोफ़ाइल देखें</string>
+    <string name="booking_cancel">बुकिंग रद्द करें</string>
+    <string name="booking_cancel_confirm_title">यह बुकिंग रद्द करें?</string>
+    <string name="booking_cancel_confirm_body">%1$s को बताया जाएगा कि आपको अब इस विज़िट की ज़रूरत नहीं है।</string>
+    <string name="booking_cancel_keep">बुकिंग रखें</string>
+    <string name="booking_cancelled_message">बुकिंग रद्द हो गई</string>
+    <string name="booking_cancel_not_allowed">यह बुकिंग अब रद्द नहीं की जा सकती। कृपया सहकारी समिति से संपर्क करें।</string>
+    <string name="booking_step_requested">अनुरोध भेजा</string>
+    <string name="booking_step_accepted">स्वीकार</string>
+    <string name="booking_step_en_route">रास्ते में</string>
+    <string name="booking_step_in_progress">काम जारी</string>
+    <string name="booking_step_completed">पूरा हुआ</string>
+</resources>

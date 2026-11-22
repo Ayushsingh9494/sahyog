@@ -54,4 +54,5 @@
     <string name="discovery_worker_languages">भाषाएँ</string>
     <string name="discovery_worker_price_note">ये शुरुआती दाम हैं। अंतिम दाम काम शुरू होने से पहले तय होता है।</string>
     <string name="discovery_worker_stat_description">%1$s: %2$s</string>
+    <string name="discovery_worker_book">अभी बुक करें</string>
 </resources>

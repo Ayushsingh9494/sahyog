@@ -12,13 +12,16 @@ import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.feature.account.AccountScreen
+import com.sahyog.feature.booking.navigation.BookingsRoute
+import com.sahyog.feature.booking.navigation.bookingDestinations
+import com.sahyog.feature.booking.navigation.navigateToBookService
 import com.sahyog.feature.discovery.navigation.HomeRoute
 import com.sahyog.feature.discovery.navigation.SearchRoute
 import com.sahyog.feature.discovery.navigation.discoveryDestinations
+import com.sahyog.feature.discovery.navigation.navigateToWorkerProfile
 import kotlinx.serialization.Serializable
 
-// Customer tabs (Home and Search routes come from feature:discovery)
-@Serializable internal data object CustomerBookingsRoute
+// Customer tabs come from the features: Home/Search (discovery) and Bookings (booking).
 
 // Worker tabs
 @Serializable internal data object WorkerJobsRoute
@@ -43,24 +46,20 @@ internal fun CustomerShell(
         tabs = listOf(
             TopLevelTab(HomeRoute, R.string.tab_home, SahyogIcons.HomeOutlined, SahyogIcons.Home),
             TopLevelTab(SearchRoute, R.string.tab_search, SahyogIcons.SearchOutlined, SahyogIcons.Search),
-            TopLevelTab(
-                CustomerBookingsRoute, R.string.tab_bookings, SahyogIcons.BookingsOutlined, SahyogIcons.Bookings,
-            ),
+            TopLevelTab(BookingsRoute, R.string.tab_bookings, SahyogIcons.BookingsOutlined, SahyogIcons.Bookings),
             accountTab,
         ),
     ) { navController ->
         discoveryDestinations(
             navController = navController,
             onOpenSearchTab = { navController.navigateToTab(SearchRoute) },
+            onBookWorker = navController::navigateToBookService,
         )
-        composable<CustomerBookingsRoute> {
-            PlaceholderTab(
-                titleRes = R.string.tab_bookings,
-                emptyTitleRes = R.string.placeholder_bookings_title,
-                emptyMessageRes = R.string.placeholder_bookings_message,
-                icon = SahyogIcons.Bookings,
-            )
-        }
+        bookingDestinations(
+            navController = navController,
+            onWorkerClick = navController::navigateToWorkerProfile,
+            onFindService = { navController.navigateToTab(HomeRoute) },
+        )
         sharedDestinations(navController, darkTheme, onThemeChange, showDeveloperOptions)
     }
 }

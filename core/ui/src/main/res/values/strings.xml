@@ -25,4 +25,20 @@
     <string name="core_ui_price_per_job">/job</string>
 
     <string name="core_ui_worker_available">Available</string>
+
+    <!-- Dates and times -->
+    <string name="core_ui_date_today">Today</string>
+    <string name="core_ui_date_tomorrow">Tomorrow</string>
+    <!-- A time window, e.g. "11 AM – 1 PM" -->
+    <string name="core_ui_time_range">%1$s – %2$s</string>
+
+    <!-- Booking statuses -->
+    <string name="core_ui_booking_status_requested">Requested</string>
+    <string name="core_ui_booking_status_accepted">Accepted</string>
+    <string name="core_ui_booking_status_en_route">On the way</string>
+    <string name="core_ui_booking_status_in_progress">In progress</string>
+    <string name="core_ui_booking_status_completed">Completed</string>
+    <string name="core_ui_booking_status_cancelled">Cancelled</string>
+    <string name="core_ui_booking_status_rejected">Declined</string>
+    <string name="core_ui_booking_status_expired">Expired</string>
 </resources>

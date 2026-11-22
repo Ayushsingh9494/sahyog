@@ -1,6 +1,8 @@
 plugins {
     id("sahyog.android.library")
     id("sahyog.hilt")
+    // DemoBookingDataSource persists its pretend-server state as JSON.
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -24,6 +26,7 @@ dependencies {
     implementation(libs.firebase.auth)
     // Task.await(): turns Firebase's callback-based Tasks into suspend calls.
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(project(":core:testing"))
     testImplementation(libs.junit)

@@ -38,5 +38,6 @@ include(":core:ui")
 
 include(":feature:account")
 include(":feature:auth")
+include(":feature:booking")
 include(":feature:discovery")
 include(":feature:onboarding")

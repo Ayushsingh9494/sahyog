@@ -12,8 +12,6 @@
     <string name="tab_earnings">Earnings</string>
 
     <!-- Customer -->
-    <string name="placeholder_bookings_title">No bookings yet</string>
-    <string name="placeholder_bookings_message">Services you book will appear here.</string>
 
     <!-- Worker -->
     <string name="placeholder_jobs_title">No job requests yet</string>

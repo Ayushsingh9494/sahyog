@@ -3,6 +3,7 @@ package com.sahyog.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.sahyog.core.database.SahyogDatabase
+import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.dao.CatalogDao
 import dagger.Module
 import dagger.Provides
@@ -22,4 +23,7 @@ internal object DatabaseModule {
 
     @Provides
     fun providesCatalogDao(database: SahyogDatabase): CatalogDao = database.catalogDao()
+
+    @Provides
+    fun providesBookingDao(database: SahyogDatabase): BookingDao = database.bookingDao()
 }

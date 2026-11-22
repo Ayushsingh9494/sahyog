@@ -33,6 +33,7 @@ UI (Compose)  --actions-->  ViewModel  -->  UseCase (only when real logic)  --> 
 | `core:testing` | Android lib | Shared fakes and test rules | M3 |
 | `feature:auth`, `:onboarding`, `:account` | Android lib | Sign-in, first-run profile, account settings | M3 |
 | `feature:discovery` | Android lib | Customer Home, Search, Category, Worker profile | M5 |
+| `feature:booking` | Android lib | Book a service, Bookings tab, Booking detail | M6 |
 | `feature:*` | Android lib | One per feature; never depend on each other (`sahyog.android.feature`) | M3+ |
 
 Modules are created when they first get real content, not as empty shells.
@@ -106,6 +107,24 @@ Room: categories · workers · worker_categories · worker_services
 - Money is `Paise` (Long). Formatting with Indian grouping lives in `core:ui` (`formatRupees`).
 - The database is a cache: everything in it can be downloaded again. Schema changes bump the
   version and add a migration (exported schemas in `core/database/schemas`).
+
+## Bookings (M6)
+
+- **Writes are server-confirmed.** `createBooking` / `cancelBooking` call the network first and
+  cache only the server's answer; the client never invents a booking id, price or status.
+- **Reads are cached** (Room `bookings`), refreshed on opening the Bookings tab or a booking, and
+  every 15 s while an active booking is on screen (until FCM in M11).
+- **Errors:** network sources throw `ApiException(AppError)` for refusals; `apiCall {}` maps every
+  exception to `AppError` once. Validation fields live in `BookingErrorFields`.
+- **Sign-out wipes personal caches:** each cache implements `UserDataCleaner` and is bound
+  `@IntoSet`; `FirebaseAuthRepository.signOut()` runs them all (via `dagger.Lazy`, which breaks the
+  auth ↔ booking dependency cycle).
+- **Time** comes from an injected `java.time.Clock`, so slot rules are testable.
+- **Demo server** (`DemoBookingDataSource`): per-uid JSON file in app storage that survives sign-out,
+  validates like the real API should, prevents double-booking a worker, auto-accepts after 20 s.
+  Replaced by Retrofit in M10.
+- **Database migrations:** bump the version, add an `AutoMigration` (or a manual `Migration`),
+  and extend `MigrationTest`. Exported schemas live in `core/database/schemas`.
 
 ## Conventions
 

@@ -1,5 +1,6 @@
 package com.sahyog.core.data.auth
 
+import android.util.Log
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -12,6 +13,8 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.common.result.map
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.OtpRequestResult
+import com.sahyog.core.data.session.UserDataCleaner
+import dagger.Lazy
 import com.sahyog.core.datastore.SahyogPreferencesDataSource
 import com.sahyog.core.model.AuthSession
 import kotlinx.coroutines.CancellationException
@@ -35,6 +38,8 @@ private const val COUNTRY_CODE = "+91"
 // Firebase waits this long for SMS auto-retrieval before giving up on it.
 private const val AUTO_RETRIEVAL_TIMEOUT_SECONDS = 60L
 
+private const val TAG = "FirebaseAuthRepository"
+
 // Upper bound for the whole request. Guards against callbacks never arriving, e.g. when
 // Firebase auto-detaches them because the app went to the background mid-request.
 private const val REQUEST_TIMEOUT_MS = 75_000L
@@ -45,6 +50,9 @@ internal class FirebaseAuthRepository @Inject constructor(
     private val activityTracker: ForegroundActivityTracker,
     private val preferences: SahyogPreferencesDataSource,
     @param:ApplicationScope private val appScope: CoroutineScope,
+    // Lazy breaks a dependency cycle: cleaners (e.g. the booking repository) may
+    // themselves depend on AuthRepository.
+    private val userDataCleaners: Lazy<Set<@JvmSuppressWildcards UserDataCleaner>>,
 ) : AuthRepository {
 
     /** State of the last code request, needed to verify a code or re-send one. Memory-only by design. */
@@ -131,6 +139,16 @@ internal class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun signOut() {
         pending = null
+        // Wipe this person's cached data first. A failing cleaner must not block sign-out.
+        userDataCleaners.get().forEach { cleaner ->
+            try {
+                cleaner.clearUserData()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to clear ${cleaner::class.simpleName} on sign-out", e)
+            }
+        }
         firebaseAuth.signOut()
         // The remembered mode belongs to the person who just left.
         preferences.setActiveRole(null)

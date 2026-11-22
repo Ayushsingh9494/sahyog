@@ -94,8 +94,25 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [ ] Distance and "near you" sorting (needs location, M8)
 - [ ] Worker photos (needs image upload, M7 + an image loader)
 
-## M6: Booking flow
-- [ ] Create → track → history, cancellation
+## M6: Booking flow ✅
+- [x] `core:model`: Booking, BookingStatus (state machine helpers), TimeSlot (2-hour windows 9 AM–9 PM,
+      7-day window, 60-min lead time), BookingRequest limits
+- [x] `core:database` v2: `bookings` table via AutoMigration 1→2 (MigrationTest on device)
+- [x] `core:data`: `BookingRepository` (reads cached, writes server-confirmed), `apiCall`/`ApiException`
+      error mapping, TEMPORARY `DemoBookingDataSource` (per-user JSON store, validation, double-booking
+      check, auto-accept after 20 s with a 4-digit start code, expiry)
+- [x] Sign-out clears cached personal data via `UserDataCleaner` multibinding
+- [x] Injectable `java.time.Clock` for time-dependent logic
+- [x] `feature:booking`: Book a service (service, day, time, address pre-filled from last booking, note),
+      Bookings tab (Upcoming / Past, pull-to-refresh, empty states), Booking detail (status, start code,
+      progress timeline, details, cancel with confirmation, 15 s refresh while visible)
+- [x] "Book now" on the worker profile; booking form replaced by the new booking on success
+- [x] Verified: 120 unit tests, 8 device tests (DAO + migration), lint 0 errors
+- [x] Verified on device: book → auto-accept + start code → cancel → Past; second account sees no
+      bookings; first account's bookings return after signing back in
+- [ ] Worker-side status changes (on the way, start with code, complete): M7
+- [ ] Push notifications instead of polling: M11
+- [ ] Payment after completion: M12
 
 ## M7: Worker side
 - [ ] Onboarding / skills, document upload, availability, job requests, active job, earnings

@@ -2,6 +2,8 @@ package com.sahyog.core.data.repository
 
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.model.AuthSession
+import com.sahyog.core.model.Booking
+import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
@@ -82,4 +84,31 @@ interface CatalogRepository {
 
     /** Downloads the latest catalog. On failure the cached copy is left untouched. */
     suspend fun refresh(): AppResult<Unit>
+}
+
+/**
+ * The signed-in customer's bookings. Reads are served from the device cache; creating
+ * and cancelling require the server's confirmation.
+ */
+interface BookingRepository {
+    /** Soonest visit first. */
+    val bookings: Flow<List<Booking>>
+
+    /** Emits null if the booking isn't in the cache. */
+    fun booking(id: String): Flow<Booking?>
+
+    /** Downloads the latest state of all bookings (e.g. a worker accepted). */
+    suspend fun refresh(): AppResult<Unit>
+
+    /**
+     * Fails with `AppError.Validation` (field from `BookingErrorFields`) if the server
+     * rejects the request, e.g. the slot was just taken.
+     */
+    suspend fun createBooking(request: BookingRequest): AppResult<Booking>
+
+    /** Allowed only while the booking is Requested or Accepted. */
+    suspend fun cancelBooking(bookingId: String): AppResult<Booking>
+
+    /** Address from the most recent booking, to pre-fill the next one. */
+    suspend fun lastUsedAddress(): String?
 }

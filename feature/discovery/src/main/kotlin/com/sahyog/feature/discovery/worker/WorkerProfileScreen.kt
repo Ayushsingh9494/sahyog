@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sahyog.core.designsystem.component.SahyogAvatar
+import com.sahyog.core.designsystem.component.SahyogButton
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogLoadingView
@@ -37,6 +40,7 @@ import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.component.StatusTone
 import com.sahyog.core.designsystem.icon.SahyogIcons
+import com.sahyog.core.designsystem.theme.SahyogElevation
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.core.model.Paise
@@ -53,15 +57,17 @@ import com.sahyog.feature.discovery.R
 fun WorkerProfileScreen(
     viewModel: WorkerProfileViewModel,
     onNavigateBack: () -> Unit,
+    onBook: (workerId: String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    WorkerProfileContent(uiState = uiState, onNavigateBack = onNavigateBack)
+    WorkerProfileContent(uiState = uiState, onNavigateBack = onNavigateBack, onBook = onBook)
 }
 
 @Composable
 internal fun WorkerProfileContent(
     uiState: WorkerProfileUiState,
     onNavigateBack: () -> Unit,
+    onBook: (workerId: String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -69,6 +75,21 @@ internal fun WorkerProfileContent(
                 title = (uiState as? WorkerProfileUiState.Ready)?.worker?.name.orEmpty(),
                 onNavigateBack = onNavigateBack,
             )
+        },
+        bottomBar = {
+            val worker = (uiState as? WorkerProfileUiState.Ready)?.worker
+            if (worker != null && worker.services.isNotEmpty()) {
+                Surface(color = SahyogTheme.colors.surfaceContainer, tonalElevation = SahyogElevation.medium) {
+                    SahyogButton(
+                        text = stringResource(R.string.discovery_worker_book),
+                        onClick = { onBook(worker.id) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .navigationBarsPadding()
+                            .padding(horizontal = SahyogSpacing.screenGutter, vertical = SahyogSpacing.md),
+                    )
+                }
+            }
         },
         containerColor = SahyogTheme.colors.surface,
     ) { padding ->
@@ -288,6 +309,7 @@ private fun WorkerProfilePreview() {
                 ),
             ),
             onNavigateBack = {},
+            onBook = {},
         )
     }
 }

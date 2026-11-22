@@ -20,6 +20,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     androidTestImplementation(libs.androidx.junit)
+    // MigrationTestHelper: opens old schema versions to prove migrations keep data.
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 }

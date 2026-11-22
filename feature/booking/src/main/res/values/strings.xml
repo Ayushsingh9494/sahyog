@@ -1,0 +1,66 @@
+<resources>
+    <!-- Book a service -->
+    <string name="booking_book_title">Book a service</string>
+    <string name="booking_book_service">Choose a service</string>
+    <string name="booking_book_day">Pick a day</string>
+    <string name="booking_book_time">Pick a time</string>
+    <string name="booking_book_time_none_left">No times left on this day. Please pick another day.</string>
+    <string name="booking_book_address">Address</string>
+    <string name="booking_book_address_label">House no., street and area</string>
+    <string name="booking_book_address_hint">So the worker can find you. At least 10 characters.</string>
+    <string name="booking_book_note_label">Note for the worker (optional)</string>
+    <string name="booking_book_note_hint">e.g. Ring the bell twice, the fan is in the bedroom</string>
+    <string name="booking_book_confirm">Confirm booking</string>
+    <string name="booking_book_price_note">Starting price</string>
+    <string name="booking_book_success">Booking requested</string>
+    <string name="booking_error_slot_taken">That time was just booked by someone else. Please pick another.</string>
+    <string name="booking_error_slot_unavailable">That time is no longer available. Please pick another.</string>
+    <string name="booking_error_worker_gone">This worker is no longer taking bookings.</string>
+
+    <!-- Bookings list -->
+    <string name="booking_list_title">Bookings</string>
+    <string name="booking_tab_upcoming">Upcoming</string>
+    <string name="booking_tab_past">Past</string>
+    <string name="booking_list_empty_upcoming_title">No upcoming bookings</string>
+    <string name="booking_list_empty_upcoming_message">Book a trusted worker from the cooperative in a few taps.</string>
+    <string name="booking_list_empty_past_title">No past bookings yet</string>
+    <string name="booking_list_empty_past_message">Completed and cancelled bookings will appear here.</string>
+    <string name="booking_list_find_service">Find a service</string>
+    <!-- e.g. "Tomorrow · 11 AM – 1 PM" -->
+    <string name="booking_when">%1$s · %2$s</string>
+
+    <!-- Booking detail -->
+    <string name="booking_detail_title">Booking %1$s</string>
+    <string name="booking_detail_requested">Waiting for %1$s to accept</string>
+    <string name="booking_detail_accepted">%1$s accepted your booking</string>
+    <string name="booking_detail_en_route">%1$s is on the way</string>
+    <string name="booking_detail_in_progress">Work in progress</string>
+    <string name="booking_detail_completed">Job completed</string>
+    <string name="booking_detail_cancelled">This booking was cancelled</string>
+    <string name="booking_detail_rejected">%1$s couldn\'t take this booking</string>
+    <string name="booking_detail_expired">This request expired before it was accepted</string>
+    <string name="booking_detail_requested_body">Workers usually respond within a few minutes. This page updates by itself.</string>
+    <string name="booking_start_code">Start code</string>
+    <string name="booking_start_code_body">Share this code with %1$s only when they arrive. They need it to start the job.</string>
+    <!-- Screen reader: reads the code digit by digit, e.g. "Start code 4 8 2 1" -->
+    <string name="booking_start_code_description">Start code %1$s</string>
+    <string name="booking_detail_progress">Progress</string>
+    <string name="booking_detail_details">Details</string>
+    <string name="booking_detail_service">Service</string>
+    <string name="booking_detail_price">Price</string>
+    <string name="booking_detail_when">When</string>
+    <string name="booking_detail_address">Address</string>
+    <string name="booking_detail_note">Note</string>
+    <string name="booking_detail_view_profile">View profile</string>
+    <string name="booking_cancel">Cancel booking</string>
+    <string name="booking_cancel_confirm_title">Cancel this booking?</string>
+    <string name="booking_cancel_confirm_body">%1$s will be told you no longer need this visit.</string>
+    <string name="booking_cancel_keep">Keep booking</string>
+    <string name="booking_cancelled_message">Booking cancelled</string>
+    <string name="booking_cancel_not_allowed">This booking can\'t be cancelled any more. Please contact the cooperative.</string>
+    <string name="booking_step_requested">Requested</string>
+    <string name="booking_step_accepted">Accepted</string>
+    <string name="booking_step_en_route">On the way</string>
+    <string name="booking_step_in_progress">In progress</string>
+    <string name="booking_step_completed">Completed</string>
+</resources>

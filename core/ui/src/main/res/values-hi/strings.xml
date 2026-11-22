@@ -24,4 +24,19 @@
     <string name="core_ui_price_per_job">/काम</string>
 
     <string name="core_ui_worker_available">उपलब्ध</string>
+
+    <!-- तारीख और समय -->
+    <string name="core_ui_date_today">आज</string>
+    <string name="core_ui_date_tomorrow">कल</string>
+    <string name="core_ui_time_range">%1$s – %2$s</string>
+
+    <!-- बुकिंग की स्थिति -->
+    <string name="core_ui_booking_status_requested">अनुरोध भेजा</string>
+    <string name="core_ui_booking_status_accepted">स्वीकार</string>
+    <string name="core_ui_booking_status_en_route">रास्ते में</string>
+    <string name="core_ui_booking_status_in_progress">काम जारी</string>
+    <string name="core_ui_booking_status_completed">पूरा हुआ</string>
+    <string name="core_ui_booking_status_cancelled">रद्द</string>
+    <string name="core_ui_booking_status_rejected">अस्वीकार</string>
+    <string name="core_ui_booking_status_expired">समय समाप्त</string>
 </resources>
