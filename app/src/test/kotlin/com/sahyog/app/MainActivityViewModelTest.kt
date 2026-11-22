@@ -6,8 +6,8 @@ import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserRole
 import com.sahyog.core.testing.MainDispatcherRule
-import com.sahyog.core.testing.TestAuthRepository
 import com.sahyog.core.testing.TestUserPreferencesRepository
+import com.sahyog.core.testing.TestUserRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -17,10 +17,10 @@ class MainActivityViewModelTest {
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-    private val auth = TestAuthRepository()
+    private val users = TestUserRepository()
     private val prefs = TestUserPreferencesRepository()
     // Lazy: must be created after MainDispatcherRule has installed the test Main dispatcher.
-    private val viewModel by lazy { MainActivityViewModel(auth, prefs) }
+    private val viewModel by lazy { MainActivityViewModel(users, prefs) }
 
     @Test
     fun `starts loading, then signed out`() = runTest {
@@ -38,14 +38,14 @@ class MainActivityViewModelTest {
             skipUntilReady()
 
             val newUser = User("u1", "9876543210", name = null, roles = emptySet(), workerStatus = null)
-            auth.setUser(newUser)
+            users.setUser(newUser)
             assertEquals(SessionState.NeedsOnboarding(newUser), awaitReady().session)
 
             val onboarded = newUser.copy(name = "Asha", roles = setOf(UserRole.Customer))
-            auth.setUser(onboarded)
+            users.setUser(onboarded)
             assertEquals(SessionState.SignedIn(onboarded, UserRole.Customer), awaitReady().session)
 
-            auth.signOut()
+            users.setUser(null)
             assertEquals(SessionState.SignedOut, awaitReady().session)
         }
     }

@@ -29,11 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sahyog.core.designsystem.component.SahyogOtpField
-import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTextButton
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
-import com.sahyog.core.designsystem.component.StatusTone
-import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.feature.auth.R
@@ -106,15 +103,6 @@ internal fun OtpContent(
             Spacer(Modifier.height(SahyogSpacing.md))
             StatusLine(uiState)
 
-            if (uiState.showDemoHint) {
-                Spacer(Modifier.height(SahyogSpacing.xl))
-                SahyogStatusBadge(
-                    text = stringResource(R.string.auth_otp_demo_hint),
-                    tone = StatusTone.Info,
-                    icon = SahyogIcons.Info,
-                )
-            }
-
             Spacer(Modifier.height(SahyogSpacing.xl))
             ResendRow(uiState, onResend)
         }
@@ -182,7 +170,7 @@ private fun ResendRow(uiState: OtpUiState, onResend: () -> Unit) {
 private fun OtpPreview() {
     SahyogTheme {
         OtpContent(
-            uiState = OtpUiState(phoneNumber = "9876543210", code = "123", resendSecondsLeft = 24, showDemoHint = true),
+            uiState = OtpUiState(phoneNumber = "9876543210", code = "123", resendSecondsLeft = 24),
             onCodeChange = {},
             onVerify = {},
             onResend = {},

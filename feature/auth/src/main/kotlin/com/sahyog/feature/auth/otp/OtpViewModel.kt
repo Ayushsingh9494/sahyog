@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.common.validation.OtpValidator
+import com.sahyog.core.data.auth.AuthErrorFields
 import com.sahyog.core.data.repository.AuthRepository
+import com.sahyog.core.data.repository.OtpRequestResult
 import com.sahyog.core.ui.messageRes
 import com.sahyog.feature.auth.R
 import dagger.assisted.Assisted
@@ -27,7 +29,6 @@ data class OtpUiState(
     val isVerifying: Boolean = false,
     val isResending: Boolean = false,
     val resendSecondsLeft: Int = 0,
-    val showDemoHint: Boolean = false,
     @param:StringRes val errorRes: Int? = null,
     @param:StringRes val infoRes: Int? = null,
 ) {
@@ -45,9 +46,7 @@ class OtpViewModel @AssistedInject constructor(
         fun create(phoneNumber: String): OtpViewModel
     }
 
-    private val _uiState = MutableStateFlow(
-        OtpUiState(phoneNumber = phoneNumber, showDemoHint = authRepository.isDemoMode),
-    )
+    private val _uiState = MutableStateFlow(OtpUiState(phoneNumber = phoneNumber))
     val uiState: StateFlow<OtpUiState> = _uiState.asStateFlow()
 
     private var countdownJob: Job? = null
@@ -85,10 +84,14 @@ class OtpViewModel @AssistedInject constructor(
         if (!state.canResend) return
         _uiState.update { it.copy(isResending = true, errorRes = null, infoRes = null) }
         viewModelScope.launch {
-            when (val result = authRepository.requestOtp(state.phoneNumber)) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(isResending = false, code = "", infoRes = R.string.auth_otp_resent) }
-                    startResendCountdown()
+            when (val result = authRepository.requestOtp(state.phoneNumber, resend = true)) {
+                is AppResult.Success -> when (result.data) {
+                    OtpRequestResult.CodeSent -> {
+                        _uiState.update { it.copy(isResending = false, code = "", infoRes = R.string.auth_otp_resent) }
+                        startResendCountdown()
+                    }
+                    // Verified automatically while resending: the app root takes over.
+                    OtpRequestResult.SignedIn -> Unit
                 }
                 is AppResult.Failure -> _uiState.update {
                     it.copy(isResending = false, errorRes = result.error.messageRes())
@@ -107,8 +110,11 @@ class OtpViewModel @AssistedInject constructor(
         }
     }
 
-    private fun AppError.toOtpMessage(): Int =
-        if (this is AppError.Validation) R.string.auth_otp_error_wrong_code else messageRes()
+    private fun AppError.toOtpMessage(): Int = when {
+        this is AppError.Validation && field == AuthErrorFields.OTP_EXPIRED -> R.string.auth_otp_error_expired
+        this is AppError.Validation -> R.string.auth_otp_error_wrong_code
+        else -> messageRes()
+    }
 
     companion object {
         const val RESEND_COOLDOWN_SECONDS = 30

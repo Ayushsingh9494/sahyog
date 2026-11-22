@@ -2,7 +2,7 @@ package com.sahyog.feature.auth.otp
 
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
-import com.sahyog.core.model.User
+import com.sahyog.core.data.auth.AuthErrorFields
 import com.sahyog.core.testing.MainDispatcherRule
 import com.sahyog.core.testing.TestAuthRepository
 import com.sahyog.feature.auth.R
@@ -25,13 +25,11 @@ class OtpViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule(StandardTestDispatcher())
 
     private val auth = TestAuthRepository()
-    private val user = User("u1", PHONE, name = null, roles = emptySet(), workerStatus = null)
 
     private fun createViewModel() = OtpViewModel(PHONE, auth)
 
     @Test
     fun `entering the sixth digit verifies automatically`() = runTest(mainDispatcherRule.testDispatcher) {
-        auth.verifyOtpResult = AppResult.Success(user)
         val viewModel = createViewModel()
 
         viewModel.onCodeChange("12345")
@@ -47,7 +45,7 @@ class OtpViewModelTest {
 
     @Test
     fun `wrong code clears the input and shows an error`() = runTest(mainDispatcherRule.testDispatcher) {
-        auth.verifyOtpResult = AppResult.Failure(AppError.Validation("otp"))
+        auth.verifyOtpResult = AppResult.Failure(AppError.Validation(AuthErrorFields.OTP))
         val viewModel = createViewModel()
 
         viewModel.onCodeChange("000000")
@@ -84,14 +82,32 @@ class OtpViewModelTest {
         viewModel.resend()
         runCurrent()
 
-        assertEquals(listOf(PHONE), auth.requestedPhones)
+        // resend = true reuses Firebase's resend token for the same number.
+        assertEquals(listOf(PHONE to true), auth.otpRequests)
         assertEquals(R.string.auth_otp_resent, viewModel.uiState.value.infoRes)
         assertEquals(30, viewModel.uiState.value.resendSecondsLeft)
     }
 
     @Test
-    fun `demo hint follows the repository`() {
-        assertFalse(createViewModel().uiState.value.showDemoHint)
+    fun `expired verification asks the user to request a new code`() = runTest(mainDispatcherRule.testDispatcher) {
+        auth.verifyOtpResult = AppResult.Failure(AppError.Validation(AuthErrorFields.OTP_EXPIRED))
+        val viewModel = createViewModel()
+
+        viewModel.onCodeChange("123456")
+        runCurrent()
+
+        assertEquals(R.string.auth_otp_error_expired, viewModel.uiState.value.errorRes)
+    }
+
+    @Test
+    fun `rate limiting shows the generic too-many-attempts message`() = runTest(mainDispatcherRule.testDispatcher) {
+        auth.verifyOtpResult = AppResult.Failure(AppError.RateLimited)
+        val viewModel = createViewModel()
+
+        viewModel.onCodeChange("123456")
+        runCurrent()
+
+        assertEquals(com.sahyog.core.ui.R.string.core_ui_error_rate_limited, viewModel.uiState.value.errorRes)
     }
 
     private companion object {

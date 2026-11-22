@@ -6,4 +6,5 @@
     <string name="core_ui_error_validation">कृपया अपने द्वारा दर्ज विवरण जाँचें।</string>
     <string name="core_ui_error_server">हमारी ओर से कुछ गड़बड़ हुई। कृपया थोड़ी देर बाद फिर से कोशिश करें।</string>
     <string name="core_ui_error_unknown">कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।</string>
+    <string name="core_ui_error_rate_limited">बहुत अधिक प्रयास हो गए। कृपया कुछ मिनट रुककर फिर से कोशिश करें।</string>
 </resources>

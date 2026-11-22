@@ -2,8 +2,10 @@ package com.sahyog.core.testing
 
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.AuthRepository
+import com.sahyog.core.data.repository.OtpRequestResult
 import com.sahyog.core.data.repository.UserPreferencesRepository
 import com.sahyog.core.data.repository.UserRepository
+import com.sahyog.core.model.AuthSession
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
@@ -14,47 +16,54 @@ import kotlinx.coroutines.flow.update
 
 /*
  * Controllable, instant test doubles. Tests set the next result and inspect the calls,
- * with no delays or DataStore involved.
+ * with no delays, Firebase or DataStore involved.
  */
 
 class TestAuthRepository : AuthRepository {
-    private val user = MutableStateFlow<User?>(null)
-    override val currentUser: Flow<User?> = user
+    private val sessionFlow = MutableStateFlow<AuthSession?>(null)
+    override val session: Flow<AuthSession?> = sessionFlow
 
-    var requestOtpResult: AppResult<Unit> = AppResult.Success(Unit)
-    var verifyOtpResult: AppResult<User>? = null
-    val requestedPhones = mutableListOf<String>()
+    var requestOtpResult: AppResult<OtpRequestResult> = AppResult.Success(OtpRequestResult.CodeSent)
+    var verifyOtpResult: AppResult<Unit> = AppResult.Success(Unit)
+
+    /** (phone, resend) for every requestOtp call. */
+    val otpRequests = mutableListOf<Pair<String, Boolean>>()
     val verifiedCodes = mutableListOf<String>()
     var signOutCount = 0
         private set
 
-    fun setUser(value: User?) = user.update { value }
+    fun setSession(value: AuthSession?) = sessionFlow.update { value }
 
-    override suspend fun requestOtp(phoneNumber: String): AppResult<Unit> {
-        requestedPhones += phoneNumber
+    override suspend fun requestOtp(phoneNumber: String, resend: Boolean): AppResult<OtpRequestResult> {
+        otpRequests += phoneNumber to resend
         return requestOtpResult
     }
 
-    override suspend fun verifyOtp(phoneNumber: String, code: String): AppResult<User> {
+    override suspend fun verifyOtp(phoneNumber: String, code: String): AppResult<Unit> {
         verifiedCodes += code
-        val result = checkNotNull(verifyOtpResult) { "Set verifyOtpResult before calling verifyOtp" }
-        if (result is AppResult.Success) setUser(result.data)
-        return result
+        return verifyOtpResult
     }
 
     override suspend fun signOut() {
         signOutCount++
-        setUser(null)
+        setSession(null)
     }
 }
 
 class TestUserRepository : UserRepository {
-    var result: AppResult<User>? = null
-    val calls = mutableListOf<Pair<String, Set<UserRole>>>()
+    private val user = MutableStateFlow<User?>(null)
+    override val currentUser: Flow<User?> = user
+
+    var onboardingResult: AppResult<User>? = null
+    val onboardingCalls = mutableListOf<Pair<String, Set<UserRole>>>()
+
+    fun setUser(value: User?) = user.update { value }
 
     override suspend fun completeOnboarding(name: String, roles: Set<UserRole>): AppResult<User> {
-        calls += name to roles
-        return checkNotNull(result) { "Set result before calling completeOnboarding" }
+        onboardingCalls += name to roles
+        val result = checkNotNull(onboardingResult) { "Set onboardingResult before calling completeOnboarding" }
+        if (result is AppResult.Success) setUser(result.data)
+        return result
     }
 }
 

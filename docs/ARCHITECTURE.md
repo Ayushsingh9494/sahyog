@@ -26,8 +26,8 @@ UI (Compose)  --actions-->  ViewModel  -->  UseCase (only when real logic)  --> 
 | `core:designsystem` | Android lib | `SahyogTheme`, tokens, reusable `Sahyog*` components | M1 |
 | `core:model` | JVM | Domain models and pure rules (User, UserRole, SessionState, ...) | M3 |
 | `core:ui` | Android lib | Shared non-visual UI helpers: error messages, event collection, formatters | M3 |
-| `core:datastore` | Android lib | DataStore: theme, active mode, cached profile | M3 |
-| `core:data` | Android lib | Repository interfaces, implementations, fakes | M3 |
+| `core:datastore` | Android lib | DataStore: theme, active mode; temporary local profiles (until M10) | M3 |
+| `core:data` | Android lib | Repository interfaces and implementations (Firebase Auth from M4) | M3 |
 | `core:database` | Android lib | Room | M5 |
 | `core:network` | Android lib | Retrofit/OkHttp, DTOs, auth interceptor | M10 |
 | `core:testing` | Android lib | Shared fakes and test rules | M3 |
@@ -64,8 +64,24 @@ MainActivity ── splash held while MainActivityUiState.Loading
 - **Screen pattern:** `XxxScreen` (gets the ViewModel and collects state/events) wraps a stateless
   `XxxContent(uiState, callbacks)` used by previews and tests. One `StateFlow<UiState>` per
   ViewModel; one-off events go through a `Channel`, collected by `ObserveAsEvents`.
-- **Fakes:** `FakeAuthRepository` / `FakeUserRepository` (demo OTP `123456`) are bound in
-  `core:data/di/DataModule`. Swapping to Firebase / Spring Boot changes only those bindings.
+
+## Authentication (M4)
+
+- **Identity = Firebase Auth (phone OTP).** `FirebaseAuthRepository` (`core:data/auth`) exposes
+  `session: Flow<AuthSession?>` from Firebase's `AuthStateListener`, so the session survives restarts
+  and sign-out is just `FirebaseAuth.signOut()`.
+- `requestOtp` returns `CodeSent` or `SignedIn` (instant verification / SMS auto-retrieval).
+  The verification ID and resend token live in memory only. If the process dies, `verifyOtp`
+  reports "code expired" and the user requests a new one.
+- Firebase needs an Activity for its reCAPTCHA/Play Integrity fallback: `ForegroundActivityTracker`
+  (weak reference, registered in `SahyogApplication`) supplies it, so ViewModels never touch Activities.
+- Firebase exceptions are mapped to `AppError` in one place (`FirebaseErrors.kt`).
+- **Profiles (name, roles) are not Firebase's job.** Until the backend exists (M10),
+  `LocalProfileUserRepository` stores them per uid in a separate DataStore that survives sign-out.
+  In M10 it is replaced by an API-backed repository; the client sends the Firebase ID token and the
+  server verifies it.
+- Setup: `app/google-services.json` is gitignored; download it from the Firebase console. Debug
+  SHA-1/SHA-256 must be registered there. Use Firebase test phone numbers during development.
 
 ## Conventions
 
@@ -101,6 +117,12 @@ Rules:
   - Libraries compiled with a much newer Kotlin may fail with metadata errors. Check before bumping.
 - KSP 2.3.x is independent of the Kotlin version.
 - Java/Kotlin bytecode target is 17. The Gradle daemon runs on JDK 25 (`gradle/gradle-daemon-jvm.properties`).
+- **Firebase BOM pinned to 34.19.0.** 35.x ships firebase-auth 25, compiled with Kotlin 2.4, which
+  the bundled Kotlin 2.2 compiler cannot read. Bump it together with the AGP/Kotlin upgrade.
+- Command-line builds without a standalone JDK 25: point Gradle at Android Studio's JBR with
+  `-Dorg.gradle.java.installations.paths="<Android Studio>/jbr" -Dorg.gradle.java.installations.auto-download=false`.
+- Networks with TLS inspection (e.g. campus Wi-Fi) break dependency downloads (PKIX errors).
+  Use another network or install the inspection CA in the JDK trust store.
 
 ## Decisions (defaults pending product confirmation)
 

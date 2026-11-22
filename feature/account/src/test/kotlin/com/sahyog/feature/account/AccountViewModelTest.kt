@@ -8,6 +8,7 @@ import com.sahyog.core.model.WorkerVerificationStatus
 import com.sahyog.core.testing.MainDispatcherRule
 import com.sahyog.core.testing.TestAuthRepository
 import com.sahyog.core.testing.TestUserPreferencesRepository
+import com.sahyog.core.testing.TestUserRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -19,10 +20,11 @@ class AccountViewModelTest {
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
+    private val users = TestUserRepository()
     private val auth = TestAuthRepository()
     private val prefs = TestUserPreferencesRepository()
     // Lazy: must be created after MainDispatcherRule has installed the test Main dispatcher.
-    private val viewModel by lazy { AccountViewModel(auth, prefs) }
+    private val viewModel by lazy { AccountViewModel(users, auth, prefs) }
 
     private val bothRoles = User(
         id = "u1",
@@ -34,7 +36,7 @@ class AccountViewModelTest {
 
     @Test
     fun `ready state reflects user, active role and theme`() = runTest {
-        auth.setUser(bothRoles)
+        users.setUser(bothRoles)
         viewModel.uiState.test {
             val ready = awaitReady()
             assertEquals(UserRole.Customer, ready.activeRole)
@@ -45,7 +47,7 @@ class AccountViewModelTest {
 
     @Test
     fun `switching role and theme updates preferences`() = runTest {
-        auth.setUser(bothRoles)
+        users.setUser(bothRoles)
         viewModel.uiState.test {
             awaitReady()
             viewModel.onSwitchRole(UserRole.Worker)
@@ -57,7 +59,7 @@ class AccountViewModelTest {
 
     @Test
     fun `single role users cannot switch`() = runTest {
-        auth.setUser(bothRoles.copy(roles = setOf(UserRole.Customer), workerStatus = null))
+        users.setUser(bothRoles.copy(roles = setOf(UserRole.Customer), workerStatus = null))
         viewModel.uiState.test {
             assertFalse(awaitReady().canSwitchRole)
         }

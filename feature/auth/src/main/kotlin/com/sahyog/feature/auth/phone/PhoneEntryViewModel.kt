@@ -7,6 +7,7 @@ import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.common.validation.PhoneNumberValidator
 import com.sahyog.core.data.repository.AuthRepository
+import com.sahyog.core.data.repository.OtpRequestResult
 import com.sahyog.core.ui.messageRes
 import com.sahyog.feature.auth.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,9 +58,14 @@ class PhoneEntryViewModel @Inject constructor(
         _uiState.update { it.copy(isSubmitting = true, errorRes = null) }
         viewModelScope.launch {
             when (val result = authRepository.requestOtp(state.phoneNumber)) {
-                is AppResult.Success -> {
-                    _uiState.update { it.copy(isSubmitting = false) }
-                    _events.send(PhoneEntryEvent.OtpSent(state.phoneNumber))
+                is AppResult.Success -> when (result.data) {
+                    OtpRequestResult.CodeSent -> {
+                        _uiState.update { it.copy(isSubmitting = false) }
+                        _events.send(PhoneEntryEvent.OtpSent(state.phoneNumber))
+                    }
+                    // Verified without a code: the session changes and the app root moves on.
+                    // Stay in the submitting state so nothing flickers meanwhile.
+                    OtpRequestResult.SignedIn -> Unit
                 }
                 is AppResult.Failure -> _uiState.update {
                     it.copy(isSubmitting = false, errorRes = result.error.toPhoneMessage())

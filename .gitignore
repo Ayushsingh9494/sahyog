@@ -16,6 +16,9 @@ secrets.properties
 *.jks
 *.keystore
 keystore.properties
+# Firebase client config: not a secret, but kept out of git in case the repo goes public.
+# Download from Firebase console -> Project settings -> Your apps.
+google-services.json
 
 # OS
 .DS_Store

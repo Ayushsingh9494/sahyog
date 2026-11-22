@@ -14,6 +14,7 @@ fun AppError.messageRes(): Int = when (this) {
     AppError.Unauthorized -> R.string.core_ui_error_unauthorized
     AppError.Forbidden -> R.string.core_ui_error_forbidden
     AppError.NotFound -> R.string.core_ui_error_not_found
+    AppError.RateLimited -> R.string.core_ui_error_rate_limited
     is AppError.Validation -> R.string.core_ui_error_validation
     is AppError.Server -> R.string.core_ui_error_server
     is AppError.Unknown -> R.string.core_ui_error_unknown

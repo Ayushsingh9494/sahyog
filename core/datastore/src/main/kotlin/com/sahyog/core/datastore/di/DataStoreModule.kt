@@ -15,20 +15,42 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UserPreferencesStore
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class LocalProfilesStore
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DataStoreModule {
 
     // Exactly one DataStore instance per file is allowed per process. @Singleton guarantees it.
+
     @Provides
     @Singleton
-    fun providesPreferencesDataStore(
+    @UserPreferencesStore
+    fun providesUserPreferencesStore(
         @ApplicationContext context: Context,
         @Dispatcher(SahyogDispatcher.IO) ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        scope = CoroutineScope(ioDispatcher + SupervisorJob()),
-        produceFile = { context.preferencesDataStoreFile("sahyog_preferences") },
-    )
+    ): DataStore<Preferences> = create(context, ioDispatcher, "sahyog_preferences")
+
+    @Provides
+    @Singleton
+    @LocalProfilesStore
+    fun providesLocalProfilesStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(SahyogDispatcher.IO) ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = create(context, ioDispatcher, "sahyog_local_profiles")
+
+    private fun create(context: Context, io: CoroutineDispatcher, name: String) =
+        PreferenceDataStoreFactory.create(
+            scope = CoroutineScope(io + SupervisorJob()),
+            produceFile = { context.preferencesDataStoreFile(name) },
+        )
 }

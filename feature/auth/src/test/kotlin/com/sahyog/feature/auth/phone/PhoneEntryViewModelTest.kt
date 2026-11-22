@@ -3,6 +3,7 @@ package com.sahyog.feature.auth.phone
 import app.cash.turbine.test
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
+import com.sahyog.core.data.repository.OtpRequestResult
 import com.sahyog.core.testing.MainDispatcherRule
 import com.sahyog.core.testing.TestAuthRepository
 import com.sahyog.feature.auth.R
@@ -35,7 +36,7 @@ class PhoneEntryViewModelTest {
         viewModel.onPhoneNumberChange("1234567890")
         assertTrue(viewModel.uiState.value.isInvalidComplete)
         viewModel.onSubmit()
-        assertTrue(auth.requestedPhones.isEmpty())
+        assertTrue(auth.otpRequests.isEmpty())
     }
 
     @Test
@@ -45,8 +46,19 @@ class PhoneEntryViewModelTest {
             viewModel.onSubmit()
             assertEquals(PhoneEntryEvent.OtpSent("9876543210"), awaitItem())
         }
-        assertEquals(listOf("9876543210"), auth.requestedPhones)
+        assertEquals(listOf("9876543210" to false), auth.otpRequests)
         assertFalse(viewModel.uiState.value.isSubmitting)
+    }
+
+    @Test
+    fun `instant verification stays in the submitting state and emits no event`() = runTest {
+        auth.requestOtpResult = AppResult.Success(OtpRequestResult.SignedIn)
+        viewModel.onPhoneNumberChange("9876543210")
+        viewModel.events.test {
+            viewModel.onSubmit()
+            expectNoEvents()
+        }
+        assertTrue(viewModel.uiState.value.isSubmitting)
     }
 
     @Test

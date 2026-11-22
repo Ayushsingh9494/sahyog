@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.UserPreferencesRepository
+import com.sahyog.core.data.repository.UserRepository
 import com.sahyog.core.model.SessionState
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
@@ -30,12 +31,13 @@ sealed interface AccountUiState {
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
+    userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<AccountUiState> =
-        combine(authRepository.currentUser, preferencesRepository.preferences) { user, prefs ->
+        combine(userRepository.currentUser, preferencesRepository.preferences) { user, prefs ->
             when (val session = SessionState.resolve(user, prefs)) {
                 is SessionState.SignedIn -> AccountUiState.Ready(session.user, session.activeRole, prefs.theme)
                 // This screen only exists inside a signed-in section; anything else is transient.

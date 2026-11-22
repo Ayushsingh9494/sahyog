@@ -17,6 +17,9 @@ sealed interface AppError {
 
     data object NotFound : AppError
 
+    /** Too many attempts (e.g. OTP requests). The user must wait before retrying. */
+    data object RateLimited : AppError
+
     /** Server rejected input. [field] lets forms highlight the offending input. */
     data class Validation(val field: String? = null, val message: String? = null) : AppError
 

@@ -27,5 +27,5 @@
     <string name="auth_otp_not_received">कोड नहीं मिला?</string>
     <string name="auth_otp_resend">कोड फिर भेजें</string>
     <string name="auth_otp_resend_in">%1$d सेकंड में फिर भेजें</string>
-    <string name="auth_otp_demo_hint">डेमो मोड: कोड 123456 इस्तेमाल करें</string>
+    <string name="auth_otp_error_expired">इस कोड की समय-सीमा समाप्त हो गई है। नया कोड पाने के लिए "कोड फिर भेजें" दबाएँ।</string>
 </resources>

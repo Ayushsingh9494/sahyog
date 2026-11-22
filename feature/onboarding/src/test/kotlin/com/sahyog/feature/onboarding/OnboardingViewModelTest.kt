@@ -45,24 +45,24 @@ class OnboardingViewModelTest {
 
         viewModel.onSubmit()
         assertTrue(viewModel.uiState.value.showNameError)
-        assertTrue(users.calls.isEmpty())
+        assertTrue(users.onboardingCalls.isEmpty())
     }
 
     @Test
     fun `submits trimmed name with both roles`() {
-        users.result = AppResult.Success(savedUser)
+        users.onboardingResult = AppResult.Success(savedUser)
         viewModel.onNameChange("  Asha Verma ")
         viewModel.onRoleToggle(UserRole.Customer, true)
         viewModel.onRoleToggle(UserRole.Worker, true)
 
         viewModel.onSubmit()
 
-        assertEquals(listOf("Asha Verma" to setOf(UserRole.Customer, UserRole.Worker)), users.calls)
+        assertEquals(listOf("Asha Verma" to setOf(UserRole.Customer, UserRole.Worker)), users.onboardingCalls)
     }
 
     @Test
     fun `failure re-enables the form and shows the error`() {
-        users.result = AppResult.Failure(AppError.Network)
+        users.onboardingResult = AppResult.Failure(AppError.Network)
         viewModel.onNameChange("Asha")
         viewModel.onRoleToggle(UserRole.Worker, true)
 

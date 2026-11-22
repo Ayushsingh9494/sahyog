@@ -58,11 +58,22 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [x] Verified on device: full sign-up flow, mode switch, theme persistence across restart,
       sign-out + Back exits app (no return to signed-in screens), Hindi UI
 
-## M4: Authentication
-- [ ] Replace `FakeAuthRepository` binding with Firebase phone OTP
-- [ ] Firebase phone OTP
-- [ ] Session persistence, logout
-- [ ] Account deletion entry point (Play requirement)
+## M4: Authentication ✅
+- [x] Firebase project `sahyog-f6bad`; `google-services.json` kept out of git (each dev downloads it)
+- [x] `FirebaseAuthRepository` replaces the fake: phone OTP (+91), resend with force-resend token,
+      instant verification / auto-retrieval, 75 s safety timeout, Firebase errors → `AppError`
+- [x] Session = Firebase auth state (`AuthStateListener` flow); persists across restarts
+- [x] `LocalProfileDataSource`: TEMPORARY per-uid profile store standing in for the backend
+      (survives sign-out, so re-signing in restores the profile). Removed in M10
+- [x] Sign-out clears Firebase session + active mode
+- [x] New errors: rate limited, expired code (EN/HI)
+- [x] Verified: 53 unit tests, lint 0 errors on all modules
+- [x] Verified on device with Firebase test numbers: wrong code rejected, correct code → onboarding,
+      session survives app restart, sign-out → sign-in restores profile, second number as worker
+      (worker shell + verification banner). Play Integrity passed
+- [ ] Real-SMS test (needs Blaze plan; Firebase test numbers send no SMS)
+- [ ] Add release SHA-1/SHA-256 to Firebase when Play App Signing is set up (M14)
+- [ ] Account deletion entry point (Play requirement): moved to M10, it needs the backend
 
 ## M5: Customer discovery
 - [ ] Home, categories, search, worker profile
@@ -98,6 +109,7 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 
 ## Maintenance
 - [ ] Toolchain upgrade as a dedicated step: AGP 9.3.3 → 9.5.x (changes bundled Kotlin), Compose BOM, coroutines
+- [ ] Firebase BOM is pinned to 34.19.0: 35.x (firebase-auth 25) needs Kotlin 2.4 metadata. Bump together with the Kotlin/AGP upgrade
 
 ## Open questions
 - [ ] Final applicationId (default `com.sahyog.app`)

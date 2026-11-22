@@ -2,8 +2,8 @@ package com.sahyog.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.UserPreferencesRepository
+import com.sahyog.core.data.repository.UserRepository
 import com.sahyog.core.model.SessionState
 import com.sahyog.core.model.ThemePreference
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,12 +27,12 @@ sealed interface MainActivityUiState {
  */
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    authRepository: AuthRepository,
+    userRepository: UserRepository,
     private val preferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<MainActivityUiState> =
-        combine(authRepository.currentUser, preferencesRepository.preferences) { user, prefs ->
+        combine(userRepository.currentUser, preferencesRepository.preferences) { user, prefs ->
             MainActivityUiState.Ready(
                 session = SessionState.resolve(user, prefs),
                 theme = prefs.theme,

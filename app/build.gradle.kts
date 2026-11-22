@@ -3,6 +3,8 @@ plugins {
     id("sahyog.android.compose")
     id("sahyog.hilt")
     alias(libs.plugins.kotlin.serialization)
+    // Reads app/google-services.json (Firebase project config) at build time.
+    alias(libs.plugins.google.services)
 }
 
 android {
