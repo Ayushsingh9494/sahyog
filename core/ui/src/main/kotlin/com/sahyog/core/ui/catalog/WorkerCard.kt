@@ -30,6 +30,7 @@ import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerService
 import com.sahyog.core.ui.R
+import com.sahyog.core.ui.location.formatDistance
 
 /**
  * A worker in a list: who they are, what they do, how they're rated, where they work
@@ -40,6 +41,8 @@ fun WorkerCard(
     worker: Worker,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Straight-line distance from the customer, when their location is known. */
+    distanceKm: Double? = null,
 ) {
     SahyogCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
         Row(verticalAlignment = Alignment.Top) {
@@ -76,7 +79,7 @@ fun WorkerCard(
             )
             Spacer(Modifier.width(SahyogSpacing.xs))
             Text(
-                text = worker.locality,
+                text = distanceKm?.let { "${worker.locality} · ${formatDistance(it)}" } ?: worker.locality,
                 style = SahyogTheme.typography.bodySmall,
                 color = SahyogTheme.colors.onSurfaceVariant,
                 modifier = Modifier.weight(1f),

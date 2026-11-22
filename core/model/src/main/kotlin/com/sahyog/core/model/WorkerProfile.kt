@@ -29,6 +29,8 @@ data class WorkerProfile(
     val verificationStatus: WorkerVerificationStatus,
     /** Which document was submitted; null until one is. The image itself is never returned. */
     val idDocumentType: IdDocumentType?,
+    /** Where they work from, coarsened to ~1 km; null if not set. */
+    val location: GeoPoint? = null,
 )
 
 /** What the worker fills in on the profile form. */
@@ -39,6 +41,7 @@ data class WorkerProfileInput(
     val locality: String,
     val languages: List<String>,
     val yearsExperience: Int,
+    val location: GeoPoint? = null,
 ) {
     val isValid: Boolean
         get() = isValid(

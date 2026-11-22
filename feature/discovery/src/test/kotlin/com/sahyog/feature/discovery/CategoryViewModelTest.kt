@@ -3,6 +3,7 @@ package com.sahyog.feature.discovery
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.sahyog.core.testing.MainDispatcherRule
+import com.sahyog.core.testing.TestLocationRepository
 import com.sahyog.core.testing.TestCatalog
 import com.sahyog.core.testing.TestCatalogRepository
 import com.sahyog.feature.discovery.category.CategoryUiState
@@ -16,13 +17,14 @@ class CategoryViewModelTest {
 
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
+    private val location = TestLocationRepository()
     private val catalog = TestCatalogRepository().apply {
         setCatalog(TestCatalog.categories, TestCatalog.workers)
     }
 
     @Test
     fun `lists the workers in the category`() = runTest {
-        CategoryViewModel("electrician", catalog).uiState.test {
+        CategoryViewModel("electrician", catalog, location).uiState.test {
             val ready = awaitState<CategoryUiState.Ready>()
             assertEquals(TestCatalog.electrician, ready.category)
             assertEquals(listOf("w1", "w2"), ready.workers.map { it.id })
@@ -32,11 +34,11 @@ class CategoryViewModelTest {
 
     @Test
     fun `available only filter hides busy workers but keeps the total`() = runTest {
-        val viewModel = CategoryViewModel("electrician", catalog)
+        val viewModel = CategoryViewModel("electrician", catalog, location)
         viewModel.uiState.test {
             awaitState<CategoryUiState.Ready>()
             viewModel.onAvailableOnlyChange(true)
-            val filtered = awaitState<CategoryUiState.Ready> { it.availableOnly }
+            val filtered = awaitState<CategoryUiState.Ready> { it.filters.availableOnly }
             assertEquals(listOf("w1"), filtered.workers.map { it.id })
             assertEquals(2, filtered.totalCount)
         }
@@ -44,7 +46,7 @@ class CategoryViewModelTest {
 
     @Test
     fun `unknown category is not found`() = runTest {
-        CategoryViewModel("astrologer", catalog).uiState.test {
+        CategoryViewModel("astrologer", catalog, location).uiState.test {
             awaitState<CategoryUiState.NotFound>()
         }
     }
@@ -52,7 +54,7 @@ class CategoryViewModelTest {
     @Test
     fun `empty cache stays loading`() = runTest {
         catalog.setCatalog(emptyList(), emptyList())
-        CategoryViewModel("electrician", catalog).uiState.test {
+        CategoryViewModel("electrician", catalog, location).uiState.test {
             assertEquals(CategoryUiState.Loading, awaitItem())
             expectNoEvents()
         }

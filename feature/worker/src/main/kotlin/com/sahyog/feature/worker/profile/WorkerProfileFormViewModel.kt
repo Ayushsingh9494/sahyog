@@ -5,14 +5,18 @@ import androidx.lifecycle.viewModelScope
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.CatalogRepository
+import com.sahyog.core.data.repository.LocationRepository
 import com.sahyog.core.data.repository.WorkerProfileRepository
 import com.sahyog.core.data.repository.WorkerProfileState
+import com.sahyog.core.location.DeviceLocationResult
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.WorkerProfile
 import com.sahyog.core.model.WorkerProfileInput
 import com.sahyog.core.model.WorkerService
+import com.sahyog.core.ui.location.LocationPermissionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +55,10 @@ data class WorkerProfileFormUiState(
     val locality: String = "",
     val languages: Set<String> = emptySet(),
     val yearsExperience: String = "",
+    /** Where they work from (approximate); optional, but customers then see distance. */
+    val location: GeoPoint? = null,
+    val locationProblem: WorkLocationProblem? = null,
+    val isLocating: Boolean = false,
     /** Field errors only show after the first save attempt. */
     val showErrors: Boolean = false,
     val isSaving: Boolean = false,
@@ -65,6 +73,9 @@ data class WorkerProfileFormUiState(
     val isValid get() = categoriesValid && servicesValid && localityValid && languagesValid && yearsValid
 }
 
+/** Why the work location couldn't be set. */
+enum class WorkLocationProblem { Denied, PermanentlyDenied, Off, Unavailable }
+
 sealed interface WorkerProfileFormEvent {
     /** @property needsIdDocument The worker still has to submit an ID for verification. */
     data class Saved(val needsIdDocument: Boolean) : WorkerProfileFormEvent
@@ -77,6 +88,7 @@ sealed interface WorkerProfileFormEvent {
 class WorkerProfileFormViewModel @Inject constructor(
     catalogRepository: CatalogRepository,
     private val workerProfileRepository: WorkerProfileRepository,
+    private val locationRepository: LocationRepository,
 ) : ViewModel() {
 
     private val form = MutableStateFlow(WorkerProfileFormUiState())
@@ -130,6 +142,37 @@ class WorkerProfileFormViewModel @Inject constructor(
 
     fun onYearsChange(value: String) = form.update { it.copy(yearsExperience = value.filter(Char::isDigit).take(2)) }
 
+    /** The worker answered the permission dialog after tapping "Use my current location". */
+    fun onLocationPermissionResult(result: LocationPermissionResult) {
+        when (result) {
+            LocationPermissionResult.Granted -> locate()
+            LocationPermissionResult.Denied -> form.update { it.copy(locationProblem = WorkLocationProblem.Denied) }
+            LocationPermissionResult.PermanentlyDenied ->
+                form.update { it.copy(locationProblem = WorkLocationProblem.PermanentlyDenied) }
+        }
+    }
+
+    fun onClearLocation() = form.update { it.copy(location = null, locationProblem = null) }
+
+    private fun locate() {
+        if (form.value.isLocating) return
+        form.update { it.copy(isLocating = true, locationProblem = null) }
+        viewModelScope.launch {
+            val result = locationRepository.updateFromDevice()
+            form.update {
+                when (result) {
+                    // Coarsened here too, so the form never holds a precise home location.
+                    is DeviceLocationResult.Found -> it.copy(isLocating = false, location = result.point.coarsened())
+                    DeviceLocationResult.PermissionDenied ->
+                        it.copy(isLocating = false, locationProblem = WorkLocationProblem.Denied)
+                    DeviceLocationResult.LocationOff -> it.copy(isLocating = false, locationProblem = WorkLocationProblem.Off)
+                    DeviceLocationResult.Unavailable ->
+                        it.copy(isLocating = false, locationProblem = WorkLocationProblem.Unavailable)
+                }
+            }
+        }
+    }
+
     fun onSave() {
         val current = form.value
         if (current.isSaving) return
@@ -150,6 +193,7 @@ class WorkerProfileFormViewModel @Inject constructor(
                     // Keep the form's canonical order rather than tap order.
                     languages = WorkerProfileInput.LANGUAGES.filter { it in current.languages },
                     yearsExperience = current.yearsExperience.toInt(),
+                    location = current.location,
                 ),
             )
             form.update { it.copy(isSaving = false) }
@@ -173,5 +217,6 @@ class WorkerProfileFormViewModel @Inject constructor(
         locality = profile.locality,
         languages = profile.languages.toSet(),
         yearsExperience = profile.yearsExperience.toString(),
+        location = profile.location,
     )
 }

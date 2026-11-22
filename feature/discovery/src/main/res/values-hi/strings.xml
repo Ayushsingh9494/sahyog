@@ -55,4 +55,25 @@
     <string name="discovery_worker_price_note">ये शुरुआती दाम हैं। अंतिम दाम काम शुरू होने से पहले तय होता है।</string>
     <string name="discovery_worker_stat_description">%1$s: %2$s</string>
     <string name="discovery_worker_book">अभी बुक करें</string>
+
+    <!-- लोकेशन -->
+    <string name="discovery_home_near_you">आपके पास</string>
+    <string name="discovery_location_title">अपने पास के कारीगर देखें</string>
+    <string name="discovery_location_body">हर कारीगर कितनी दूर है, यह देखने के लिए अपनी अनुमानित लोकेशन दें। यह आपके फ़ोन पर ही रहती है।</string>
+    <string name="discovery_location_use">मेरी लोकेशन इस्तेमाल करें</string>
+    <string name="discovery_location_denied">लोकेशन के बिना हम दूरी नहीं दिखा सकते। आप फिर भी रेटिंग के हिसाब से सभी को देख सकते हैं।</string>
+    <string name="discovery_location_blocked">सहयोग के लिए लोकेशन बंद है। दूरी देखने के लिए सेटिंग में इसकी अनुमति दें।</string>
+    <string name="discovery_location_settings">सेटिंग खोलें</string>
+    <string name="discovery_location_off">आपके फ़ोन की लोकेशन बंद है। इसे चालू करके फिर से कोशिश करें।</string>
+    <string name="discovery_location_unavailable">अभी आपकी लोकेशन नहीं मिल सकी। कृपया फिर से कोशिश करें।</string>
+    <string name="discovery_location_retry">फिर से कोशिश करें</string>
+    <string name="discovery_location_using">आपके इलाके से दूरी दिखाई जा रही है</string>
+    <string name="discovery_location_update">अपडेट करें</string>
+    <string name="discovery_worker_distance">दूरी</string>
+    <string name="discovery_worker_distance_value">%1$s दूर</string>
+    <string name="discovery_sort_nearest">सबसे पास पहले</string>
+    <string name="discovery_radius_any">कोई भी दूरी</string>
+    <string name="discovery_radius_km">%1$d किमी के अंदर</string>
+    <string name="discovery_category_none_nearby_title">%1$d किमी के अंदर कोई नहीं</string>
+    <string name="discovery_category_none_nearby_message">ज़्यादा दूरी चुनें, या इस श्रेणी के सभी कारीगर देखें।</string>
 </resources>

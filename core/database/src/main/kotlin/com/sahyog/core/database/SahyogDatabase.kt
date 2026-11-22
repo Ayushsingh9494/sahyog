@@ -30,13 +30,15 @@ import com.sahyog.core.database.entity.WorkerServiceEntity
         BookingEntity::class,
         JobEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
     autoMigrations = [
         // v2: bookings table. Purely additive, so Room generates the migration.
         AutoMigration(from = 1, to = 2),
         // v3: jobs table (worker side).
         AutoMigration(from = 2, to = 3),
+        // v4: worker coordinates (nullable columns).
+        AutoMigration(from = 3, to = 4),
     ],
 )
 @TypeConverters(Converters::class)

@@ -7,6 +7,7 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserRole
 import com.sahyog.core.testing.MainDispatcherRule
+import com.sahyog.core.testing.TestLocationRepository
 import com.sahyog.core.testing.TestCatalog
 import com.sahyog.core.testing.TestCatalogRepository
 import com.sahyog.core.testing.TestUserRepository
@@ -27,9 +28,10 @@ class HomeViewModelTest {
         setUser(User("u1", "9876543210", "Asha Devi", setOf(UserRole.Customer), workerStatus = null))
     }
     private val catalog = TestCatalogRepository()
+    private val location = TestLocationRepository()
 
     // Lazy: must be created after MainDispatcherRule has installed the test Main dispatcher.
-    private val viewModel by lazy { HomeViewModel(users, catalog) }
+    private val viewModel by lazy { HomeViewModel(users, catalog, location) }
 
     @Test
     fun `refreshes on start and shows cached catalog with first name`() = runTest {

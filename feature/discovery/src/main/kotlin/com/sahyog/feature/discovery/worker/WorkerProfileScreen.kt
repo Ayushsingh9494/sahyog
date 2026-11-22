@@ -51,6 +51,7 @@ import com.sahyog.core.ui.catalog.WorkerRating
 import com.sahyog.core.ui.catalog.categoryLabel
 import com.sahyog.core.ui.catalog.formatRupees
 import com.sahyog.core.ui.catalog.priceUnitSuffix
+import com.sahyog.core.ui.location.formatDistance
 import com.sahyog.feature.discovery.R
 
 @Composable
@@ -103,13 +104,13 @@ internal fun WorkerProfileContent(
                 message = stringResource(R.string.discovery_not_found_message),
                 modifier = modifier,
             )
-            is WorkerProfileUiState.Ready -> WorkerProfile(uiState.worker, modifier)
+            is WorkerProfileUiState.Ready -> WorkerProfile(uiState.worker, uiState.distanceKm, modifier)
         }
     }
 }
 
 @Composable
-private fun WorkerProfile(worker: Worker, modifier: Modifier) {
+private fun WorkerProfile(worker: Worker, distanceKm: Double?, modifier: Modifier) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(
@@ -155,6 +156,13 @@ private fun WorkerProfile(worker: Worker, modifier: Modifier) {
         item(key = "details") {
             Section(stringResource(R.string.discovery_worker_details)) {
                 DetailRow(stringResource(R.string.discovery_worker_area), worker.locality)
+                if (distanceKm != null) {
+                    Spacer(Modifier.height(SahyogSpacing.sm))
+                    DetailRow(
+                        stringResource(R.string.discovery_worker_distance),
+                        stringResource(R.string.discovery_worker_distance_value, formatDistance(distanceKm)),
+                    )
+                }
                 if (worker.languages.isNotEmpty()) {
                     Spacer(Modifier.height(SahyogSpacing.sm))
                     DetailRow(stringResource(R.string.discovery_worker_languages), worker.languages.joinToString(", "))

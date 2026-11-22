@@ -144,6 +144,15 @@ Room: categories · workers · worker_categories · worker_services
   than 3 hours before the visit, so jobs can't be completed early.
 - Earnings are sums of completed jobs' starting prices until payments exist (M12).
 
+## Location (M8)
+
+- Customer location is read once when asked (no background tracking), coarsened to ~1 km, kept only
+  on the device and wiped on sign-out. Distances are computed on the phone for now; with the real
+  backend (M10) "near me" becomes a server-side PostGIS query that receives only the coarse point.
+- Worker work locations are stored coarsened too (they're often homes).
+- `core:location` wraps Play services behind `DeviceLocationProvider`; `core:ui` has the permission
+  requester (explain first, then ask; "denied for good" → app settings) and distance formatting.
+
 ## Conventions
 
 - Base package `com.sahyog`; module namespace `com.sahyog.<area>.<module>`.

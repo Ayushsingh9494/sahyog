@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahyog.core.data.repository.CatalogRepository
+import com.sahyog.core.data.repository.LocationRepository
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.Worker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,13 +26,19 @@ sealed interface SearchResultsState {
     /** Nothing typed yet: suggest categories instead. */
     data class Idle(val categories: List<ServiceCategory>) : SearchResultsState
 
-    data class Results(val query: String, val workers: List<Worker>) : SearchResultsState
+    /** @property distances Km by worker id; empty when the customer's location is unknown. */
+    data class Results(
+        val query: String,
+        val workers: List<Worker>,
+        val distances: Map<String, Double> = emptyMap(),
+    ) : SearchResultsState
 }
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     catalogRepository: CatalogRepository,
+    locationRepository: LocationRepository,
 ) : ViewModel() {
 
     /**
@@ -54,11 +61,19 @@ class SearchViewModel @Inject constructor(
     val results: StateFlow<SearchResultsState> = combine(
         catalogRepository.categories,
         matches,
-    ) { categories, match ->
+        locationRepository.location,
+    ) { categories, match, here ->
         if (match == null) {
             SearchResultsState.Idle(categories)
         } else {
-            SearchResultsState.Results(query = match.first, workers = match.second)
+            val (query, workers) = match
+            SearchResultsState.Results(
+                query = query,
+                workers = workers,
+                distances = here?.let { point ->
+                    workers.mapNotNull { w -> w.location?.let { w.id to point.distanceKmTo(it) } }.toMap()
+                }.orEmpty(),
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SearchResultsState.Idle(emptyList()))
 

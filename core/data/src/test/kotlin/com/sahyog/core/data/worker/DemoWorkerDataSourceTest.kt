@@ -205,6 +205,25 @@ class DemoWorkerDataSourceTest {
     }
 
     @Test
+    fun `work location is stored at about 1 km precision and shown in the catalog`() = runTest {
+        val env = env()
+        env.workers.saveProfile(input.copy(latitude = 31.308512, longitude = 75.587134))
+        assertEquals(31.31, env.workers.fetchMyProfile()?.latitude)
+        assertEquals(75.59, env.workers.fetchMyProfile()?.longitude)
+        assertEquals(
+            AppError.Validation(WorkerErrorFields.PROFILE),
+            errorOf { env.workers.saveProfile(input.copy(latitude = 95.0, longitude = 75.0)) },
+        )
+
+        env.workers.submitIdDocument("Aadhaar", photo, "image/jpeg")
+        env.now = env.now.plusSeconds(DemoServer.AUTO_VERIFY_SECONDS)
+        val catalog = env.catalog.fetchCatalog().workers
+        assertEquals(31.31, catalog.single { it.id == "ravi" }.latitude)
+        // Every sample worker has a point, so distances work out of the box.
+        assertTrue(catalog.filter { it.id != "ravi" }.all { it.latitude != null && it.longitude != null })
+    }
+
+    @Test
     fun `availability switch is saved`() = runTest {
         val env = env()
         env.workers.saveProfile(input)

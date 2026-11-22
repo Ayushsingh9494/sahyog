@@ -72,6 +72,8 @@ data class NetworkWorkerProfile(
     val status: String,
     val documentType: String? = null,
     val documentSubmittedAtMillis: Long? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 @Serializable
@@ -82,4 +84,6 @@ data class NetworkWorkerProfileInput(
     val locality: String,
     val languages: List<String>,
     val yearsExperience: Int,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )

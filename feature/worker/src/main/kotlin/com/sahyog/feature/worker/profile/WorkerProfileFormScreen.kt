@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
@@ -42,6 +43,7 @@ import com.sahyog.core.designsystem.component.SahyogButton
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogFilterChip
 import com.sahyog.core.designsystem.component.SahyogLoadingView
+import com.sahyog.core.designsystem.component.SahyogOutlinedButton
 import com.sahyog.core.designsystem.component.SahyogSegmentedControl
 import com.sahyog.core.designsystem.component.SahyogTextButton
 import com.sahyog.core.designsystem.component.SahyogTextField
@@ -54,6 +56,8 @@ import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.WorkerProfileInput
 import com.sahyog.core.ui.ObserveAsEvents
 import com.sahyog.core.ui.catalog.categoryLabel
+import com.sahyog.core.ui.location.openAppSettings
+import com.sahyog.core.ui.location.rememberLocationPermissionRequester
 import com.sahyog.core.ui.messageRes
 import com.sahyog.feature.worker.R
 import kotlinx.coroutines.launch
@@ -183,6 +187,9 @@ private fun ProfileForm(state: WorkerProfileFormUiState, viewModel: WorkerProfil
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+        item(key = "work-location") {
+            WorkLocationSection(state, viewModel)
+        }
         item(key = "years") {
             SahyogTextField(
                 value = state.yearsExperience,
@@ -288,6 +295,64 @@ private fun Section(title: String, error: String?, content: @Composable () -> Un
         if (error != null) {
             Spacer(Modifier.height(SahyogSpacing.xs))
             Text(error, style = SahyogTheme.typography.bodySmall, color = SahyogTheme.colors.error)
+        }
+    }
+}
+
+@Composable
+private fun WorkLocationSection(state: WorkerProfileFormUiState, viewModel: WorkerProfileFormViewModel) {
+    val context = LocalContext.current
+    val requestLocation = rememberLocationPermissionRequester(viewModel::onLocationPermissionResult)
+    Section(title = stringResource(R.string.worker_form_location), error = null) {
+        Text(
+            text = stringResource(R.string.worker_form_location_body),
+            style = SahyogTheme.typography.bodySmall,
+            color = SahyogTheme.colors.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(SahyogSpacing.sm))
+        if (state.location != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(SahyogIcons.Verified, contentDescription = null, tint = SahyogTheme.colors.primary)
+                Spacer(Modifier.width(SahyogSpacing.sm))
+                Text(
+                    text = stringResource(R.string.worker_form_location_set),
+                    style = SahyogTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
+                SahyogTextButton(text = stringResource(R.string.worker_form_location_remove), onClick = viewModel::onClearLocation)
+            }
+        }
+        state.locationProblem?.let { problem ->
+            Text(
+                text = stringResource(
+                    when (problem) {
+                        WorkLocationProblem.Denied -> R.string.worker_form_location_denied
+                        WorkLocationProblem.PermanentlyDenied -> R.string.worker_form_location_blocked
+                        WorkLocationProblem.Off -> R.string.worker_form_location_off
+                        WorkLocationProblem.Unavailable -> R.string.worker_form_location_unavailable
+                    },
+                ),
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.error,
+            )
+            Spacer(Modifier.height(SahyogSpacing.xs))
+        }
+        if (state.locationProblem == WorkLocationProblem.PermanentlyDenied) {
+            SahyogOutlinedButton(
+                text = stringResource(R.string.worker_form_location_settings),
+                onClick = context::openAppSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            SahyogOutlinedButton(
+                text = stringResource(
+                    if (state.location == null) R.string.worker_form_location_use else R.string.worker_form_location_update,
+                ),
+                onClick = requestLocation,
+                loading = state.isLocating,
+                leadingIcon = SahyogIcons.Location,
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

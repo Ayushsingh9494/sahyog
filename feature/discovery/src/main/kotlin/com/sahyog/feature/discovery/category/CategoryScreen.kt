@@ -1,18 +1,18 @@
 package com.sahyog.feature.discovery.category
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -24,6 +24,7 @@ import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.ui.catalog.WorkerCard
 import com.sahyog.core.ui.catalog.categoryLabel
 import com.sahyog.feature.discovery.R
@@ -38,17 +39,29 @@ fun CategoryScreen(
     CategoryContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
-        onAvailableOnlyChange = viewModel::onAvailableOnlyChange,
-        onWorkerClick = onWorkerClick,
+        actions = CategoryActions(
+            onAvailableOnlyChange = viewModel::onAvailableOnlyChange,
+            onNearestFirstChange = viewModel::onNearestFirstChange,
+            onRadiusChange = viewModel::onRadiusChange,
+            onClearFilters = viewModel::onClearFilters,
+            onWorkerClick = onWorkerClick,
+        ),
     )
 }
+
+internal data class CategoryActions(
+    val onAvailableOnlyChange: (Boolean) -> Unit,
+    val onNearestFirstChange: (Boolean) -> Unit,
+    val onRadiusChange: (Int?) -> Unit,
+    val onClearFilters: () -> Unit,
+    val onWorkerClick: (String) -> Unit,
+)
 
 @Composable
 internal fun CategoryContent(
     uiState: CategoryUiState,
     onNavigateBack: () -> Unit,
-    onAvailableOnlyChange: (Boolean) -> Unit,
-    onWorkerClick: (String) -> Unit,
+    actions: CategoryActions,
 ) {
     val title = (uiState as? CategoryUiState.Ready)?.let { categoryLabel(it.category) }.orEmpty()
     Scaffold(
@@ -65,7 +78,7 @@ internal fun CategoryContent(
                 message = stringResource(R.string.discovery_not_found_message),
                 modifier = modifier,
             )
-            is CategoryUiState.Ready -> CategoryList(uiState, onAvailableOnlyChange, onWorkerClick, modifier)
+            is CategoryUiState.Ready -> CategoryList(uiState, actions, modifier)
         }
     }
 }
@@ -73,10 +86,10 @@ internal fun CategoryContent(
 @Composable
 private fun CategoryList(
     uiState: CategoryUiState.Ready,
-    onAvailableOnlyChange: (Boolean) -> Unit,
-    onWorkerClick: (String) -> Unit,
+    actions: CategoryActions,
     modifier: Modifier,
 ) {
+    val filters = uiState.filters
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(
@@ -97,14 +110,42 @@ private fun CategoryList(
             return@LazyColumn
         }
         item(key = "filters") {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                SahyogFilterChip(
-                    label = stringResource(R.string.discovery_category_available_now),
-                    selected = uiState.availableOnly,
-                    onClick = { onAvailableOnlyChange(!uiState.availableOnly) },
-                    leadingIcon = if (uiState.availableOnly) SahyogIcons.Verified else null,
-                )
-                Spacer(Modifier.weight(1f))
+            Column(verticalArrangement = Arrangement.spacedBy(SahyogSpacing.xs)) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(SahyogSpacing.sm)) {
+                    item {
+                        SahyogFilterChip(
+                            label = stringResource(R.string.discovery_category_available_now),
+                            selected = filters.availableOnly,
+                            onClick = { actions.onAvailableOnlyChange(!filters.availableOnly) },
+                            leadingIcon = if (filters.availableOnly) SahyogIcons.Verified else null,
+                        )
+                    }
+                    // Distance options only make sense once we know where the customer is.
+                    if (uiState.hasLocation) {
+                        item {
+                            SahyogFilterChip(
+                                label = stringResource(R.string.discovery_sort_nearest),
+                                selected = filters.nearestFirst,
+                                onClick = { actions.onNearestFirstChange(!filters.nearestFirst) },
+                                leadingIcon = SahyogIcons.Location,
+                            )
+                        }
+                        item {
+                            SahyogFilterChip(
+                                label = stringResource(R.string.discovery_radius_any),
+                                selected = filters.radiusKm == null,
+                                onClick = { actions.onRadiusChange(null) },
+                            )
+                        }
+                        items(GeoPoint.RADIUS_OPTIONS_KM) { km ->
+                            SahyogFilterChip(
+                                label = stringResource(R.string.discovery_radius_km, km),
+                                selected = filters.radiusKm == km,
+                                onClick = { actions.onRadiusChange(km) },
+                            )
+                        }
+                    }
+                }
                 Text(
                     text = pluralStringResource(
                         R.plurals.discovery_category_worker_count,
@@ -118,17 +159,31 @@ private fun CategoryList(
         }
         if (uiState.workers.isEmpty()) {
             item(key = "none-available") {
+                // Say *why* the list is empty: too far away, or nobody free right now.
+                val radius = filters.radiusKm.takeIf { uiState.hasLocation }
                 SahyogEmptyView(
-                    title = stringResource(R.string.discovery_category_none_available_title),
-                    message = stringResource(R.string.discovery_category_none_available_message),
+                    title = if (radius != null) {
+                        stringResource(R.string.discovery_category_none_nearby_title, radius)
+                    } else {
+                        stringResource(R.string.discovery_category_none_available_title)
+                    },
+                    message = if (radius != null) {
+                        stringResource(R.string.discovery_category_none_nearby_message)
+                    } else {
+                        stringResource(R.string.discovery_category_none_available_message)
+                    },
                     icon = SahyogIcons.Info,
                     actionLabel = stringResource(R.string.discovery_category_show_all),
-                    onAction = { onAvailableOnlyChange(false) },
+                    onAction = actions.onClearFilters,
                 )
             }
         }
         items(uiState.workers, key = { it.id }) { worker ->
-            WorkerCard(worker = worker, onClick = { onWorkerClick(worker.id) })
+            WorkerCard(
+                worker = worker,
+                onClick = { actions.onWorkerClick(worker.id) },
+                distanceKm = uiState.distances[worker.id],
+            )
         }
     }
 }

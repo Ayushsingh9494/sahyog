@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.sahyog.core.testing.MainDispatcherRule
+import com.sahyog.core.testing.TestLocationRepository
 import com.sahyog.core.testing.TestCatalog
 import com.sahyog.core.testing.TestCatalogRepository
 import com.sahyog.feature.discovery.search.SearchResultsState
@@ -20,7 +21,7 @@ class SearchViewModelTest {
     private val catalog = TestCatalogRepository().apply {
         setCatalog(TestCatalog.categories, TestCatalog.workers)
     }
-    private val viewModel by lazy { SearchViewModel(SavedStateHandle(), catalog) }
+    private val viewModel by lazy { SearchViewModel(SavedStateHandle(), catalog, TestLocationRepository()) }
 
     @Test
     fun `empty query suggests categories`() = runTest {
@@ -74,7 +75,7 @@ class SearchViewModelTest {
 
     @Test
     fun `restores the query after process death`() = runTest {
-        val restored = SearchViewModel(SavedStateHandle(mapOf("query" to "rajesh")), catalog)
+        val restored = SearchViewModel(SavedStateHandle(mapOf("query" to "rajesh")), catalog, TestLocationRepository())
         assertEquals("rajesh", restored.query.value)
         restored.results.test {
             assertEquals(listOf("w3"), awaitState<SearchResultsState.Results>().workers.map { it.id })

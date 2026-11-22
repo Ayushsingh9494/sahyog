@@ -12,6 +12,7 @@ import com.sahyog.core.data.network.apiCall
 import com.sahyog.core.data.repository.WorkerProfileRepository
 import com.sahyog.core.data.repository.WorkerProfileState
 import com.sahyog.core.data.session.UserDataCleaner
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
@@ -57,6 +58,8 @@ internal class DefaultWorkerProfileRepository @Inject constructor(
                 locality = input.locality,
                 languages = input.languages,
                 yearsExperience = input.yearsExperience,
+                latitude = input.location?.latitude,
+                longitude = input.location?.longitude,
             ),
         ).publish()
     }
@@ -126,4 +129,5 @@ internal fun NetworkWorkerProfile.asExternalModel() = WorkerProfile(
     verificationStatus = WorkerVerificationStatus.entries.firstOrNull { it.name == status }
         ?: WorkerVerificationStatus.NotSubmitted,
     idDocumentType = IdDocumentType.entries.firstOrNull { it.name == documentType },
+    location = latitude?.let { lat -> longitude?.let { lng -> GeoPoint(lat, lng) } },
 )

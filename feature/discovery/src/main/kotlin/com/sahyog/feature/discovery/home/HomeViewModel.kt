@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.CatalogRepository
+import com.sahyog.core.data.repository.LocationRepository
 import com.sahyog.core.data.repository.UserRepository
+import com.sahyog.core.location.DeviceLocationResult
 import com.sahyog.core.model.ServiceCategory
+import com.sahyog.core.ui.location.LocationPermissionResult
 import com.sahyog.core.model.Worker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -21,6 +24,19 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/** Where the "workers near you" flow is. */
+enum class LocationStatus {
+    /** Nothing in progress (location known, or never asked). */
+    Idle,
+    Locating,
+    Denied,
+    PermanentlyDenied,
+    /** Location services are switched off on the phone. */
+    Off,
+    /** No fix arrived (e.g. indoors without network). */
+    Unavailable,
+}
 
 sealed interface HomeUiState {
     /** Nothing cached yet and the first download is in progress. */
@@ -41,6 +57,12 @@ sealed interface HomeUiState {
         val categories: List<ServiceCategory>,
         val topWorkers: List<Worker>,
         val isRefreshing: Boolean,
+        val hasLocation: Boolean = false,
+        val locationStatus: LocationStatus = LocationStatus.Idle,
+        /** Closest workers within [NEARBY_RADIUS_KM], nearest first. Empty without a location. */
+        val nearby: List<Worker> = emptyList(),
+        /** Distance in km by worker id, for every worker with a known location. */
+        val distances: Map<String, Double> = emptyMap(),
     ) : HomeUiState
 }
 
@@ -53,7 +75,11 @@ sealed interface HomeEvent {
 class HomeViewModel @Inject constructor(
     userRepository: UserRepository,
     private val catalogRepository: CatalogRepository,
+    private val locationRepository: LocationRepository,
 ) : ViewModel() {
+
+    private val locationStatus = MutableStateFlow(LocationStatus.Idle)
+    private val locationState = combine(locationRepository.location, locationStatus) { point, status -> point to status }
 
     private data class RefreshStatus(
         val inFlight: Boolean = false,
@@ -72,9 +98,20 @@ class HomeViewModel @Inject constructor(
         catalogRepository.categories,
         catalogRepository.workers(),
         refreshStatus,
-    ) { firstName, categories, workers, status ->
+        locationState,
+    ) { firstName, categories, workers, status, (here, locating) ->
+        val distances = here?.let { point ->
+            workers.mapNotNull { worker -> worker.location?.let { worker.id to point.distanceKmTo(it) } }.toMap()
+        }.orEmpty()
         when {
             categories.isNotEmpty() -> HomeUiState.Ready(
+                hasLocation = here != null,
+                locationStatus = locating,
+                distances = distances,
+                nearby = workers
+                    .filter { (distances[it.id] ?: Double.MAX_VALUE) <= NEARBY_RADIUS_KM }
+                    .sortedBy { distances[it.id] }
+                    .take(TOP_WORKER_COUNT),
                 firstName = firstName,
                 categories = categories,
                 topWorkers = workers.take(TOP_WORKER_COUNT),
@@ -90,6 +127,33 @@ class HomeViewModel @Inject constructor(
     init {
         // Keep the cache fresh every time Home is opened; cached content shows meanwhile.
         refresh(userInitiated = false)
+        // Permission granted earlier: refresh the location quietly (no prompts on open).
+        if (locationRepository.hasPermission()) viewModelScope.launch { locationRepository.updateFromDevice() }
+    }
+
+    /** The user answered the system permission dialog (after tapping "Use my location"). */
+    fun onLocationPermissionResult(result: LocationPermissionResult) {
+        when (result) {
+            LocationPermissionResult.Granted -> locate()
+            LocationPermissionResult.Denied -> locationStatus.value = LocationStatus.Denied
+            LocationPermissionResult.PermanentlyDenied -> locationStatus.value = LocationStatus.PermanentlyDenied
+        }
+    }
+
+    /** "Update" after the location is known, or "Try again" after it failed. */
+    fun onRetryLocation() = locate()
+
+    private fun locate() {
+        if (locationStatus.value == LocationStatus.Locating) return
+        locationStatus.value = LocationStatus.Locating
+        viewModelScope.launch {
+            locationStatus.value = when (locationRepository.updateFromDevice()) {
+                is DeviceLocationResult.Found -> LocationStatus.Idle
+                DeviceLocationResult.PermissionDenied -> LocationStatus.Denied
+                DeviceLocationResult.LocationOff -> LocationStatus.Off
+                DeviceLocationResult.Unavailable -> LocationStatus.Unavailable
+            }
+        }
     }
 
     fun onRefresh() = refresh(userInitiated = true)
@@ -113,6 +177,7 @@ class HomeViewModel @Inject constructor(
 
     private companion object {
         const val TOP_WORKER_COUNT = 5
+        const val NEARBY_RADIUS_KM = 25.0
         const val STOP_TIMEOUT_MS = 5_000L
     }
 }

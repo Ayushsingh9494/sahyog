@@ -136,4 +136,15 @@
     <string name="worker_badge_pending">जाँच जारी</string>
     <string name="worker_badge_verified">सत्यापित</string>
     <string name="worker_badge_action_needed">कार्रवाई ज़रूरी</string>
+    <string name="worker_form_location">काम की लोकेशन (वैकल्पिक)</string>
+    <string name="worker_form_location_body">इससे ग्राहक देख पाते हैं कि आप कितनी दूर हैं। सिर्फ़ अनुमानित जगह (लगभग 1 किमी) सेव होती है।</string>
+    <string name="worker_form_location_use">मेरी अभी की लोकेशन इस्तेमाल करें</string>
+    <string name="worker_form_location_update">अभी की लोकेशन से अपडेट करें</string>
+    <string name="worker_form_location_set">काम की लोकेशन सेट है</string>
+    <string name="worker_form_location_remove">हटाएँ</string>
+    <string name="worker_form_location_denied">लोकेशन की अनुमति नहीं मिली। आप फिर से कोशिश कर सकते हैं।</string>
+    <string name="worker_form_location_blocked">सहयोग के लिए लोकेशन बंद है। सेटिंग में इसकी अनुमति दें।</string>
+    <string name="worker_form_location_settings">सेटिंग खोलें</string>
+    <string name="worker_form_location_off">आपके फ़ोन की लोकेशन बंद है। इसे चालू करके फिर से कोशिश करें।</string>
+    <string name="worker_form_location_unavailable">आपकी लोकेशन नहीं मिल सकी। कृपया फिर से कोशिश करें।</string>
 </resources>

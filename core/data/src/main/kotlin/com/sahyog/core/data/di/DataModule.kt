@@ -9,7 +9,9 @@ import com.sahyog.core.data.catalog.CatalogNetworkDataSource
 import com.sahyog.core.data.catalog.DemoCatalogDataSource
 import com.sahyog.core.data.catalog.OfflineFirstCatalogRepository
 import com.sahyog.core.data.repository.CatalogRepository
+import com.sahyog.core.data.location.DefaultLocationRepository
 import com.sahyog.core.data.repository.JobRepository
+import com.sahyog.core.data.repository.LocationRepository
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.data.repository.LocalProfileUserRepository
@@ -84,6 +86,14 @@ internal interface DataModule {
     @Binds
     @IntoSet
     fun bindsJobCleaner(impl: OfflineFirstJobRepository): UserDataCleaner
+
+    @Binds
+    fun bindsLocationRepository(impl: DefaultLocationRepository): LocationRepository
+
+    /** The customer's last location is personal: cleared on sign-out. */
+    @Binds
+    @IntoSet
+    fun bindsLocationCleaner(impl: DefaultLocationRepository): UserDataCleaner
 }
 
 @Module

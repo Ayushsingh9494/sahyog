@@ -48,7 +48,8 @@ data class WorkerService(
  * A cooperative member as shown to customers. Only cooperative-verified workers
  * are ever returned to customers, so there is no verification flag here.
  *
- * @property locality Neighbourhood they work from. Distance-based matching comes with location (M8).
+ * @property locality Neighbourhood they work from, shown to customers.
+ * @property location Approximate (~1 km) point they work from; null if they never set one.
  */
 data class Worker(
     val id: String,
@@ -63,6 +64,7 @@ data class Worker(
     val languages: List<String>,
     val services: List<WorkerService>,
     val isAvailable: Boolean,
+    val location: GeoPoint? = null,
 ) {
     /** Lowest price across services: the "from ₹X" shown on cards. */
     val startingPrice: Paise?

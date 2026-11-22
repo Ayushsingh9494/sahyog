@@ -151,7 +151,23 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [ ] Rejected-verification flow needs the admin side (cooperative dashboard)
 
 ## M8: Location
-- [ ] Permission flow, Maps (key via secrets plugin, restricted), nearby matching
+### M8a: Location and distance ✅
+- [x] `core:model` GeoPoint: haversine distance, `coarsened()` (~1 km) for anything stored or sent
+- [x] `core:location`: one-shot fused location (balanced power, coarse is enough), never background;
+      location-off detection with an Android 8 fallback
+- [x] `LocationRepository`: last location kept coarsened, on device only, cleared on sign-out
+- [x] Permission flow: our explanation first, system dialog on tap; handles refused, refused for good
+      (→ app settings), location off, no fix; the app works fully without location
+- [x] Home "Near you" (nearest within 25 km); distances on all worker cards, search and profile
+- [x] Category: "Nearest first" and radius filter (2 / 5 / 10 / 25 km), shown only with a location;
+      empty state explains "no one within X km"
+- [x] Workers can set an optional work location (stored coarsened); sample workers placed around Jalandhar
+- [x] Room v4 (worker coordinates) via AutoMigration
+- [x] Verified: 160 unit tests, 9 device tests, lint 0 errors (caught an API 28-only call)
+- [x] Verified on device: refuse → explanation; allow approximate → "Near you" with distances;
+      nearest-first and radius filters
+### M8b: Map address picker
+- [ ] Maps key via local.properties (never committed), restricted to the app; pin-drop address picker
 
 ## M9: Reviews and ratings
 

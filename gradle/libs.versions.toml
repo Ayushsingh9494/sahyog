@@ -25,6 +25,8 @@ hilt = "2.60.1"
 # Move to 35.x together with the planned Kotlin 2.4 toolchain upgrade.
 firebaseBom = "34.19.0"
 googleServices = "4.6.0"
+# Fused location: battery-friendly current location for "near me" sorting.
+playServicesLocation = "21.4.0"
 
 # KotlinX
 kotlinxCoroutines = "1.10.2"
@@ -72,6 +74,7 @@ androidx-hilt-lifecycle-viewmodel-compose = { group = "androidx.hilt", name = "h
 # Firebase (versions come from the BOM)
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 # KotlinX
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }

@@ -8,6 +8,7 @@ import com.sahyog.core.data.demo.DemoServer
 import com.sahyog.core.data.network.ApiException
 import com.sahyog.core.datastore.LocalProfileDataSource
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
 import com.sahyog.core.model.JOB_START_WINDOW_HOURS
 import com.sahyog.core.model.JobAction
@@ -33,6 +34,13 @@ internal class DemoWorkerDataSource @Inject constructor(
 
     override suspend fun saveProfile(input: NetworkWorkerProfileInput): NetworkWorkerProfile = server.call { uid ->
         if (!input.isValid()) throw ApiException(AppError.Validation(WorkerErrorFields.PROFILE))
+        // Never store more than ~1 km precision: it's where someone works from, often their home.
+        val point = input.latitude?.let { lat ->
+            input.longitude?.let { lng ->
+                runCatching { GeoPoint(lat, lng).coarsened() }.getOrNull()
+                    ?: throw ApiException(AppError.Validation(WorkerErrorFields.PROFILE))
+            }
+        }
         val existing = state.workers[uid]
         val saved = NetworkWorkerProfile(
             categoryIds = input.categoryIds.distinct(),
@@ -46,6 +54,8 @@ internal class DemoWorkerDataSource @Inject constructor(
             status = existing?.status ?: WorkerVerificationStatus.NotSubmitted.name,
             documentType = existing?.documentType,
             documentSubmittedAtMillis = existing?.documentSubmittedAtMillis,
+            latitude = point?.latitude,
+            longitude = point?.longitude,
         )
         state = state.copy(workers = state.workers + (uid to saved))
         saved

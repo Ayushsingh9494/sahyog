@@ -38,12 +38,33 @@ internal class DemoCatalogDataSource @Inject constructor(
                     languages = profile.languages,
                     services = profile.services,
                     isAvailable = profile.isAvailable,
+                    latitude = profile.latitude,
+                    longitude = profile.longitude,
                 )
             }
-        NetworkCatalog(categories = categories, workers = sampleWorkers + realWorkers)
+        val located = sampleWorkers.map { worker ->
+            val point = SAMPLE_AREAS[worker.locality]
+            worker.copy(latitude = point?.first, longitude = point?.second)
+        }
+        NetworkCatalog(categories = categories, workers = located + realWorkers)
     }
 
     private companion object {
+        /**
+         * Approximate centres of the sample workers' areas, placed around Jalandhar
+         * (Punjab). Fictional workers, real-world-ish points so distances look realistic.
+         */
+        val SAMPLE_AREAS = mapOf(
+            "Model Town" to (31.3085 to 75.5871),
+            "Civil Lines" to (31.3302 to 75.5796),
+            "Gandhi Nagar" to (31.3365 to 75.5642),
+            "Rajendra Nagar" to (31.3178 to 75.5968),
+            "Shastri Nagar" to (31.3149 to 75.5710),
+            "Old City" to (31.3256 to 75.5762),
+            "Sector 14" to (31.2958 to 75.6105),
+            "Railway Colony" to (31.3331 to 75.5852),
+        )
+
 
         val categories = listOf(
             NetworkCategory(

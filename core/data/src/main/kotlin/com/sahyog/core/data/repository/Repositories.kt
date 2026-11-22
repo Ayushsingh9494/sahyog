@@ -1,9 +1,11 @@
 package com.sahyog.core.data.repository
 
 import com.sahyog.core.common.result.AppResult
+import com.sahyog.core.location.DeviceLocationResult
 import com.sahyog.core.model.AuthSession
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
 import com.sahyog.core.model.Job
 import com.sahyog.core.model.ServiceCategory
@@ -171,4 +173,16 @@ interface JobRepository {
     suspend fun startJob(jobId: String, startCode: String): AppResult<Job>
 
     suspend fun complete(jobId: String): AppResult<Job>
+}
+
+/** The customer's approximate location, for showing distances and sorting by "near me". */
+interface LocationRepository {
+    /** Last known location (~1 km precision), or null if never shared. */
+    val location: Flow<GeoPoint?>
+
+    /** Whether the app currently holds a location permission. */
+    fun hasPermission(): Boolean
+
+    /** Asks the device for a fresh fix and remembers it if found. */
+    suspend fun updateFromDevice(): DeviceLocationResult
 }

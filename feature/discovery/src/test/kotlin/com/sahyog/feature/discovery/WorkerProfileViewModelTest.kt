@@ -3,6 +3,7 @@ package com.sahyog.feature.discovery
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.sahyog.core.testing.MainDispatcherRule
+import com.sahyog.core.testing.TestLocationRepository
 import com.sahyog.core.testing.TestCatalog
 import com.sahyog.core.testing.TestCatalogRepository
 import com.sahyog.feature.discovery.worker.WorkerProfileUiState
@@ -22,14 +23,14 @@ class WorkerProfileViewModelTest {
 
     @Test
     fun `shows the worker`() = runTest {
-        WorkerProfileViewModel("w1", catalog).uiState.test {
+        WorkerProfileViewModel("w1", catalog, TestLocationRepository()).uiState.test {
             assertEquals(WorkerProfileUiState.Ready(TestCatalog.ramesh), awaitLoaded())
         }
     }
 
     @Test
     fun `worker removed from the catalog becomes not found`() = runTest {
-        WorkerProfileViewModel("w1", catalog).uiState.test {
+        WorkerProfileViewModel("w1", catalog, TestLocationRepository()).uiState.test {
             awaitLoaded()
             catalog.setCatalog(TestCatalog.categories, listOf(TestCatalog.rajesh))
             assertEquals(WorkerProfileUiState.NotFound, awaitItem())

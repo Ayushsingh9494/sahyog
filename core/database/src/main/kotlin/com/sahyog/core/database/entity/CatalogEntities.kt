@@ -37,6 +37,9 @@ data class WorkerEntity(
     val languages: List<String>,
     @ColumnInfo(name = "is_available") val isAvailable: Boolean,
     @ColumnInfo(name = "starting_price_paise") val startingPricePaise: Long?,
+    // Added in v4 (nullable, so the auto-migration needs no default).
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 /** Which categories a worker serves (many-to-many). */

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        Approximate location is enough for "workers near me" and is what we ask for first.
+        FINE is declared so a user can choose "Precise" in the system dialog if they want
+        more accurate distances; the app works fully with approximate only.
+        No background location: the app only reads location while it is open.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+</manifest>

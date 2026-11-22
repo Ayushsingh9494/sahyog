@@ -43,4 +43,7 @@
     <string name="core_ui_booking_status_expired">Expired</string>
     <!-- Badge for a worker with no reviews yet -->
     <string name="core_ui_worker_new">New</string>
+    <!-- Distances, e.g. "800 m" or "2.3 km" -->
+    <string name="core_ui_distance_m">%1$d m</string>
+    <string name="core_ui_distance_km">%1$s km</string>
 </resources>

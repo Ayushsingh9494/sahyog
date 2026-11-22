@@ -24,7 +24,7 @@ class MigrationTest {
     )
 
     @Test
-    fun migrate2To3KeepsBookings() {
+    fun migrate2ToLatestKeepsBookings() {
         helper.createDatabase(dbName, 2).apply {
             execSQL(
                 """
@@ -37,7 +37,7 @@ class MigrationTest {
             close()
         }
 
-        helper.runMigrationsAndValidate(dbName, 3, true)
+        helper.runMigrationsAndValidate(dbName, LATEST_VERSION, true)
 
         val database = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -62,7 +62,7 @@ class MigrationTest {
         }
 
         // Runs every migration up to the latest version and checks the result matches its schema.
-        helper.runMigrationsAndValidate(dbName, 3, true)
+        helper.runMigrationsAndValidate(dbName, LATEST_VERSION, true)
 
         val database = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -78,5 +78,9 @@ class MigrationTest {
         } finally {
             database.close()
         }
+    }
+
+    private companion object {
+        const val LATEST_VERSION = 4
     }
 }

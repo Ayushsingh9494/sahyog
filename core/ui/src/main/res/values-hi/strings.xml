@@ -40,4 +40,6 @@
     <string name="core_ui_booking_status_rejected">अस्वीकार</string>
     <string name="core_ui_booking_status_expired">समय समाप्त</string>
     <string name="core_ui_worker_new">नया</string>
+    <string name="core_ui_distance_m">%1$d मी</string>
+    <string name="core_ui_distance_km">%1$s किमी</string>
 </resources>

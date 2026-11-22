@@ -95,6 +95,8 @@ internal class OfflineFirstCatalogRepository @Inject constructor(
                     languages = worker.languages,
                     isAvailable = worker.isAvailable,
                     startingPricePaise = worker.services.minOfOrNull { it.pricePaise },
+                    latitude = worker.latitude,
+                    longitude = worker.longitude,
                 )
             },
             // Skip links to categories the response didn't include, so a partial

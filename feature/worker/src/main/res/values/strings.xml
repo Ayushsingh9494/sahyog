@@ -138,4 +138,16 @@
     <string name="worker_badge_pending">Under review</string>
     <string name="worker_badge_verified">Verified</string>
     <string name="worker_badge_action_needed">Action needed</string>
+    <!-- Work location on the profile form -->
+    <string name="worker_form_location">Work location (optional)</string>
+    <string name="worker_form_location_body">Lets customers see how far you are. Only an approximate point (about 1 km) is saved.</string>
+    <string name="worker_form_location_use">Use my current location</string>
+    <string name="worker_form_location_update">Update to my current location</string>
+    <string name="worker_form_location_set">Work location set</string>
+    <string name="worker_form_location_remove">Remove</string>
+    <string name="worker_form_location_denied">Location permission was refused. You can try again.</string>
+    <string name="worker_form_location_blocked">Location is turned off for Sahyog. Allow it in Settings.</string>
+    <string name="worker_form_location_settings">Open settings</string>
+    <string name="worker_form_location_off">Your phone\'s location is switched off. Turn it on and try again.</string>
+    <string name="worker_form_location_unavailable">Couldn\'t find your location. Please try again.</string>
 </resources>

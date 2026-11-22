@@ -1,5 +1,6 @@
 package com.sahyog.core.database.entity
 
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.ServiceCategory
@@ -22,6 +23,7 @@ fun PopulatedWorker.asExternalModel() = Worker(
     languages = worker.languages,
     services = services.sortedBy { it.position }.map { it.asExternalModel() },
     isAvailable = worker.isAvailable,
+    location = worker.latitude?.let { lat -> worker.longitude?.let { lng -> GeoPoint(lat, lng) } },
 )
 
 private fun WorkerServiceEntity.asExternalModel() = WorkerService(

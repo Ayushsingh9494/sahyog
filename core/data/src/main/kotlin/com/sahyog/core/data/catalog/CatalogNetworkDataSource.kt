@@ -39,6 +39,8 @@ data class NetworkWorker(
     val languages: List<String>,
     val services: List<NetworkWorkerService>,
     val isAvailable: Boolean,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 /** @property unit "PerVisit", "PerHour" or "PerJob". */

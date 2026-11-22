@@ -131,7 +131,11 @@ internal fun SearchContent(
                         )
                     }
                     items(results.workers, key = { it.id }) { worker ->
-                        WorkerCard(worker = worker, onClick = { onWorkerClick(worker.id) })
+                        WorkerCard(
+                            worker = worker,
+                            onClick = { onWorkerClick(worker.id) },
+                            distanceKm = results.distances[worker.id],
+                        )
                     }
                 }
             }

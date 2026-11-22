@@ -56,4 +56,27 @@
     <!-- Screen-reader text for a stat cell, e.g. "Jobs done: 486" -->
     <string name="discovery_worker_stat_description">%1$s: %2$s</string>
     <string name="discovery_worker_book">Book now</string>
+
+    <!-- Location -->
+    <string name="discovery_home_near_you">Near you</string>
+    <string name="discovery_location_title">See workers near you</string>
+    <string name="discovery_location_body">Share your approximate location to see how far each worker is. It stays on your phone.</string>
+    <string name="discovery_location_use">Use my location</string>
+    <string name="discovery_location_denied">Without location we can\'t show distances. You can still browse everyone by rating.</string>
+    <string name="discovery_location_blocked">Location is turned off for Sahyog. Allow it in Settings to see distances.</string>
+    <string name="discovery_location_settings">Open settings</string>
+    <string name="discovery_location_off">Your phone\'s location is switched off. Turn it on and try again.</string>
+    <string name="discovery_location_unavailable">We couldn\'t find your location just now. Please try again.</string>
+    <string name="discovery_location_retry">Try again</string>
+    <string name="discovery_location_using">Showing distances from your area</string>
+    <string name="discovery_location_update">Update</string>
+    <string name="discovery_worker_distance">Distance</string>
+    <!-- e.g. "2.3 km away" -->
+    <string name="discovery_worker_distance_value">%1$s away</string>
+    <string name="discovery_sort_nearest">Nearest first</string>
+    <string name="discovery_radius_any">Any distance</string>
+    <!-- e.g. "Within 5 km" -->
+    <string name="discovery_radius_km">Within %1$d km</string>
+    <string name="discovery_category_none_nearby_title">No one within %1$d km</string>
+    <string name="discovery_category_none_nearby_message">Try a wider distance, or see everyone in this category.</string>
 </resources>

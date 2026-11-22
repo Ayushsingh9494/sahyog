@@ -8,6 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.platform.LocalContext
+import com.sahyog.core.designsystem.component.SahyogCard
+import com.sahyog.core.designsystem.component.SahyogOutlinedButton
+import com.sahyog.core.designsystem.component.SahyogTextButton
+import com.sahyog.core.ui.location.openAppSettings
+import com.sahyog.core.ui.location.rememberLocationPermissionRequester
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -70,6 +78,8 @@ fun HomeScreen(
             }
         }
     }
+    val context = LocalContext.current
+    val requestLocation = rememberLocationPermissionRequester(viewModel::onLocationPermissionResult)
     HomeContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
@@ -78,8 +88,20 @@ fun HomeScreen(
         onSearchClick = onSearchClick,
         onCategoryClick = onCategoryClick,
         onWorkerClick = onWorkerClick,
+        locationActions = LocationActions(
+            onUseLocation = requestLocation,
+            onRetry = viewModel::onRetryLocation,
+            onOpenSettings = context::openAppSettings,
+        ),
     )
 }
+
+internal data class LocationActions(
+    /** Shows the system permission dialog (after our own explanation). */
+    val onUseLocation: () -> Unit,
+    val onRetry: () -> Unit,
+    val onOpenSettings: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +113,7 @@ internal fun HomeContent(
     onSearchClick: () -> Unit,
     onCategoryClick: (String) -> Unit,
     onWorkerClick: (String) -> Unit,
+    locationActions: LocationActions,
 ) {
     Scaffold(
         containerColor = SahyogTheme.colors.surface,
@@ -125,7 +148,7 @@ internal fun HomeContent(
                 onRefresh = onRefresh,
                 modifier = modifier,
             ) {
-                HomeList(uiState, onSearchClick, onCategoryClick, onWorkerClick)
+                HomeList(uiState, onSearchClick, onCategoryClick, onWorkerClick, locationActions)
             }
         }
     }
@@ -137,6 +160,7 @@ private fun HomeList(
     onSearchClick: () -> Unit,
     onCategoryClick: (String) -> Unit,
     onWorkerClick: (String) -> Unit,
+    locationActions: LocationActions,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -171,6 +195,19 @@ private fun HomeList(
             )
         }
         item(key = "services") { CategoryGrid(uiState.categories, onCategoryClick) }
+        item(key = "location") { LocationCard(uiState, locationActions) }
+        if (uiState.nearby.isNotEmpty()) {
+            item(key = "near-header") {
+                SectionHeader(
+                    text = stringResource(R.string.discovery_home_near_you),
+                    modifier = Modifier.padding(top = SahyogSpacing.sm),
+                )
+            }
+            // A worker can be in both lists, so keys are prefixed per section.
+            items(uiState.nearby, key = { "near-${it.id}" }) { worker ->
+                WorkerCard(worker = worker, onClick = { onWorkerClick(worker.id) }, distanceKm = uiState.distances[worker.id])
+            }
+        }
         if (uiState.topWorkers.isNotEmpty()) {
             item(key = "top-header") {
                 SectionHeader(
@@ -178,10 +215,68 @@ private fun HomeList(
                     modifier = Modifier.padding(top = SahyogSpacing.sm),
                 )
             }
-            items(uiState.topWorkers, key = { it.id }) { worker ->
-                WorkerCard(worker = worker, onClick = { onWorkerClick(worker.id) })
+            items(uiState.topWorkers, key = { "top-${it.id}" }) { worker ->
+                WorkerCard(worker = worker, onClick = { onWorkerClick(worker.id) }, distanceKm = uiState.distances[worker.id])
             }
         }
+    }
+}
+
+/**
+ * Explains why we'd like the location *before* the system dialog appears, and handles
+ * every outcome: refused, refused for good (send to settings), location off, no fix.
+ * Once a location is known it shrinks to a one-line "update" row.
+ */
+@Composable
+private fun LocationCard(state: HomeUiState.Ready, actions: LocationActions) {
+    val status = state.locationStatus
+    if (state.hasLocation && status == LocationStatus.Idle) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                SahyogIcons.Location,
+                contentDescription = null,
+                tint = SahyogTheme.colors.primary,
+                modifier = Modifier.size(SahyogSize.iconSmall),
+            )
+            Spacer(Modifier.width(SahyogSpacing.xs))
+            Text(
+                text = stringResource(R.string.discovery_location_using),
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            SahyogTextButton(text = stringResource(R.string.discovery_location_update), onClick = actions.onRetry)
+        }
+        return
+    }
+    val (bodyRes, actionRes, onAction) = when (status) {
+        LocationStatus.Idle, LocationStatus.Locating ->
+            Triple(R.string.discovery_location_body, R.string.discovery_location_use, actions.onUseLocation)
+        LocationStatus.Denied ->
+            Triple(R.string.discovery_location_denied, R.string.discovery_location_use, actions.onUseLocation)
+        LocationStatus.PermanentlyDenied ->
+            Triple(R.string.discovery_location_blocked, R.string.discovery_location_settings, actions.onOpenSettings)
+        LocationStatus.Off ->
+            Triple(R.string.discovery_location_off, R.string.discovery_location_retry, actions.onRetry)
+        LocationStatus.Unavailable ->
+            Triple(R.string.discovery_location_unavailable, R.string.discovery_location_retry, actions.onRetry)
+    }
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(SahyogIcons.Location, contentDescription = null, tint = SahyogTheme.colors.primary)
+            Spacer(Modifier.width(SahyogSpacing.sm))
+            Text(stringResource(R.string.discovery_location_title), style = SahyogTheme.typography.titleMedium)
+        }
+        Spacer(Modifier.height(SahyogSpacing.xs))
+        Text(stringResource(bodyRes), style = SahyogTheme.typography.bodyMedium, color = SahyogTheme.colors.onSurfaceVariant)
+        Spacer(Modifier.height(SahyogSpacing.md))
+        SahyogOutlinedButton(
+            text = stringResource(actionRes),
+            onClick = onAction,
+            loading = status == LocationStatus.Locating,
+            leadingIcon = SahyogIcons.Location,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -242,6 +337,7 @@ private fun HomeContentPreview() {
             onSearchClick = {},
             onCategoryClick = {},
             onWorkerClick = {},
+            locationActions = LocationActions({}, {}, {}),
         )
     }
 }
