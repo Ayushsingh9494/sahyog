@@ -45,7 +45,15 @@ dependencies {
     // /actuator/health for uptime checks (Cloud Run later).
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Google Cloud (production profile only is configured to use them):
+    // - Cloud SQL connector: private, IAM-authorised connection to the database, no public IP rules.
+    runtimeOnly("com.google.cloud.sql:postgres-socket-factory:1.31.1")
+    // - Cloud Storage for ID photos, in a private bucket.
+    implementation(platform("com.google.cloud:libraries-bom:26.94.0"))
+    implementation("com.google.cloud:google-cloud-storage")
+
     // Local development only: starts compose.yaml (PostGIS in Docker) with ./gradlew bootRun.
+    developmentOnly(platform(SpringBootPlugin.BOM_COORDINATES))
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -56,6 +64,11 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.bootJar {
+    // A fixed name, so the Dockerfile can copy it.
+    archiveFileName = "sahyog-server.jar"
 }
 
 tasks.bootRun {

@@ -104,3 +104,27 @@ sample workers around Jalandhar (the same ones the app's demo catalog had), with
 past jobs and reviews. Being fictional, they "accept" requests by themselves after 20 seconds
 (`SampleWorkerAutoAccept`, dev only). None of this exists in production. ID photos uploaded
 locally go to `backend/data/documents` (gitignored).
+
+## Google Cloud (temporary test deployment)
+
+`deploy/deploy.sh` creates, in Mumbai (asia-south1): a Cloud Run service (scales to zero), a Cloud
+SQL PostgreSQL 17 instance (smallest size, no backups), a private Cloud Storage bucket for ID photos,
+a random database password in Secret Manager, and a service account with only the roles it needs.
+The server runs with the `prod` profile (`application-prod.yaml`); nothing secret is in the repo.
+
+```sh
+cd backend
+ADMIN_PHONE_NUMBERS="+91XXXXXXXXXX" deploy/deploy.sh   # prints the https URL
+```
+
+Then set `SAHYOG_API_URL=<that URL>/` in the app's `local.properties` and rebuild the app.
+
+**Cost:** Cloud SQL is billed every hour it exists, used or not. When finished:
+
+```sh
+deploy/teardown.sh   # deletes the service, database, bucket, secret, images, service account
+```
+
+To keep the data, first export it: `gcloud sql export sql sahyog-db gs://<bucket>/backup.sql
+--database=sahyog` (or `pg_dump` through the Cloud SQL proxy) and download it before teardown.
+

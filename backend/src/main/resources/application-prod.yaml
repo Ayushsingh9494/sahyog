@@ -1,0 +1,23 @@
+# Production on Google Cloud (Cloud Run + Cloud SQL + Cloud Storage). Everything specific to the
+# deployment comes from environment variables set by deploy/deploy.sh; no secrets in this file.
+spring:
+  datasource:
+    # Connects through the Cloud SQL connector (IAM-authorised, encrypted), not a public IP.
+    url: jdbc:postgresql:///${DB_NAME:sahyog}?cloudSqlInstance=${DB_INSTANCE}&socketFactory=com.google.cloud.sql.postgres.SocketFactory
+    username: ${DB_USER:sahyog}
+    # Injected by Cloud Run from Secret Manager.
+    password: ${DB_PASSWORD}
+    hikari:
+      # Small instance (db-f1-micro allows ~25 connections); keep well under it.
+      maximum-pool-size: 5
+  docker:
+    compose:
+      enabled: false
+
+sahyog:
+  storage:
+    bucket: ${DOCUMENTS_BUCKET}
+
+server:
+  # Cloud Run tells the container which port to listen on.
+  port: ${PORT:8080}

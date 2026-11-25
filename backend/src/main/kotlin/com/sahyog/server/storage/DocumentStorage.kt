@@ -1,6 +1,10 @@
 package com.sahyog.server.storage
 
+import com.google.cloud.storage.BlobId
+import com.google.cloud.storage.BlobInfo
+import com.google.cloud.storage.StorageOptions
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,7 +25,9 @@ interface DocumentStorage {
     fun load(key: String): ByteArray?
 }
 
+/** Development and tests: a folder on disk. */
 @Component
+@Profile("!prod")
 class LocalDocumentStorage(
     @Value("\${sahyog.storage.documents-dir}") directory: String,
 ) : DocumentStorage {
@@ -40,6 +46,27 @@ class LocalDocumentStorage(
         val id = runCatching { UUID.fromString(key) }.getOrNull() ?: return null
         val file = root.resolve(id.toString())
         return if (Files.isRegularFile(file)) Files.readAllBytes(file) else null
+    }
+}
+
+/**
+ * Production: a private Cloud Storage bucket (encrypted at rest by Google; public access
+ * prevented on the bucket). The server's service account is the only reader and writer.
+ */
+@Component
+@Profile("prod")
+class CloudDocumentStorage(@Value("\${sahyog.storage.bucket}") private val bucket: String) : DocumentStorage {
+    private val storage = StorageOptions.getDefaultInstance().service
+
+    override fun save(bytes: ByteArray): String {
+        val key = UUID.randomUUID().toString()
+        storage.create(BlobInfo.newBuilder(BlobId.of(bucket, key)).build(), bytes)
+        return key
+    }
+
+    override fun load(key: String): ByteArray? {
+        val id = runCatching { UUID.fromString(key) }.getOrNull() ?: return null
+        return storage.get(BlobId.of(bucket, id.toString()))?.getContent()
     }
 }
 

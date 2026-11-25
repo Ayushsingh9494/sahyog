@@ -1,0 +1,8 @@
+# Only the Dockerfile and the built jar are uploaded to Cloud Build.
+*
+!Dockerfile
+!build/
+build/*
+!build/libs/
+build/libs/*
+!build/libs/sahyog-server.jar
