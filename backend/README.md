@@ -81,7 +81,7 @@ Every error is `{"code": "...", "field": "..."}` with a matching HTTP status
 ## Admins
 
 Cooperative staff are configured on the server, never through the API: set `ADMIN_PHONE_NUMBERS`
-(E.164, comma-separated, e.g. `+919812345678`) and they become admins the next time they open the
+(E.164, comma-separated, e.g. `+91XXXXXXXXXX`) and they become admins the next time they open the
 app. Removing a number doesn't revoke an existing admin; do that in the database. Locally:
 
 ```sh

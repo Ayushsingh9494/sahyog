@@ -31,7 +31,7 @@ sahyog:
   firebase:
     project-id: ${FIREBASE_PROJECT_ID:sahyog-f6bad}
   admin:
-    # Cooperative staff by phone number (E.164, comma-separated), e.g. "+919812345678".
+    # Cooperative staff by phone number (E.164, comma-separated), e.g. "+91XXXXXXXXXX".
     phone-numbers: ${ADMIN_PHONE_NUMBERS:}
   storage:
     # Private folder for ID documents. Production replaces this with a private Cloud Storage bucket.
