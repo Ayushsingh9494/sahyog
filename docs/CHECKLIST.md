@@ -229,8 +229,18 @@ Cloud SQL, Mumbai).
       PostGIS nearest query works
 - [ ] Admin screen (web dashboard vs in-app is still an open question); the API is ready for either
 - [ ] Production: Cloud Storage bucket for documents (private, encrypted) instead of a local folder
-### M10c: Bookings, jobs, reviews
-- [ ] Booking + job lifecycle, start code, time rules, reviews and ratings: the demo server's rules
+### M10c: Bookings, jobs, reviews ✅
+- [x] V3 `bookings` (snapshots of names/service/price, map pin, start code, review columns); a partial
+      unique index makes double booking impossible even under concurrent requests
+- [x] Customer API: list, book (server price, slot rules in India time, pin rules), cancel, review
+- [x] Worker API: jobs list and lifecycle steps under a row lock; 3-hour start window; start code
+- [x] Fixed a demo leak: the worker's job list never includes the start code (the demo sent it)
+- [x] Expiry of unanswered requests (every minute + on read); public reviews by first name;
+      catalog ratings and completed-job counts computed from bookings
+- [x] Dev only: fictional past reviews for the sample workers, and sample workers auto-accept
+- [x] Tests use a movable clock and a temporary uploads folder
+- [x] Verified: 20 integration tests on real PostGIS; manual dev run: V3 applied, sample ratings
+      (e.g. 4.7 from 3), dev auto-accept issued a start code
 ### M10d: App switch-over
 - [ ] Retrofit + auth interceptor (Firebase ID token), base URL via local.properties, `adb reverse`
 - [ ] Replace the demo data sources; remove `DemoServer`; full two-account test on the phone

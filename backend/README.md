@@ -55,6 +55,23 @@ Every error is `{"code": "...", "field": "..."}` with a matching HTTP status
 | GET | `/api/v1/admin/verifications/{uid}/document` | Admin: the latest ID image (`no-store`) |
 | POST | `/api/v1/admin/verifications/{uid}/approve` | Admin: Pending → Verified |
 | POST | `/api/v1/admin/verifications/{uid}/reject` | Admin: `{"reason"}` → Rejected (the worker may submit again) |
+| GET | `/api/v1/bookings` | The customer's bookings (with the start code once accepted) |
+| POST | `/api/v1/bookings` | Book: worker, service, slot, address, note, optional map pin → 201 |
+| POST | `/api/v1/bookings/{id}/cancel` | Only while Requested or Accepted |
+| POST | `/api/v1/bookings/{id}/review` | `{"rating", "comment"}` once, within 14 days of completion |
+| GET | `/api/v1/worker/jobs` | The worker's jobs (never includes the start code) |
+| POST | `/api/v1/worker/jobs/{id}/accept` · `decline` · `start-trip` · `complete` | One lifecycle step |
+| POST | `/api/v1/worker/jobs/{id}/start` | `{"startCode"}`: the code the customer reads out |
+| GET | `/api/v1/workers/{id}/reviews` | Recent reviews, newest first, reviewers by first name |
+
+## Booking rules (server-enforced)
+
+- Slots: 9, 11, 1, 3, 5 and 7 o'clock (2 hours), at least 60 minutes ahead, up to 7 days ahead, in
+  India time (`sahyog.time-zone`).
+- One live booking per worker per slot, enforced by a unique index (no race between customers).
+- Workers set off / start at most 3 hours before the visit; starting needs the customer's code.
+- Requests nobody accepts expire when the visit time arrives (checked every minute and on every read).
+- Ratings and completed-job counts are computed from bookings; clients never send them.
 
 ## Admins
 
@@ -70,5 +87,7 @@ An admin can't approve their own worker profile. Every decision is kept (who, wh
 ## Development data
 
 `./gradlew bootRun` uses the `dev` profile, which also loads `db/devdata`: 18 **fictional**
-sample workers around Jalandhar (the same ones the app's demo catalog had). They are never
-loaded in production. ID photos uploaded locally go to `backend/data/documents` (gitignored).
+sample workers around Jalandhar (the same ones the app's demo catalog had), with a few fictional
+past jobs and reviews. Being fictional, they "accept" requests by themselves after 20 seconds
+(`SampleWorkerAutoAccept`, dev only). None of this exists in production. ID photos uploaded
+locally go to `backend/data/documents` (gitignored).

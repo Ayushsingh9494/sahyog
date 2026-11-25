@@ -5,41 +5,11 @@ import org.hamcrest.Matchers.hasItem
 import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 
 class WorkerVerificationFlowTest : ApiTest() {
-
-    private fun profileJson(
-        categories: String = """["electrician"]""",
-        price: Long = 30_000,
-        languages: String = """["Hindi","Punjabi"]""",
-        location: String = """"latitude":31.308512,"longitude":75.587134""",
-    ) = """
-        {"categoryIds":$categories,
-         "services":[{"name":" Fan repair ","pricePaise":$price,"unit":"PerVisit"}],
-         "about":"Ten years of house wiring.","locality":"Model Town","languages":$languages,
-         "yearsExperience":10,$location}
-    """.trimIndent()
-
-    private fun saveProfile(uid: String, body: String = profileJson()) = mvc.put("/api/v1/worker/profile") {
-        with(token(uid))
-        contentType = MediaType.APPLICATION_JSON
-        content = body
-    }
-
-    /** The first bytes of a real JPEG, enough for the content check. */
-    private val jpeg = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0xE0.toByte()) + ByteArray(2_000) { 7 }
-
-    private fun upload(uid: String, bytes: ByteArray = jpeg, type: String = "Aadhaar") =
-        mvc.multipart("/api/v1/worker/profile/document") {
-            with(token(uid))
-            file(MockMultipartFile("image", "id.jpg", "image/jpeg", bytes))
-            param("type", type)
-        }
 
     @Test
     fun `only workers have a worker profile`() {

@@ -99,6 +99,10 @@ data class WorkerRecord(
     val location: LatLng?,
     /** Straight-line km from the point a query was made for; null otherwise. */
     val distanceKm: Double? = null,
+    /** Average of customers' ratings (0 when nobody has rated yet) and how many there are. */
+    val rating: Double = 0.0,
+    val ratingCount: Int = 0,
+    val jobsCompleted: Int = 0,
 )
 
 data class DocumentRecord(
@@ -217,8 +221,15 @@ class WorkerRepository(private val jdbc: JdbcClient) {
             """
             SELECT p.*, u.name, u.worker_status,
                    ST_Y(p.location::geometry) AS lat, ST_X(p.location::geometry) AS lng,
-                   $distance AS distance_km
+                   $distance AS distance_km,
+                   COALESCE(s.rating, 0) AS rating, COALESCE(s.rating_count, 0) AS rating_count,
+                   COALESCE(s.jobs_completed, 0) AS jobs_completed
             FROM worker_profiles p JOIN users u ON u.uid = p.uid
+            LEFT JOIN LATERAL (
+                SELECT avg(b.review_rating) AS rating, count(b.review_rating) AS rating_count,
+                       count(*) FILTER (WHERE b.status = 'Completed') AS jobs_completed
+                FROM bookings b WHERE b.worker_uid = p.uid
+            ) s ON true
             $where
             ORDER BY ${if (distanceFrom != null) "distance_km" else "u.name"}
             """.trimIndent(),
@@ -262,6 +273,9 @@ class WorkerRepository(private val jdbc: JdbcClient) {
             isAvailable = getBoolean("is_available"),
             location = if (lat != null && lng != null) LatLng(lat, lng) else null,
             distanceKm = getDouble("distance_km").takeUnless { wasNull() },
+            rating = getDouble("rating"),
+            ratingCount = getInt("rating_count"),
+            jobsCompleted = getInt("jobs_completed"),
         )
     }
 

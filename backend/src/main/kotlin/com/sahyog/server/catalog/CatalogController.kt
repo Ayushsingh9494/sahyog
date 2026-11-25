@@ -69,14 +69,14 @@ class CatalogController(private val workers: WorkerRepository, private val jdbc:
             )
         }.list()
 
-    // Ratings and completed jobs are computed from reviews and bookings (M10c); new until then.
+    /** Ratings and completed jobs are computed from bookings, never stored or sent by a client. */
     private fun WorkerRecord.toPublic() = PublicWorker(
         id = uid,
         name = name,
         categoryIds = categoryIds,
-        rating = 0f,
-        ratingCount = 0,
-        jobsCompleted = 0,
+        rating = (Math.round(rating * 10) / 10.0).toFloat(),
+        ratingCount = ratingCount,
+        jobsCompleted = jobsCompleted,
         yearsExperience = yearsExperience,
         locality = locality,
         about = about,

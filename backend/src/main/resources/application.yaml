@@ -26,6 +26,8 @@ spring:
   # Locally the Docker Compose support fills these in from compose.yaml.
 
 sahyog:
+  # Visit slots ("11 AM – 1 PM") are local times in the cooperative's time zone.
+  time-zone: Asia/Kolkata
   firebase:
     project-id: ${FIREBASE_PROJECT_ID:sahyog-f6bad}
   storage:
