@@ -28,6 +28,12 @@ data class GeoPoint(val latitude: Double, val longitude: Double) {
      */
     fun coarsened(): GeoPoint = GeoPoint(latitude.roundTo(COARSE_DECIMALS), longitude.roundTo(COARSE_DECIMALS))
 
+    /**
+     * About 1 m precision: enough for a worker to find the door, without pretending to
+     * GPS accuracy the phone doesn't have. Only for a customer's own booking address.
+     */
+    fun doorstep(): GeoPoint = GeoPoint(latitude.roundTo(DOORSTEP_DECIMALS), longitude.roundTo(DOORSTEP_DECIMALS))
+
     private fun Double.roundTo(decimals: Int): Double {
         val factor = 10.0.pow(decimals)
         return kotlin.math.round(this * factor) / factor
@@ -36,6 +42,13 @@ data class GeoPoint(val latitude: Double, val longitude: Double) {
     companion object {
         private const val EARTH_RADIUS_KM = 6371.0088
         private const val COARSE_DECIMALS = 2
+        private const val DOORSTEP_DECIMALS = 5
+
+        /** A point from optional stored/received coordinates; null if missing or out of range. */
+        fun ofOrNull(latitude: Double?, longitude: Double?): GeoPoint? {
+            if (latitude == null || longitude == null) return null
+            return runCatching { GeoPoint(latitude, longitude) }.getOrNull()
+        }
 
         /** Radius choices offered to customers, in km. */
         val RADIUS_OPTIONS_KM = listOf(2, 5, 10, 25)

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("sahyog.android.application")
     id("sahyog.android.compose")
@@ -15,6 +17,10 @@ android {
         applicationId = "com.sahyog.app"
         versionCode = 1
         versionName = "0.1.0"
+
+        // Google Maps key: read from the untracked local.properties (or a CI secret), never
+        // committed. Without one the app still builds; it just hides the map picker.
+        manifestPlaceholders["mapsApiKey"] = mapsApiKey()
     }
 
     buildFeatures {
@@ -63,4 +69,15 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+/** `MAPS_API_KEY` from local.properties, else the environment (CI), else empty. */
+fun mapsApiKey(): String {
+    val localFile = rootProject.file("local.properties")
+    val local = if (localFile.exists()) {
+        Properties().apply { localFile.inputStream().use(::load) }.getProperty("MAPS_API_KEY")
+    } else {
+        null
+    }
+    return (local ?: System.getenv("MAPS_API_KEY")).orEmpty().trim()
 }

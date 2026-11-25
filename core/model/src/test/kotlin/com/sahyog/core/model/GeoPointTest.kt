@@ -28,6 +28,14 @@ class GeoPointTest {
         assertEquals(0.0, precise.distanceKmTo(precise.coarsened()), 1.0)
     }
 
+    @Test
+    fun `doorstep keeps about a metre, and bad stored values become null`() {
+        assertEquals(GeoPoint(31.25679, 75.70432), GeoPoint(31.256789, 75.704321).doorstep())
+        assertEquals(GeoPoint(1.0, 2.0), GeoPoint.ofOrNull(1.0, 2.0))
+        assertEquals(null, GeoPoint.ofOrNull(1.0, null))
+        assertEquals(null, GeoPoint.ofOrNull(200.0, 2.0))
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `rejects impossible coordinates`() {
         GeoPoint(91.0, 0.0)

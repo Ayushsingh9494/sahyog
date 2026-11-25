@@ -166,8 +166,21 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 - [x] Verified: 160 unit tests, 9 device tests, lint 0 errors (caught an API 28-only call)
 - [x] Verified on device: refuse → explanation; allow approximate → "Near you" with distances;
       nearest-first and radius filters
-### M8b: Map address picker
-- [ ] Maps key via local.properties (never committed), restricted to the app; pin-drop address picker
+### M8b: Map address picker ✅
+- [x] Maps key from `local.properties` / CI env var into the manifest (never committed); key restricted
+      to `com.sahyog.app` + debug SHA-1 and to Maps SDK for Android only; no key → picker hidden
+- [x] maps-compose 7.0.0 (newest built with Kotlin 2.2; 8.x+ waits for the toolchain upgrade)
+- [x] Pin-drop picker: fixed centre pin, "My location", address under the pin via Android's built-in
+      Geocoder (free, no key); confirm fills the address (a typed address is kept)
+- [x] Pin stored with the booking at ~1 m precision (server validates), shared only with the assigned
+      worker; worker gets "Directions" (Google Maps universal link, no key)
+- [x] Room v6 (pin columns on bookings and jobs) via AutoMigration
+- [x] Verified: 183 unit tests, 10 device tests (incl. v6 migration), lint 0 errors
+- [x] Verified on device: map loads with the restricted key, jumps to current location, address
+      updates while dragging, confirm fills the form, booking shows "Map pin", worker's Directions
+      opens Google Maps navigation to the pin
+- [ ] Release: add the release signing SHA-1 to the Maps key restriction (M14)
+- [ ] Dark map style to match the dark theme
 
 ## M9: Reviews and ratings ✅
 - [x] `core:model` BookingReview (on the booking/job), WorkerReview (public), ReviewInput rules

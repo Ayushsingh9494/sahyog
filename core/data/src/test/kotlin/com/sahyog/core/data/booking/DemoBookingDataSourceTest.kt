@@ -43,6 +43,22 @@ class DemoBookingDataSourceTest {
     }
 
     @Test
+    fun `a map pin is kept at doorstep precision, and must be both coordinates on Earth`() = runTest {
+        val source = env().bookings
+        val pinned = source.createBooking(request.copy(latitude = 31.3085123456, longitude = 75.5871987654))
+        assertEquals(31.30851, pinned.latitude!!, 1e-9)
+        assertEquals(75.5872, pinned.longitude!!, 1e-9)
+
+        assertValidation(BookingErrorFields.LOCATION) {
+            source.createBooking(request.copy(slotStartHour = 13, latitude = 31.3, longitude = null))
+        }
+        assertValidation(BookingErrorFields.LOCATION) {
+            source.createBooking(request.copy(slotStartHour = 13, latitude = 95.0, longitude = 75.0))
+        }
+        assertNull(source.createBooking(request.copy(slotStartHour = 13)).latitude)
+    }
+
+    @Test
     fun `sample worker accepts after the delay and a start code is issued`() = runTest {
         val env = env()
         env.bookings.createBooking(request)

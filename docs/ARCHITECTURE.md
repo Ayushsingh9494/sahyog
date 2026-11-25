@@ -152,6 +152,12 @@ Room: categories · workers · worker_categories · worker_services
 - Worker work locations are stored coarsened too (they're often homes).
 - `core:location` wraps Play services behind `DeviceLocationProvider`; `core:ui` has the permission
   requester (explain first, then ask; "denied for good" → app settings) and distance formatting.
+- Map picker (M8b): the Maps key lives only in `local.properties` (or a CI secret) and is injected
+  as a manifest placeholder; it is restricted in Google Cloud to this package + signing SHA-1 and to
+  Maps SDK for Android. A booking's pin is kept at ~1 m (`GeoPoint.doorstep()`), unlike every other
+  location, because the worker needs the door; it is only sent to the customer and the assigned
+  worker. Addresses come from Android's `Geocoder` (no key, no cost); directions open the Google
+  Maps universal link.
 
 ## Reviews (M9)
 

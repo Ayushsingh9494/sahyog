@@ -149,4 +149,6 @@
     <string name="worker_form_location_unavailable">आपकी लोकेशन नहीं मिल सकी। कृपया फिर से कोशिश करें।</string>
     <string name="worker_home_rating_title">ग्राहकों से आपकी रेटिंग</string>
     <string name="worker_job_review_title">ग्राहक की रेटिंग</string>
+    <string name="worker_job_directions">रास्ता देखें</string>
+    <string name="worker_job_directions_unavailable">रास्ता दिखाने के लिए कोई मैप ऐप नहीं मिला।</string>
 </resources>

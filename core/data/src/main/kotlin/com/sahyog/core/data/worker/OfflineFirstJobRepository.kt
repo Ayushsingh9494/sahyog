@@ -10,6 +10,7 @@ import com.sahyog.core.database.dao.JobDao
 import com.sahyog.core.database.entity.asEntity
 import com.sahyog.core.database.entity.asExternalModel
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.Job
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
@@ -72,4 +73,5 @@ internal fun NetworkBooking.asJob() = Job(
     createdAt = Instant.ofEpochMilli(createdAtMillis),
     completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
     review = review?.asExternalModel(),
+    location = GeoPoint.ofOrNull(latitude, longitude),
 )

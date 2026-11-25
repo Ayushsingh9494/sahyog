@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.Job
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
@@ -32,6 +33,8 @@ data class JobEntity(
     @ColumnInfo(name = "review_rating") val reviewRating: Int? = null,
     @ColumnInfo(name = "review_comment") val reviewComment: String? = null,
     @ColumnInfo(name = "reviewed_at") val reviewedAt: Instant? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 fun JobEntity.asExternalModel() = Job(
@@ -47,6 +50,7 @@ fun JobEntity.asExternalModel() = Job(
     createdAt = createdAt,
     completedAt = completedAt,
     review = reviewOf(reviewRating, reviewComment, reviewedAt),
+    location = GeoPoint.ofOrNull(latitude, longitude),
 )
 
 fun Job.asEntity() = JobEntity(
@@ -65,4 +69,6 @@ fun Job.asEntity() = JobEntity(
     reviewRating = review?.rating,
     reviewComment = review?.comment,
     reviewedAt = review?.createdAt,
+    latitude = location?.latitude,
+    longitude = location?.longitude,
 )

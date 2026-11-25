@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
@@ -39,6 +40,8 @@ data class BookingEntity(
     @ColumnInfo(name = "review_rating") val reviewRating: Int? = null,
     @ColumnInfo(name = "review_comment") val reviewComment: String? = null,
     @ColumnInfo(name = "reviewed_at") val reviewedAt: Instant? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 /** The three review columns, read back as one value (all set, or none). */
@@ -60,6 +63,7 @@ fun BookingEntity.asExternalModel() = Booking(
     createdAt = createdAt,
     completedAt = completedAt,
     review = reviewOf(reviewRating, reviewComment, reviewedAt),
+    location = GeoPoint.ofOrNull(latitude, longitude),
 )
 
 fun Booking.asEntity() = BookingEntity(
@@ -80,4 +84,6 @@ fun Booking.asEntity() = BookingEntity(
     reviewRating = review?.rating,
     reviewComment = review?.comment,
     reviewedAt = review?.createdAt,
+    latitude = location?.latitude,
+    longitude = location?.longitude,
 )

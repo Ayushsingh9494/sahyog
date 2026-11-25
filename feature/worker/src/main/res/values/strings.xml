@@ -152,4 +152,6 @@
     <string name="worker_form_location_unavailable">Couldn\'t find your location. Please try again.</string>
     <string name="worker_home_rating_title">Your rating from customers</string>
     <string name="worker_job_review_title">Customer\'s rating</string>
+    <string name="worker_job_directions">Directions</string>
+    <string name="worker_job_directions_unavailable">No maps app found to show directions.</string>
 </resources>

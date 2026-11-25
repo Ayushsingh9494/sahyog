@@ -8,6 +8,7 @@ import com.sahyog.core.data.booking.BookingErrorFields
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.data.repository.CatalogRepository
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.TimeSlot
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerService
@@ -49,6 +50,8 @@ sealed interface BookServiceUiState {
         val address: String,
         val note: String,
         val isSubmitting: Boolean,
+        /** Pin from the map picker; null if the customer only typed the address. */
+        val location: GeoPoint? = null,
     ) : BookServiceUiState {
         val addressIsValid: Boolean
             get() = address.trim().length >= BookingRequest.ADDRESS_MIN_LENGTH
@@ -85,6 +88,7 @@ class BookServiceViewModel @AssistedInject constructor(
         val note: String = "",
         val isSubmitting: Boolean = false,
         val addressEdited: Boolean = false,
+        val location: GeoPoint? = null,
     )
 
     private val input = MutableStateFlow(Input())
@@ -116,6 +120,7 @@ class BookServiceViewModel @AssistedInject constructor(
             address = input.address,
             note = input.note,
             isSubmitting = input.isSubmitting,
+            location = input.location,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BookServiceUiState.Loading)
 
@@ -139,6 +144,21 @@ class BookServiceViewModel @AssistedInject constructor(
         it.copy(address = value.take(BookingRequest.ADDRESS_MAX_LENGTH), addressEdited = true)
     }
 
+    /**
+     * A pin from the map picker. Its address replaces the field only if the customer hasn't
+     * typed one themselves (a pre-filled address from last time doesn't count).
+     */
+    fun onLocationPicked(point: GeoPoint, address: String?) = input.update {
+        val replace = address != null && (!it.addressEdited || it.address.isBlank())
+        it.copy(
+            location = point,
+            address = if (replace) address.take(BookingRequest.ADDRESS_MAX_LENGTH) else it.address,
+            addressEdited = it.addressEdited || replace,
+        )
+    }
+
+    fun onLocationClear() = input.update { it.copy(location = null) }
+
     fun onNoteChange(value: String) = input.update { it.copy(note = value.take(BookingRequest.NOTE_MAX_LENGTH)) }
 
     fun onSubmit() {
@@ -155,6 +175,7 @@ class BookServiceViewModel @AssistedInject constructor(
                     slot = slot,
                     address = form.address,
                     note = form.note.ifBlank { null },
+                    location = form.location,
                 ),
             )
             when (result) {

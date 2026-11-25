@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.booking.BookingErrorFields
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.TimeSlot
@@ -110,6 +111,42 @@ class BookServiceViewModelTest {
         assertEquals("Wiring", request.serviceName)
         assertEquals(TimeSlot(today.plusDays(1), 9), request.slot)
         assertNull(request.note)
+    }
+
+    @Test
+    fun `a map pin fills an empty address, is sent with the booking, and can be removed`() = runTest {
+        val pin = GeoPoint(31.30851, 75.58712)
+        val viewModel = viewModel()
+        viewModel.uiState.test {
+            awaitForm()
+            viewModel.onLocationPicked(pin, "Model Town, Jalandhar, Punjab 144003")
+            val form = awaitForm { it.location != null }
+            assertEquals("Model Town, Jalandhar, Punjab 144003", form.address)
+
+            viewModel.onSlotSelect(TimeSlot(today.plusDays(1), 9))
+            awaitForm { it.canSubmit }
+            cancelAndIgnoreRemainingEvents()
+        }
+        viewModel.eventFlow.test {
+            viewModel.onSubmit()
+            awaitItem()
+        }
+        assertEquals(pin, bookings.createRequests.single().location)
+
+        viewModel.onLocationClear()
+        viewModel.uiState.test { assertNull(awaitForm { it.location == null }.location) }
+    }
+
+    @Test
+    fun `a typed address is kept when a pin is dropped`() = runTest {
+        val viewModel = viewModel()
+        viewModel.uiState.test {
+            awaitForm()
+            viewModel.onAddressChange("Flat 4, Rose Apartments, Model Town")
+            viewModel.onLocationPicked(GeoPoint(31.3, 75.5), "Some street")
+            val form = awaitForm { it.location != null }
+            assertEquals("Flat 4, Rose Apartments, Model Town", form.address)
+        }
     }
 
     @Test

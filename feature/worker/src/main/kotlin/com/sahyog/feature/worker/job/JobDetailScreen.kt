@@ -1,5 +1,13 @@
 package com.sahyog.feature.worker.job
 
+import com.sahyog.core.designsystem.icon.SahyogIcons
+import com.sahyog.core.model.GeoPoint
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import android.widget.Toast
+import android.content.Intent
+import android.content.Context
+import android.content.ActivityNotFoundException
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -246,6 +254,17 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
                     DetailRow(stringResource(R.string.worker_job_address), job.address)
                     job.note?.let { DetailRow(stringResource(R.string.worker_job_note), it) }
                 }
+                val pin = job.location
+                if (pin != null && job.status.isActive) {
+                    Spacer(Modifier.height(SahyogSpacing.md))
+                    val context = LocalContext.current
+                    SahyogOutlinedButton(
+                        text = stringResource(R.string.worker_job_directions),
+                        onClick = { context.openDirections(pin) },
+                        leadingIcon = SahyogIcons.Location,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }
@@ -401,3 +420,16 @@ private const val CODE_LENGTH = 4
 private val DetailLabelWidth = 88.dp
 
 private val ReviewStar = 20.dp
+
+/**
+ * Opens turn-by-turn directions to the customer's pin in Google Maps (or the browser if
+ * the app isn't installed). The universal Maps URL needs no API key.
+ */
+private fun Context.openDirections(destination: GeoPoint) {
+    val uri = "https://www.google.com/maps/dir/?api=1&destination=${destination.latitude},${destination.longitude}".toUri()
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, uri))
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.worker_job_directions_unavailable, Toast.LENGTH_SHORT).show()
+    }
+}

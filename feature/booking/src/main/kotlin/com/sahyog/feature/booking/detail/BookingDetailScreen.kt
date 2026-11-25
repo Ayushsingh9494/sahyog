@@ -456,6 +456,9 @@ private fun DetailsSection(booking: Booking, today: LocalDate, onWorkerClick: (S
                 )
                 DetailRow(stringResource(R.string.booking_detail_when), bookingWhen(booking, today))
                 DetailRow(stringResource(R.string.booking_detail_address), booking.address)
+                if (booking.location != null) {
+                    DetailRow(stringResource(R.string.booking_detail_pin), stringResource(R.string.booking_detail_pin_value))
+                }
                 booking.note?.let { DetailRow(stringResource(R.string.booking_detail_note), it) }
             }
         }

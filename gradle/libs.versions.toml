@@ -27,6 +27,9 @@ firebaseBom = "34.19.0"
 googleServices = "4.6.0"
 # Fused location: battery-friendly current location for "near me" sorting.
 playServicesLocation = "21.4.0"
+# Google Maps for Compose (pulls in play-services-maps 19.2.0). 7.0.0 is the newest
+# release built with Kotlin 2.2; 8.x+ needs the Kotlin 2.3/2.4 toolchain upgrade.
+mapsCompose = "7.0.0"
 
 # KotlinX
 kotlinxCoroutines = "1.10.2"
@@ -75,6 +78,7 @@ androidx-hilt-lifecycle-viewmodel-compose = { group = "androidx.hilt", name = "h
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 
 # KotlinX
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }

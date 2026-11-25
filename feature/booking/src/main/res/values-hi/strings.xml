@@ -75,4 +75,24 @@
     <string name="booking_reviewed_message">रेटिंग के लिए धन्यवाद</string>
     <string name="booking_error_review_closed">इस बुकिंग को अब रेटिंग नहीं दी जा सकती।</string>
     <string name="booking_error_review_invalid">1 से 5 स्टार चुनें, और टिप्पणी 500 अक्षरों से कम रखें।</string>
+
+    <!-- Map pin -->
+    <string name="booking_book_pick_on_map">मैप पर चुनें</string>
+    <string name="booking_book_pin_set">मैप पर पिन लगा है</string>
+    <string name="booking_book_pin_change">बदलें</string>
+    <string name="booking_book_pin_remove">हटाएँ</string>
+    <string name="booking_book_address_hint_pinned">फ़्लैट या मकान नंबर लिखें ताकि कारीगर सही दरवाज़े तक पहुँचे।</string>
+    <string name="booking_detail_pin">मैप पिन</string>
+    <string name="booking_detail_pin_value">आपके कारीगर के साथ साझा</string>
+    <string name="booking_map_title">अपनी जगह चुनें</string>
+    <string name="booking_map_hint">मैप खिसकाकर पिन को अपने दरवाज़े पर रखें</string>
+    <string name="booking_map_label">काम का पता</string>
+    <string name="booking_map_finding">पता ढूँढ रहे हैं…</string>
+    <string name="booking_map_no_address">यहाँ का पता नहीं मिला। अगली स्क्रीन पर लिख सकते हैं।</string>
+    <string name="booking_map_confirm">जगह पक्की करें</string>
+    <string name="booking_map_my_location">मेरी जगह</string>
+    <string name="booking_map_open_settings">सेटिंग्स</string>
+    <string name="booking_map_permission_denied">लोकेशन की अनुमति के बिना, मैप को खुद अपनी जगह पर ले जाएँ।</string>
+    <string name="booking_map_location_off">लोकेशन बंद है। उसे चालू करें, या मैप को अपनी जगह पर ले जाएँ।</string>
+    <string name="booking_map_location_unavailable">आपकी जगह नहीं मिली। मैप को अपनी जगह पर ले जाएँ।</string>
 </resources>

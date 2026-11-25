@@ -14,6 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SAHYOG"
         tools:targetApi="33">
+        <!-- Restricted to this app's package + signing certificate and to the Maps SDK.
+             Filled in at build time from local.properties; see app/build.gradle.kts. -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${mapsApiKey}" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

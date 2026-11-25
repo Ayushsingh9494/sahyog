@@ -33,7 +33,7 @@ import com.sahyog.core.database.entity.WorkerServiceEntity
         JobEntity::class,
         ReviewEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
     autoMigrations = [
         // v2: bookings table. Purely additive, so Room generates the migration.
@@ -44,6 +44,8 @@ import com.sahyog.core.database.entity.WorkerServiceEntity
         AutoMigration(from = 3, to = 4),
         // v5: reviews (nullable review columns on bookings and jobs, worker_reviews table).
         AutoMigration(from = 4, to = 5),
+        // v6: the customer's map pin on bookings and jobs (nullable columns).
+        AutoMigration(from = 5, to = 6),
     ],
 )
 @TypeConverters(Converters::class)

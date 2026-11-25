@@ -13,6 +13,7 @@ import java.time.temporal.TemporalAdjusters
  * @property customerName As registered; null for very old records.
  * @property completedAt When the worker marked it done; null until then.
  * @property review The customer's rating of this job, once they give one.
+ * @property location The customer's pin, for directions; null if they only typed an address.
  */
 data class Job(
     val id: String,
@@ -27,6 +28,7 @@ data class Job(
     val createdAt: Instant,
     val completedAt: Instant?,
     val review: BookingReview? = null,
+    val location: GeoPoint? = null,
 )
 
 /** How long before the visit the worker may set off or start (so jobs can't be "done" early). */

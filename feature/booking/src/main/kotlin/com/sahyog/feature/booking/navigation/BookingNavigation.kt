@@ -1,6 +1,9 @@
 package com.sahyog.feature.booking.navigation
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -10,7 +13,11 @@ import com.sahyog.feature.booking.book.BookServiceViewModel
 import com.sahyog.feature.booking.detail.BookingDetailScreen
 import com.sahyog.feature.booking.detail.BookingDetailViewModel
 import com.sahyog.feature.booking.list.BookingsScreen
+import com.sahyog.feature.booking.map.MapPickerScreen
+import com.sahyog.feature.booking.map.MapPickerViewModel
+import com.sahyog.core.model.GeoPoint
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /** The Bookings bottom-nav tab. */
 @Serializable data object BookingsRoute
@@ -18,6 +25,14 @@ import kotlinx.serialization.Serializable
 @Serializable internal data class BookServiceRoute(val workerId: String)
 
 @Serializable internal data class BookingDetailRoute(val bookingId: String)
+
+/** @property latitude With [longitude], a pin chosen earlier, to adjust it. */
+@Serializable internal data class MapPickerRoute(val latitude: Double? = null, val longitude: Double? = null)
+
+/** What the map picker hands back to the booking form (via its saved state). */
+@Serializable private data class PickedLocation(val latitude: Double, val longitude: Double, val address: String?)
+
+private const val PICKED_LOCATION_KEY = "picked_location"
 
 fun NavController.navigateToBookService(workerId: String) = navigate(BookServiceRoute(workerId))
 
@@ -40,16 +55,43 @@ fun NavGraphBuilder.bookingDestinations(
     }
     composable<BookServiceRoute> { entry ->
         val route = entry.toRoute<BookServiceRoute>()
+        val viewModel = hiltViewModel<BookServiceViewModel, BookServiceViewModel.Factory>(
+            creationCallback = { factory -> factory.create(route.workerId) },
+        )
+        // A pin coming back from the map picker: apply it once, then forget it.
+        val picked by entry.savedStateHandle.getStateFlow<String?>(PICKED_LOCATION_KEY, null)
+            .collectAsStateWithLifecycle()
+        LaunchedEffect(picked) {
+            val json = picked ?: return@LaunchedEffect
+            val location = Json.decodeFromString<PickedLocation>(json)
+            viewModel.onLocationPicked(GeoPoint(location.latitude, location.longitude), location.address)
+            entry.savedStateHandle[PICKED_LOCATION_KEY] = null
+        }
         BookServiceScreen(
-            viewModel = hiltViewModel<BookServiceViewModel, BookServiceViewModel.Factory>(
-                creationCallback = { factory -> factory.create(route.workerId) },
-            ),
+            viewModel = viewModel,
             onNavigateBack = navController::navigateUp,
+            onPickOnMap = { current -> navController.navigate(MapPickerRoute(current?.latitude, current?.longitude)) },
             onBooked = { bookingId ->
                 // Replace the form with the new booking, so Back doesn't reopen a submitted form.
                 navController.navigate(BookingDetailRoute(bookingId)) {
                     popUpTo<BookServiceRoute> { inclusive = true }
                 }
+            },
+        )
+    }
+    composable<MapPickerRoute> { entry ->
+        val route = entry.toRoute<MapPickerRoute>()
+        MapPickerScreen(
+            viewModel = hiltViewModel<MapPickerViewModel, MapPickerViewModel.Factory>(
+                creationCallback = { factory -> factory.create(GeoPoint.ofOrNull(route.latitude, route.longitude)) },
+            ),
+            onNavigateBack = navController::navigateUp,
+            onPicked = { point, address ->
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    PICKED_LOCATION_KEY,
+                    Json.encodeToString(PickedLocation(point.latitude, point.longitude, address)),
+                )
+                navController.navigateUp()
             },
         )
     }

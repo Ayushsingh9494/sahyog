@@ -93,6 +93,7 @@ data class BookingWorker(
  *   to start the job, proving they're actually at the customer's place.
  * @property completedAt When the worker marked the job done; null until then.
  * @property review The customer's rating, once given.
+ * @property location Where the customer dropped the pin, if they did; shared only with the worker.
  */
 data class Booking(
     val id: String,
@@ -108,6 +109,7 @@ data class Booking(
     val createdAt: Instant,
     val completedAt: Instant? = null,
     val review: BookingReview? = null,
+    val location: GeoPoint? = null,
 )
 
 /** What the customer submits; the server fills in price, status and ids. */
@@ -117,6 +119,8 @@ data class BookingRequest(
     val slot: TimeSlot,
     val address: String,
     val note: String?,
+    /** Optional pin from the map picker, so the worker can navigate to the door. */
+    val location: GeoPoint? = null,
 ) {
     companion object {
         const val ADDRESS_MIN_LENGTH = 10

@@ -31,6 +31,7 @@ object BookingErrorFields {
     const val SLOT = "slot"
     const val SLOT_TAKEN = "slot_taken"
     const val ADDRESS = "address"
+    const val LOCATION = "location"
     const val STATUS = "status"
     const val REVIEW = "review"
 
@@ -44,6 +45,8 @@ object BookingErrorFields {
  * @property customerName Shown to the worker; null in older records.
  * @property completedAtMillis When the worker marked the job done.
  * @property review The customer's rating; visible to the customer and the worker.
+ * @property latitude With [longitude], the customer's map pin; only ever sent to the customer
+ *   and the assigned worker.
  */
 @Serializable
 data class NetworkBooking(
@@ -63,6 +66,8 @@ data class NetworkBooking(
     val customerName: String? = null,
     val completedAtMillis: Long? = null,
     val review: NetworkReview? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )
 
 @Serializable
@@ -86,4 +91,6 @@ data class NetworkBookingRequest(
     val slotStartHour: Int,
     val address: String,
     val note: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 )

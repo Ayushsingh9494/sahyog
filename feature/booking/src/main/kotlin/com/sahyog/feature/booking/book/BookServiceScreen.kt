@@ -1,5 +1,12 @@
 package com.sahyog.feature.booking.book
 
+import androidx.compose.material3.Icon
+import com.sahyog.core.designsystem.icon.SahyogIcons
+import com.sahyog.core.designsystem.component.SahyogTextButton
+import com.sahyog.core.designsystem.component.SahyogOutlinedButton
+import com.sahyog.feature.booking.map.hasMapsKey
+import com.sahyog.core.model.GeoPoint
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -70,6 +77,7 @@ fun BookServiceScreen(
     viewModel: BookServiceViewModel,
     onNavigateBack: () -> Unit,
     onBooked: (bookingId: String) -> Unit,
+    onPickOnMap: (current: GeoPoint?) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -94,6 +102,8 @@ fun BookServiceScreen(
             onAddressChange = viewModel::onAddressChange,
             onNoteChange = viewModel::onNoteChange,
             onSubmit = viewModel::onSubmit,
+            onPickOnMap = if (LocalContext.current.hasMapsKey()) onPickOnMap else null,
+            onLocationClear = viewModel::onLocationClear,
         ),
     )
 }
@@ -105,6 +115,9 @@ internal data class BookServiceActions(
     val onAddressChange: (String) -> Unit,
     val onNoteChange: (String) -> Unit,
     val onSubmit: () -> Unit,
+    /** Null when this build has no Maps key: the map option is hidden. */
+    val onPickOnMap: ((GeoPoint?) -> Unit)? = null,
+    val onLocationClear: () -> Unit = {},
 )
 
 @Composable
@@ -218,11 +231,17 @@ private fun BookingForm(form: BookServiceUiState.Form, actions: BookServiceActio
         }
         item(key = "address") {
             Section(stringResource(R.string.booking_book_address)) {
+                actions.onPickOnMap?.let { pick ->
+                    MapPinRow(form.location, onPick = { pick(form.location) }, onClear = actions.onLocationClear)
+                    Spacer(Modifier.height(SahyogSpacing.md))
+                }
                 SahyogTextField(
                     value = form.address,
                     onValueChange = actions.onAddressChange,
                     label = stringResource(R.string.booking_book_address_label),
-                    supportingText = stringResource(R.string.booking_book_address_hint),
+                    supportingText = stringResource(
+                        if (form.location != null) R.string.booking_book_address_hint_pinned else R.string.booking_book_address_hint,
+                    ),
                     singleLine = false,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                     modifier = Modifier.fillMaxWidth(),
@@ -316,3 +335,28 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 private val AvatarSize = 48.dp
+
+/** "Pick on map", or once a pin is set: "Pinned on map · Change · Remove". */
+@Composable
+private fun MapPinRow(location: GeoPoint?, onPick: () -> Unit, onClear: () -> Unit) {
+    if (location == null) {
+        SahyogOutlinedButton(
+            text = stringResource(R.string.booking_book_pick_on_map),
+            onClick = onPick,
+            leadingIcon = SahyogIcons.Location,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    } else {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Icon(SahyogIcons.Location, contentDescription = null, tint = SahyogTheme.colors.primary)
+            Spacer(Modifier.width(SahyogSpacing.sm))
+            Text(
+                text = stringResource(R.string.booking_book_pin_set),
+                style = SahyogTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f),
+            )
+            SahyogTextButton(text = stringResource(R.string.booking_book_pin_change), onClick = onPick)
+            SahyogTextButton(text = stringResource(R.string.booking_book_pin_remove), onClick = onClear)
+        }
+    }
+}

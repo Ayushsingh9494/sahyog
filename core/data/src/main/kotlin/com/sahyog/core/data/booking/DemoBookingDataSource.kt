@@ -7,6 +7,7 @@ import com.sahyog.core.data.demo.StoredBooking
 import com.sahyog.core.data.network.ApiException
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import java.time.LocalDate
@@ -37,6 +38,12 @@ internal class DemoBookingDataSource @Inject constructor(
         if (address.length !in BookingRequest.ADDRESS_MIN_LENGTH..BookingRequest.ADDRESS_MAX_LENGTH) {
             throw ApiException(AppError.Validation(BookingErrorFields.ADDRESS))
         }
+        // Both coordinates or neither, and on Earth.
+        val pin = when {
+            request.latitude == null && request.longitude == null -> null
+            else -> GeoPoint.ofOrNull(request.latitude, request.longitude)?.doorstep()
+                ?: throw ApiException(AppError.Validation(BookingErrorFields.LOCATION))
+        }
 
         return server.call { uid ->
             if (!slot.isBookableAt(now)) throw ApiException(AppError.Validation(BookingErrorFields.SLOT))
@@ -62,6 +69,8 @@ internal class DemoBookingDataSource @Inject constructor(
                 status = BookingStatus.Requested.name,
                 createdAtMillis = nowMillis,
                 customerName = userName(uid),
+                latitude = pin?.latitude,
+                longitude = pin?.longitude,
             )
             state = state.copy(bookings = state.bookings + StoredBooking(uid, booking))
             booking

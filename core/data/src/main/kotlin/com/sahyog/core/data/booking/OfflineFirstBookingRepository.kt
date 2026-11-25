@@ -11,6 +11,7 @@ import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
@@ -57,6 +58,8 @@ internal class OfflineFirstBookingRepository @Inject constructor(
                 slotStartHour = request.slot.startHour,
                 address = request.address.trim(),
                 note = request.note?.trim()?.ifBlank { null },
+                latitude = request.location?.latitude,
+                longitude = request.location?.longitude,
             ),
         ).asExternalModel()
         dao.upsert(created.asEntity())
@@ -97,6 +100,7 @@ internal fun NetworkBooking.asExternalModel() = Booking(
     createdAt = Instant.ofEpochMilli(createdAtMillis),
     completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
     review = review?.asExternalModel(),
+    location = GeoPoint.ofOrNull(latitude, longitude),
 )
 
 internal fun NetworkReview.asExternalModel() = BookingReview(
