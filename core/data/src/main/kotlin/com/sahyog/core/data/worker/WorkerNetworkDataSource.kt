@@ -5,8 +5,7 @@ import com.sahyog.core.data.catalog.NetworkWorkerService
 import kotlinx.serialization.Serializable
 
 /**
- * The worker-side API, acting for the signed-in user. Implemented by
- * [DemoWorkerDataSource] until the Spring Boot API exists (Milestone 10).
+ * The worker-side API (Sahyog server), acting for the signed-in user.
  *
  * Failures: `ApiException` for refused requests, `IOException` for connectivity.
  */

@@ -241,10 +241,27 @@ Cloud SQL, Mumbai).
 - [x] Tests use a movable clock and a temporary uploads folder
 - [x] Verified: 20 integration tests on real PostGIS; manual dev run: V3 applied, sample ratings
       (e.g. 4.7 from 3), dev auto-accept issued a start code
-### M10d: App switch-over
-- [ ] Retrofit + auth interceptor (Firebase ID token), base URL via local.properties, `adb reverse`
-- [ ] Replace the demo data sources; remove `DemoServer`; full two-account test on the phone
+### M10d: App switch-over ✅
+- [x] Retrofit 3.0.0 + OkHttp 5.5.1 (Kotlin ≤ 2.2 builds); Firebase ID token interceptor, one retry
+      with a fresh token on 401; server `{code, field}` → `AppError`
+- [x] Base URL from `SAHYOG_API_URL` (default laptop via `adb reverse`); cleartext only to loopback
+- [x] Demo server and demo data sources removed; Retrofit data sources for catalog, bookings,
+      worker profile / ID upload / jobs, reviews; profile from `/me` with an on-device copy
+- [x] New session states: loading profile (first sign-in on a device) and "couldn't load" (retry /
+      sign out); worker approval updates the account badge
+- [x] Verified: 165 app unit tests (incl. MockWebServer client tests and ApiUserRepository), lint 0
+      errors, 20 server tests
+- [x] Verified on device against the laptop server: real Firebase tokens accepted; onboarding saved
+      to PostgreSQL; worker profile + ID upload (test image) → Pending → approved → "Verified" in the
+      app by itself; catalog with server ratings and reviews; booking with map pin; sample worker
+      auto-accept with start code; worker accept, no code on the worker side, "too early" refused;
+      app opens from cache when the server is down; offline first sign-in → "Couldn't load your
+      profile" → reconnect → Try again works
+- [x] Fixed during testing: the "couldn't load" screen crashed (its ViewModel needs a NavHost entry)
+- [ ] A full complete-and-review run on the device (only possible within 3 hours of a visit; the
+      server tests cover it)
 - [ ] OpenAPI contract published by the server (springdoc) for future clients
+- [ ] Admin screen for verifications (API ready; web vs in-app still open)
 
 ## M11: Notifications (FCM)
 

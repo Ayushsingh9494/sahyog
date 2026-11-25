@@ -3,10 +3,10 @@ package com.sahyog.core.data.di
 import com.google.firebase.auth.FirebaseAuth
 import com.sahyog.core.data.auth.FirebaseAuthRepository
 import com.sahyog.core.data.booking.BookingNetworkDataSource
-import com.sahyog.core.data.booking.DemoBookingDataSource
+import com.sahyog.core.data.booking.RetrofitBookingDataSource
 import com.sahyog.core.data.booking.OfflineFirstBookingRepository
 import com.sahyog.core.data.catalog.CatalogNetworkDataSource
-import com.sahyog.core.data.catalog.DemoCatalogDataSource
+import com.sahyog.core.data.catalog.RetrofitCatalogDataSource
 import com.sahyog.core.data.catalog.OfflineFirstCatalogRepository
 import com.sahyog.core.data.repository.CatalogRepository
 import com.sahyog.core.data.location.DefaultLocationRepository
@@ -14,17 +14,20 @@ import com.sahyog.core.data.repository.JobRepository
 import com.sahyog.core.data.repository.LocationRepository
 import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.BookingRepository
-import com.sahyog.core.data.repository.LocalProfileUserRepository
+import com.sahyog.core.data.repository.ApiUserRepository
+import com.sahyog.core.data.repository.RetrofitUserDataSource
+import com.sahyog.core.data.repository.UserNetworkDataSource
+import com.sahyog.core.data.repository.WorkerStatusListener
 import com.sahyog.core.data.repository.OfflineUserPreferencesRepository
 import com.sahyog.core.data.repository.ReviewRepository
-import com.sahyog.core.data.review.DemoReviewDataSource
+import com.sahyog.core.data.review.RetrofitReviewDataSource
 import com.sahyog.core.data.review.OfflineFirstReviewRepository
 import com.sahyog.core.data.review.ReviewNetworkDataSource
 import com.sahyog.core.data.repository.UserPreferencesRepository
 import com.sahyog.core.data.repository.UserRepository
 import com.sahyog.core.data.repository.WorkerProfileRepository
 import com.sahyog.core.data.worker.DefaultWorkerProfileRepository
-import com.sahyog.core.data.worker.DemoWorkerDataSource
+import com.sahyog.core.data.worker.RetrofitWorkerDataSource
 import com.sahyog.core.data.worker.OfflineFirstJobRepository
 import com.sahyog.core.data.worker.WorkerNetworkDataSource
 import com.sahyog.core.data.session.UserDataCleaner
@@ -38,7 +41,7 @@ import javax.inject.Singleton
 
 /**
  * Which implementation backs each repository. The only place that changes when an
- * implementation is swapped (e.g. LocalProfileUserRepository -> API-backed in Milestone 10).
+ * implementation is swapped.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -48,7 +51,17 @@ internal interface DataModule {
     fun bindsAuthRepository(impl: FirebaseAuthRepository): AuthRepository
 
     @Binds
-    fun bindsUserRepository(impl: LocalProfileUserRepository): UserRepository
+    fun bindsUserRepository(impl: ApiUserRepository): UserRepository
+
+    @Binds
+    fun bindsUserNetworkDataSource(impl: RetrofitUserDataSource): UserNetworkDataSource
+
+    @Binds
+    fun bindsWorkerStatusListener(impl: ApiUserRepository): WorkerStatusListener
+
+    @Binds
+    @IntoSet
+    fun bindsUserCleaner(impl: ApiUserRepository): UserDataCleaner
 
     @Binds
     fun bindsUserPreferencesRepository(impl: OfflineUserPreferencesRepository): UserPreferencesRepository
@@ -58,14 +71,14 @@ internal interface DataModule {
 
     /** Demo data until the Spring Boot API exists (M10). */
     @Binds
-    fun bindsCatalogNetworkDataSource(impl: DemoCatalogDataSource): CatalogNetworkDataSource
+    fun bindsCatalogNetworkDataSource(impl: RetrofitCatalogDataSource): CatalogNetworkDataSource
 
     @Binds
     fun bindsBookingRepository(impl: OfflineFirstBookingRepository): BookingRepository
 
     /** Demo server until the Spring Boot API exists (M10). */
     @Binds
-    fun bindsBookingNetworkDataSource(impl: DemoBookingDataSource): BookingNetworkDataSource
+    fun bindsBookingNetworkDataSource(impl: RetrofitBookingDataSource): BookingNetworkDataSource
 
     /** Cached bookings hold personal data (addresses): cleared on sign-out. */
     @Binds
@@ -76,14 +89,14 @@ internal interface DataModule {
     fun bindsReviewRepository(impl: OfflineFirstReviewRepository): ReviewRepository
 
     @Binds
-    fun bindsReviewNetworkDataSource(impl: DemoReviewDataSource): ReviewNetworkDataSource
+    fun bindsReviewNetworkDataSource(impl: RetrofitReviewDataSource): ReviewNetworkDataSource
 
     @Binds
     fun bindsWorkerProfileRepository(impl: DefaultWorkerProfileRepository): WorkerProfileRepository
 
     /** Demo server until the Spring Boot API exists (M10). */
     @Binds
-    fun bindsWorkerNetworkDataSource(impl: DemoWorkerDataSource): WorkerNetworkDataSource
+    fun bindsWorkerNetworkDataSource(impl: RetrofitWorkerDataSource): WorkerNetworkDataSource
 
     @Binds
     @IntoSet

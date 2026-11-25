@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sahyog.app.ui.shell.CustomerShell
 import com.sahyog.app.ui.shell.WorkerShell
+import com.sahyog.core.designsystem.component.SahyogLoadingView
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.core.model.SessionState
 import com.sahyog.core.model.ThemePreference
@@ -23,6 +24,8 @@ import com.sahyog.feature.onboarding.OnboardingScreen
 import kotlinx.serialization.Serializable
 
 @Serializable private data object OnboardingRoute
+
+@Serializable private data object ProfileUnavailableRoute
 
 /**
  * Root of the UI. Renders exactly one section for the current [SessionState].
@@ -50,6 +53,15 @@ fun SahyogApp(
             SectionViewModelScope(key = state.sectionKey()) {
                 when (state) {
                     SessionState.SignedOut -> AuthNavHost()
+                    SessionState.LoadingProfile -> SahyogLoadingView(Modifier.fillMaxSize())
+                    SessionState.ProfileUnavailable -> {
+                        // Inside a NavHost like every section: its back stack entry gives the
+                        // ViewModel the saved-state owner Hilt needs.
+                        val navController = rememberNavController()
+                        NavHost(navController, startDestination = ProfileUnavailableRoute) {
+                            composable<ProfileUnavailableRoute> { ProfileUnavailableScreen() }
+                        }
+                    }
                     is SessionState.NeedsOnboarding -> {
                         // A one-destination NavHost so onboarding gets standard lifecycle and
                         // saved-state handling, and can grow into multiple steps (worker skills, M7).
@@ -78,6 +90,8 @@ fun SahyogApp(
 
 private fun SessionState.sectionKey(): String = when (this) {
     SessionState.SignedOut -> "auth"
+    SessionState.LoadingProfile -> "loading"
+    SessionState.ProfileUnavailable -> "unavailable"
     is SessionState.NeedsOnboarding -> "onboarding"
     // Include the user id so a different account never inherits another's screens.
     is SessionState.SignedIn -> "${activeRole.name.lowercase()}:${user.id}"

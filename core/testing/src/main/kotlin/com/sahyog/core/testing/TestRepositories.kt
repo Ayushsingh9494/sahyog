@@ -10,8 +10,10 @@ import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
 import com.sahyog.core.model.UserRole
+import com.sahyog.core.model.UserState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 
 /*
@@ -53,6 +55,23 @@ class TestAuthRepository : AuthRepository {
 class TestUserRepository : UserRepository {
     private val user = MutableStateFlow<User?>(null)
     override val currentUser: Flow<User?> = user
+
+    /** Signed out when there's no user, else Ready; override with [setState] for loading/unavailable. */
+    private val stateOverride = MutableStateFlow<UserState?>(null)
+    override val userState: Flow<UserState> = combine(user, stateOverride) { u, override ->
+        override ?: if (u == null) UserState.SignedOut else UserState.Ready(u)
+    }
+
+    var refreshResult: AppResult<Unit> = AppResult.Success(Unit)
+    var refreshCount = 0
+        private set
+
+    fun setState(value: UserState?) = stateOverride.update { value }
+
+    override suspend fun refresh(): AppResult<Unit> {
+        refreshCount++
+        return refreshResult
+    }
 
     var onboardingResult: AppResult<User>? = null
     val onboardingCalls = mutableListOf<Pair<String, Set<UserRole>>>()

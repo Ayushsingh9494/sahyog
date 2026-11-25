@@ -8,11 +8,24 @@ package com.sahyog.core.model
 sealed interface SessionState {
     data object SignedOut : SessionState
 
+    /** Signed in; waiting for the profile from the server (first sign-in on this device). */
+    data object LoadingProfile : SessionState
+
+    /** Signed in, but the profile couldn't be loaded; offer retry and sign-out. */
+    data object ProfileUnavailable : SessionState
+
     data class NeedsOnboarding(val user: User) : SessionState
 
     data class SignedIn(val user: User, val activeRole: UserRole) : SessionState
 
     companion object {
+        fun resolve(state: UserState, preferences: UserPreferences): SessionState = when (state) {
+            UserState.SignedOut -> SignedOut
+            UserState.Loading -> LoadingProfile
+            UserState.Unavailable -> ProfileUnavailable
+            is UserState.Ready -> resolve(state.user, preferences)
+        }
+
         /**
          * Derives the session from the current user and local preferences.
          * The remembered [UserPreferences.activeRole] is honoured only if the user

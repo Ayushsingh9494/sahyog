@@ -14,6 +14,7 @@ import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
 import com.sahyog.core.model.UserRole
+import com.sahyog.core.model.UserState
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerProfile
 import com.sahyog.core.model.WorkerProfileInput
@@ -55,11 +56,17 @@ interface AuthRepository {
 
 /**
  * The signed-in person's profile (name, roles, verification), combined with their identity.
- * Implementation: local stand-in until the Spring Boot API arrives (Milestone 10).
+ * The Sahyog server owns it; a copy is cached on the device.
  */
 interface UserRepository {
-    /** The signed-in user with their profile, or null when signed out. */
+    /** Signed out, loading, unavailable, or the user with their profile. */
+    val userState: Flow<UserState>
+
+    /** The signed-in user with their profile, or null when signed out or not loaded yet. */
     val currentUser: Flow<User?>
+
+    /** Fetches the profile again (e.g. "Try again" after it couldn't be loaded). */
+    suspend fun refresh(): AppResult<Unit>
 
     /** Sets the display name and requested roles. Workers start as NotSubmitted. */
     suspend fun completeOnboarding(name: String, roles: Set<UserRole>): AppResult<User>

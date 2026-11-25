@@ -15,7 +15,8 @@ cd backend
 - Starts the database from `compose.yaml` (PostGIS on port **5433**) automatically, applies the
   migrations in `src/main/resources/db/migration`, and serves on **http://localhost:8080**.
 - `GET /actuator/health` → `{"status":"UP"}`.
-- The phone reaches the laptop over USB with `adb reverse tcp:8080 tcp:8080` (set up in M10d).
+- The phone reaches the laptop over USB: run `adb reverse tcp:8080 tcp:8080` once per USB
+  connection; the app's default API address is `http://127.0.0.1:8080/`.
 
 Tests run against a throwaway PostGIS container (Testcontainers):
 

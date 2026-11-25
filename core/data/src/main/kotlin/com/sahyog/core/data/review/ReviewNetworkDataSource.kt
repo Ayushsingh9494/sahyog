@@ -3,9 +3,8 @@ package com.sahyog.core.data.review
 import kotlinx.serialization.Serializable
 
 /**
- * Public reviews API. Implemented by [DemoReviewDataSource] until the Spring Boot API
- * exists (Milestone 10). Reviews are written through the bookings API, since only the
- * customer of a completed booking may write one.
+ * Public reviews API (Sahyog server). Reviews are written through the bookings API, since
+ * only the customer of a completed booking may write one.
  */
 interface ReviewNetworkDataSource {
     /** The most recent reviews of [workerId], newest first, at most [RECENT_REVIEWS_LIMIT]. */

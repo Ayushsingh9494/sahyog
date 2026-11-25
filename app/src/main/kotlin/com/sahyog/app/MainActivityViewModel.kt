@@ -32,7 +32,7 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<MainActivityUiState> =
-        combine(userRepository.currentUser, preferencesRepository.preferences) { user, prefs ->
+        combine(userRepository.userState, preferencesRepository.preferences) { user, prefs ->
             MainActivityUiState.Ready(
                 session = SessionState.resolve(user, prefs),
                 theme = prefs.theme,

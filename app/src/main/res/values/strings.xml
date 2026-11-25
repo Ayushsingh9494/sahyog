@@ -15,4 +15,7 @@
 
     <!-- Worker -->
 
+    <string name="app_profile_unavailable_title">Couldn\'t load your profile</string>
+    <string name="app_profile_unavailable_body">Check your internet connection and try again.</string>
+    <string name="app_profile_unavailable_sign_out">Sign out</string>
 </resources>

@@ -52,4 +52,11 @@ class SessionStateTest {
         val u = user(roles = setOf(UserRole.Worker))
         assertEquals(SessionState.SignedIn(u, UserRole.Worker), SessionState.resolve(u, UserPreferences()))
     }
+
+    @Test
+    fun `profile loading and unavailable have their own states`() {
+        assertEquals(SessionState.SignedOut, SessionState.resolve(UserState.SignedOut, UserPreferences()))
+        assertEquals(SessionState.LoadingProfile, SessionState.resolve(UserState.Loading, UserPreferences()))
+        assertEquals(SessionState.ProfileUnavailable, SessionState.resolve(UserState.Unavailable, UserPreferences()))
+    }
 }

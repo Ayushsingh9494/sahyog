@@ -11,6 +11,7 @@ import com.sahyog.core.data.network.ApiException
 import com.sahyog.core.data.network.apiCall
 import com.sahyog.core.data.repository.WorkerProfileRepository
 import com.sahyog.core.data.repository.WorkerProfileState
+import com.sahyog.core.data.repository.WorkerStatusListener
 import com.sahyog.core.data.session.UserDataCleaner
 import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
@@ -39,14 +40,15 @@ internal class DefaultWorkerProfileRepository @Inject constructor(
     private val network: WorkerNetworkDataSource,
     @param:ApplicationContext private val context: Context,
     @param:Dispatcher(SahyogDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val statusListener: WorkerStatusListener,
 ) : WorkerProfileRepository, UserDataCleaner {
 
     private val state = MutableStateFlow<WorkerProfileState>(WorkerProfileState.NotLoaded)
     override val profile: StateFlow<WorkerProfileState> = state.asStateFlow()
 
     override suspend fun refresh(): AppResult<Unit> = apiCall {
-        state.value = network.fetchMyProfile()?.let { WorkerProfileState.Ready(it.asExternalModel()) }
-            ?: WorkerProfileState.NotSetUp
+        val profile = network.fetchMyProfile()
+        if (profile == null) state.value = WorkerProfileState.NotSetUp else profile.publish()
     }
 
     override suspend fun saveProfile(input: WorkerProfileInput): AppResult<WorkerProfile> = apiCall {
@@ -77,8 +79,12 @@ internal class DefaultWorkerProfileRepository @Inject constructor(
         state.value = WorkerProfileState.NotLoaded
     }
 
-    private fun NetworkWorkerProfile.publish(): WorkerProfile =
-        asExternalModel().also { state.value = WorkerProfileState.Ready(it) }
+    /** Also keeps the account's verification badge in step (e.g. right after approval). */
+    private suspend fun NetworkWorkerProfile.publish(): WorkerProfile =
+        asExternalModel().also {
+            state.value = WorkerProfileState.Ready(it)
+            statusListener.onWorkerStatus(it.verificationStatus)
+        }
 
     /**
      * Reads a Photo Picker image. Reading stops one byte past the limit, so a huge file

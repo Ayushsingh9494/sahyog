@@ -29,3 +29,17 @@ data class User(
     val hasCompletedOnboarding: Boolean
         get() = !name.isNullOrBlank() && roles.isNotEmpty()
 }
+
+/** What the app knows about the signed-in person's profile right now. */
+sealed interface UserState {
+    data object SignedOut : UserState
+
+    /** Signed in; the profile is being fetched for the first time on this device. */
+    data object Loading : UserState
+
+    /** Signed in, but the profile couldn't be fetched and none is cached (e.g. offline). */
+    data object Unavailable : UserState
+
+    /** The profile is known (possibly from the cache); [User.name] is null until onboarding. */
+    data class Ready(val user: User) : UserState
+}

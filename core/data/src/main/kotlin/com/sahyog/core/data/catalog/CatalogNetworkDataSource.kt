@@ -3,9 +3,7 @@ package com.sahyog.core.data.catalog
 import kotlinx.serialization.Serializable
 
 /**
- * Where the service catalog comes from. Implemented by [DemoCatalogDataSource] until
- * the Spring Boot API exists (Milestone 10), when a Retrofit implementation replaces it.
- * Its shapes mirror the planned API response, so the swap doesn't touch the repository.
+ * Where the service catalog comes from: the Sahyog API (`GET /api/v1/catalog`).
  *
  * Implementations throw on failure (IOException for connectivity problems); the
  * repository maps exceptions to AppError.
@@ -14,18 +12,21 @@ interface CatalogNetworkDataSource {
     suspend fun fetchCatalog(): NetworkCatalog
 }
 
+@Serializable
 data class NetworkCatalog(
     val categories: List<NetworkCategory>,
     val workers: List<NetworkWorker>,
 )
 
 /** @property keywords Search synonyms, including Hindi terms. */
+@Serializable
 data class NetworkCategory(
     val id: String,
     val name: String,
     val keywords: List<String>,
 )
 
+@Serializable
 data class NetworkWorker(
     val id: String,
     val name: String,

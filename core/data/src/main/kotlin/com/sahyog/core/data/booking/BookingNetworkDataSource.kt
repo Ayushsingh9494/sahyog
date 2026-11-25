@@ -3,8 +3,7 @@ package com.sahyog.core.data.booking
 import kotlinx.serialization.Serializable
 
 /**
- * The bookings API. Implemented by [DemoBookingDataSource] until the Spring Boot API
- * exists (Milestone 10). All calls act on behalf of the signed-in user; the server
+ * The bookings API (Sahyog server). All calls act on behalf of the signed-in user; the server
  * identifies them from the auth token, never from a client-supplied id.
  *
  * Failures: `ApiException` for refused requests, `IOException` for connectivity.
