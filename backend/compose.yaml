@@ -1,0 +1,20 @@
+# Local development database. `./gradlew bootRun` starts it automatically (Spring Boot
+# Docker Compose support); data persists in the named volume until `docker compose down -v`.
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    labels:
+      # Tells Spring Boot this image is PostgreSQL, so it wires up the connection itself.
+      org.springframework.boot.service-connection: postgres
+    environment:
+      POSTGRES_DB: sahyog
+      POSTGRES_USER: sahyog
+      # Local-only throwaway credentials; production uses Cloud SQL with IAM / secrets.
+      POSTGRES_PASSWORD: sahyog-local
+    ports:
+      # 5433, not 5432: the PostgreSQL 18 installed on this laptop already uses 5432.
+      - "5433:5432"
+    volumes:
+      - sahyog-db:/var/lib/postgresql/data
+volumes:
+  sahyog-db:

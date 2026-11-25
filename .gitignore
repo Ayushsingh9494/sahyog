@@ -23,3 +23,8 @@ google-services.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Backend (separate Gradle build in backend/)
+backend/.gradle/
+backend/build/
+backend/.kotlin/

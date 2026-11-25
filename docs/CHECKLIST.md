@@ -202,7 +202,29 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
       server rule (e.g. mark missed, notify the cooperative) — found during M9 testing
 
 ## M10: Backend integration
-- [ ] OpenAPI contract, Retrofit, Firebase ID token → Spring Boot verification
+Decided: server code in `backend/` (this repo), PostGIS in Docker, laptop-only for now (phone over
+USB with `adb reverse`). Production hosting is chosen before real users (recommended: Cloud Run +
+Cloud SQL, Mumbai).
+
+### M10a: Server foundation ✅
+- [x] `backend/`: Spring Boot 4.1.3, Kotlin 2.3.21, Java 25 (Android Studio's JBR); separate Gradle build
+- [x] PostGIS 3.5 (PostgreSQL 17) via Docker Compose, started by `bootRun`; port 5433 (5432 is taken locally)
+- [x] Flyway migrations; V1 `users` (roles and worker status are server-owned; admin flag only via SQL)
+- [x] Firebase ID token verification as a JWT resource server (Google's public keys; issuer + audience
+      = project id). No service-account secret
+- [x] One error shape `{code, field}` + HTTP status, matching the app's `AppError` / `*ErrorFields`
+- [x] `GET/PUT /api/v1/me` (onboarding; same name rule as the app; roles can be added, not dropped)
+- [x] Verified: 5 integration tests on a real PostGIS (Testcontainers); manual run: health UP, missing
+      and forged tokens → 401, migration applied
+### M10b: Catalog, worker profiles, verification
+- [ ] Categories, worker profiles with PostGIS location, near-me / radius queries
+- [ ] ID document upload (private storage) and an admin approve / reject step (replaces auto-verify)
+### M10c: Bookings, jobs, reviews
+- [ ] Booking + job lifecycle, start code, time rules, reviews and ratings: the demo server's rules
+### M10d: App switch-over
+- [ ] Retrofit + auth interceptor (Firebase ID token), base URL via local.properties, `adb reverse`
+- [ ] Replace the demo data sources; remove `DemoServer`; full two-account test on the phone
+- [ ] OpenAPI contract published by the server (springdoc) for future clients
 
 ## M11: Notifications (FCM)
 

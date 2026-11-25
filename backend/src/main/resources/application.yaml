@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: sahyog-server
+  threads:
+    virtual:
+      enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Firebase ID tokens are JWTs signed by Google. Spring fetches Google's public keys
+          # from this issuer and checks signature, expiry, issuer and audience on every request.
+          # Only the (public) project id is needed: no service-account secret.
+          issuer-uri: https://securetoken.google.com/${sahyog.firebase.project-id}
+          audiences: ${sahyog.firebase.project-id}
+  docker:
+    compose:
+      # Keep the database container running between server restarts (faster dev loop).
+      lifecycle-management: start-only
+  # Production (Cloud Run later) sets SPRING_DATASOURCE_URL / _USERNAME / _PASSWORD.
+  # Locally the Docker Compose support fills these in from compose.yaml.
+
+sahyog:
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:sahyog-f6bad}
+
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

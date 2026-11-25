@@ -159,6 +159,19 @@ Room: categories · workers · worker_categories · worker_services
   worker. Addresses come from Android's `Geocoder` (no key, no cost); directions open the Google
   Maps universal link.
 
+## Server (M10)
+
+- `backend/` is a Spring Boot 4.1 (Kotlin) app, built separately from the Android project so the two
+  toolchains can move independently. See `backend/README.md` to run it.
+- **Auth:** the app sends its Firebase ID token; the server verifies it as a JWT (signature with
+  Google's public keys, expiry, issuer and audience = Firebase project id). The uid in the token is
+  the user id everywhere; the client never sends its own id. Roles and verification are stored only
+  on the server.
+- **Data:** PostgreSQL + PostGIS with Flyway migrations and plain SQL (`JdbcClient`), not an ORM:
+  geo queries and constraints are easier to read and check in SQL.
+- **Errors:** `{code, field}` + HTTP status; the app maps the status to `AppError` and the field to
+  its form inputs. Server messages are never shown, so all text stays translated in the app.
+
 ## Reviews (M9)
 
 - A review belongs to one completed booking (`Booking.review`, `Job.review`) and is written through
