@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.sahyog.app.ui.shell.AdminShell
 import com.sahyog.app.ui.shell.CustomerShell
 import com.sahyog.app.ui.shell.WorkerShell
 import com.sahyog.core.designsystem.component.SahyogLoadingView
@@ -72,6 +73,11 @@ fun SahyogApp(
                     }
                     is SessionState.SignedIn -> when (state.activeRole) {
                         UserRole.Customer -> CustomerShell(
+                            darkTheme = darkTheme,
+                            onThemeChange = onThemeChange,
+                            showDeveloperOptions = showDeveloperOptions,
+                        )
+                        UserRole.Admin -> AdminShell(
                             darkTheme = darkTheme,
                             onThemeChange = onThemeChange,
                             showDeveloperOptions = showDeveloperOptions,

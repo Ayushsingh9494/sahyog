@@ -1,6 +1,7 @@
 package com.sahyog.server.user
 
 import com.sahyog.server.api.ValidationException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
@@ -72,6 +73,10 @@ class UserRepository(private val jdbc: JdbcClient) {
             .update()
     }
 
+    fun grantAdmin(uid: String) {
+        jdbc.sql("UPDATE users SET is_admin = true, updated_at = now() WHERE uid = :uid").param("uid", uid).update()
+    }
+
     fun updateWorkerStatus(uid: String, status: WorkerStatus) {
         jdbc.sql("UPDATE users SET worker_status = :status, updated_at = now() WHERE uid = :uid AND is_worker")
             .param("uid", uid).param("status", status.name).update()
@@ -91,9 +96,24 @@ class UserRepository(private val jdbc: JdbcClient) {
 }
 
 @Service
-class UserService(private val users: UserRepository) {
+class UserService(
+    private val users: UserRepository,
+    /**
+     * Phone numbers (E.164, comma-separated) of cooperative staff. They become admins the next
+     * time they open the app. Server configuration only (env `ADMIN_PHONE_NUMBERS`), never the API.
+     * Removing a number doesn't revoke an admin; that's done in the database.
+     */
+    @Value("\${sahyog.admin.phone-numbers:}") adminPhoneNumbers: String,
+) {
+    private val adminPhones = adminPhoneNumbers.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
 
-    fun find(uid: String): User? = users.find(uid)
+    fun find(uid: String): User? = users.find(uid)?.let(::withConfiguredAdmin)
+
+    private fun withConfiguredAdmin(user: User): User {
+        if (user.isAdmin || user.phoneNumber !in adminPhones) return user
+        users.grantAdmin(user.uid)
+        return user.copy(isAdmin = true)
+    }
 
     /**
      * Onboarding, and later profile edits. Roles can be added but never dropped here: a
@@ -118,6 +138,6 @@ class UserService(private val users: UserRepository) {
             isAdmin = existing?.isAdmin ?: false,
         )
         users.upsert(user)
-        return user
+        return withConfiguredAdmin(user)
     }
 }

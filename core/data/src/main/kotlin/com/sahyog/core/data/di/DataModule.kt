@@ -1,7 +1,9 @@
 package com.sahyog.core.data.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.sahyog.core.data.admin.ApiAdminRepository
 import com.sahyog.core.data.auth.FirebaseAuthRepository
+import com.sahyog.core.data.repository.AdminRepository
 import com.sahyog.core.data.booking.BookingNetworkDataSource
 import com.sahyog.core.data.booking.RetrofitBookingDataSource
 import com.sahyog.core.data.booking.OfflineFirstBookingRepository
@@ -90,6 +92,9 @@ internal interface DataModule {
 
     @Binds
     fun bindsReviewNetworkDataSource(impl: RetrofitReviewDataSource): ReviewNetworkDataSource
+
+    @Binds
+    fun bindsAdminRepository(impl: ApiAdminRepository): AdminRepository
 
     @Binds
     fun bindsWorkerProfileRepository(impl: DefaultWorkerProfileRepository): WorkerProfileRepository

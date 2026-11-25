@@ -1,5 +1,6 @@
 package com.sahyog.server.worker
 
+import com.sahyog.server.admin.StatusAudit
 import com.sahyog.server.api.ValidationException
 import com.sahyog.server.security.toCaller
 import com.sahyog.server.storage.DocumentStorage
@@ -45,6 +46,7 @@ class WorkerProfileService(
     private val workers: WorkerRepository,
     private val users: UserRepository,
     private val storage: DocumentStorage,
+    private val audit: StatusAudit,
 ) {
     fun profile(uid: String): WorkerProfileResponse? {
         access.worker(uid)
@@ -83,7 +85,10 @@ class WorkerProfileService(
 
         val key = storage.save(image)
         workers.addDocument(uid, documentType, key, contentType)
-        if (user.workerStatus != WorkerStatus.Verified) users.updateWorkerStatus(uid, WorkerStatus.Pending)
+        if (user.workerStatus != WorkerStatus.Verified && user.workerStatus != WorkerStatus.Pending) {
+            users.updateWorkerStatus(uid, WorkerStatus.Pending)
+            audit.record(uid, user.workerStatus, WorkerStatus.Pending, changedBy = null)
+        }
         return toResponse(workers.find(uid)!!)
     }
 

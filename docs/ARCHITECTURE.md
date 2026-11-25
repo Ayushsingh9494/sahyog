@@ -174,6 +174,16 @@ Room: categories · workers · worker_categories · worker_services
 - **Errors:** `{code, field}` + HTTP status; the app maps the status to `AppError` and the field to
   its form inputs. Server messages are never shown, so all text stays translated in the app.
 
+## Admin console (M10e)
+
+- Cooperative staff get a third mode, `UserRole.Admin`, which the server grants from its own config
+  (`ADMIN_PHONE_NUMBERS`) and reports as `isAdmin` on `/me`; it can't be requested in onboarding.
+- `feature:admin` talks to `/api/v1/admin/**` through `AdminRepository`. Nothing is cached: the data
+  is other people's phone numbers and identity documents. ID photos are fetched per review, decoded
+  in memory (downscaled) and shown with `FLAG_SECURE`, so they can't be screenshotted.
+- Every status change is written to `worker_status_changes`, which feeds "recent decisions" and each
+  worker's history.
+
 ## Reviews (M9)
 
 - A review belongs to one completed booking (`Booking.review`, `Job.review`) and is written through

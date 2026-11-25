@@ -17,6 +17,8 @@ data class MeResponse(
     val name: String,
     val roles: Set<Role>,
     val workerStatus: WorkerStatus?,
+    /** Cooperative staff: may open the admin screens. Granted by the server only. */
+    val isAdmin: Boolean,
 )
 
 data class ProfileRequest(val name: String, val roles: Set<Role>)
@@ -37,5 +39,5 @@ class MeController(private val users: UserService) {
         return users.saveProfile(caller.uid, caller.phoneNumber, request.name, request.roles).toResponse()
     }
 
-    private fun User.toResponse() = MeResponse(uid, phoneNumber, name, roles, workerStatus)
+    private fun User.toResponse() = MeResponse(uid, phoneNumber, name, roles, workerStatus, isAdmin)
 }

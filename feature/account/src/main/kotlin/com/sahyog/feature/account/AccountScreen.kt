@@ -101,7 +101,7 @@ internal fun AccountContent(
                         )
                         Spacer(Modifier.height(SahyogSpacing.md))
                         SahyogSegmentedControl(
-                            options = listOf(UserRole.Customer, UserRole.Worker),
+                            options = UserRole.entries.filter { it in uiState.user.roles },
                             selected = uiState.activeRole,
                             onSelect = onSwitchRole,
                             label = { stringResource(it.labelRes()) },
@@ -212,6 +212,7 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 private fun UserRole.labelRes(): Int = when (this) {
     UserRole.Customer -> R.string.account_role_customer
     UserRole.Worker -> R.string.account_role_worker
+    UserRole.Admin -> R.string.account_role_admin
 }
 
 private fun ThemePreference.labelRes(): Int = when (this) {

@@ -1,7 +1,10 @@
 package com.sahyog.core.model
 
-/** A role a person can hold on the platform. One account may hold both. */
-enum class UserRole { Customer, Worker }
+/**
+ * A role a person can hold, and the app mode it opens. One account may hold several.
+ * [Admin] (cooperative staff) is granted by the server only; it's never offered in onboarding.
+ */
+enum class UserRole { Customer, Worker, Admin }
 
 /** Cooperative verification of a worker's identity and skills. */
 enum class WorkerVerificationStatus {

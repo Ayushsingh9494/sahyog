@@ -50,7 +50,7 @@ internal class RetrofitUserDataSource @Inject constructor(private val api: Sahyo
     }
 
     override suspend fun saveMe(name: String, roles: Set<UserRole>): NetworkUser =
-        api.saveMe(NetworkProfileRequest(name, roles.map { it.name }.toSet()))
+        api.saveMe(NetworkProfileRequest(name, (roles - UserRole.Admin).map { it.name }.toSet()))
 
     private companion object {
         const val HTTP_NOT_FOUND = 404
@@ -150,7 +150,9 @@ internal class ApiUserRepository @Inject constructor(
 
 private fun NetworkUser.toStoredProfile() = StoredProfile(
     name = name,
-    roles = roles.mapNotNull { role -> UserRole.entries.firstOrNull { it.name == role } }.toSet(),
+    // Admin comes from its own flag: it isn't a role people sign up for.
+    roles = roles.mapNotNull { role -> UserRole.entries.firstOrNull { it.name == role && it != UserRole.Admin } }
+        .toSet() + if (isAdmin) setOf(UserRole.Admin) else emptySet(),
     workerStatus = WorkerVerificationStatus.entries.firstOrNull { it.name == workerStatus },
 )
 

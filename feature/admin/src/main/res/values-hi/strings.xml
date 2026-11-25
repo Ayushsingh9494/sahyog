@@ -1,0 +1,118 @@
+<resources>
+    <string name="admin_overview_title">सहकारी समिति का सार</string>
+    <string name="admin_queue_title">सत्यापन</string>
+    <string name="admin_workers_title">कारीगर</string>
+    <string name="admin_console_badge">एडमिन</string>
+
+    <string name="admin_attention_title">आपका ध्यान चाहिए</string>
+    <plurals name="admin_attention_body">
+        <item quantity="one">%d कारीगर पहचान सत्यापन का इंतज़ार कर रहा है</item>
+        <item quantity="other">%d कारीगर पहचान सत्यापन का इंतज़ार कर रहे हैं</item>
+    </plurals>
+    <string name="admin_attention_action">अभी जाँचें</string>
+    <string name="admin_all_clear_title">सब पूरा हो गया</string>
+    <string name="admin_all_clear_body">कोई भी सत्यापन का इंतज़ार नहीं कर रहा।</string>
+    <string name="admin_section_cooperative">सहकारी समिति</string>
+    <string name="admin_section_activity">गतिविधि</string>
+    <string name="admin_section_queue_preview">कतार में अगले</string>
+    <string name="admin_section_recent">हाल के फ़ैसले</string>
+    <string name="admin_see_all">सभी देखें</string>
+    <string name="admin_stat_verified">सत्यापित कारीगर</string>
+    <string name="admin_stat_customers">ग्राहक</string>
+    <string name="admin_stat_rejected">स्वीकृत नहीं</string>
+    <string name="admin_stat_bookings_today">आज की बुकिंग</string>
+    <string name="admin_stat_live_jobs">चल रहे काम</string>
+    <string name="admin_stat_completed_week">इस हफ़्ते पूरे हुए</string>
+    <string name="admin_stat_rating">औसत रेटिंग</string>
+    <string name="admin_stat_rating_none">अभी कोई रेटिंग नहीं</string>
+    <string name="admin_recent_empty">स्वीकृतियाँ और अस्वीकृतियाँ यहाँ दिखेंगी।</string>
+    <string name="admin_error_title">एडमिन कंसोल लोड नहीं हो सका</string>
+
+    <string name="admin_change_approved">%1$s को स्वीकृत किया</string>
+    <string name="admin_change_rejected">%1$s को अस्वीकार किया</string>
+    <string name="admin_change_revoked">%1$s का सत्यापन रद्द किया</string>
+    <string name="admin_change_submitted">%1$s ने पहचान पत्र भेजा</string>
+    <string name="admin_change_other">%1$s: %2$s</string>
+    <string name="admin_change_by">%1$s द्वारा · %2$s</string>
+    <string name="admin_change_by_worker">कारीगर द्वारा · %1$s</string>
+
+    <plurals name="admin_queue_count">
+        <item quantity="one">%d व्यक्ति इंतज़ार में · सबसे पुराने पहले</item>
+        <item quantity="other">%d लोग इंतज़ार में · सबसे पुराने पहले</item>
+    </plurals>
+    <string name="admin_queue_waiting">%1$s से इंतज़ार</string>
+    <string name="admin_queue_resubmitted">दोबारा भेजा</string>
+    <string name="admin_queue_empty_title">कोई इंतज़ार नहीं कर रहा</string>
+    <string name="admin_queue_empty_body">नए पहचान पत्र यहाँ दिखेंगे, सबसे पुराने पहले।</string>
+
+    <string name="admin_status_all">सभी</string>
+    <string name="admin_status_pending">जाँच बाकी</string>
+    <string name="admin_status_verified">सत्यापित</string>
+    <string name="admin_status_rejected">स्वीकृत नहीं</string>
+    <string name="admin_status_not_submitted">पहचान पत्र नहीं</string>
+
+    <string name="admin_search_hint">नाम, फ़ोन या इलाका खोजें</string>
+    <string name="admin_workers_empty">कोई कारीगर नहीं मिला।</string>
+    <plurals name="admin_workers_jobs">
+        <item quantity="one">%1$d काम</item>
+        <item quantity="other">%1$d काम</item>
+    </plurals>
+    <string name="admin_new">नया</string>
+
+    <string name="admin_worker_title">कारीगर की जाँच</string>
+    <string name="admin_call">कॉल करें</string>
+    <string name="admin_joined">%1$s को जुड़े</string>
+    <string name="admin_stat_jobs">पूरे काम</string>
+    <string name="admin_stat_experience">अनुभव</string>
+    <plurals name="admin_years">
+        <item quantity="one">%d साल</item>
+        <item quantity="other">%d साल</item>
+    </plurals>
+    <string name="admin_section_document">पहचान पत्र</string>
+    <string name="admin_document_submitted">%1$s · %2$s भेजा</string>
+    <string name="admin_document_none">अभी तक कोई पहचान पत्र नहीं भेजा गया।</string>
+    <string name="admin_document_failed">पहचान पत्र लोड नहीं हो सका।</string>
+    <string name="admin_document_unreadable">यह फ़ोटो इस फ़ोन पर नहीं दिखाई जा सकती।</string>
+    <string name="admin_document_tap">पूरी स्क्रीन पर देखने के लिए दबाएँ</string>
+    <string name="admin_document_private">निजी: सिर्फ़ सहकारी समिति के स्टाफ़ को दिखता है, इस फ़ोन पर कभी सेव नहीं होता। स्क्रीनशॉट बंद हैं।</string>
+    <string name="admin_document_description">कारीगर के %1$s की फ़ोटो</string>
+    <string name="admin_section_checklist">स्वीकृत करने से पहले</string>
+    <string name="admin_check_name">पहचान पत्र पर नाम \"%1$s\" से मेल खाता है</string>
+    <string name="admin_check_photo">फ़ोटो साफ़ है और दस्तावेज़ कटा हुआ नहीं है</string>
+    <string name="admin_check_valid">दस्तावेज़ मान्य है (समाप्त नहीं) और स्वीकृत प्रकार का है</string>
+    <string name="admin_section_services">सेवाएँ और दाम</string>
+    <string name="admin_section_profile">प्रोफ़ाइल</string>
+    <string name="admin_area">इलाका</string>
+    <string name="admin_languages">भाषाएँ</string>
+    <string name="admin_about">परिचय</string>
+    <string name="admin_section_history">इतिहास</string>
+    <string name="admin_history_empty">अभी कोई बदलाव नहीं।</string>
+    <string name="admin_close">बंद करें</string>
+
+    <string name="admin_approve">स्वीकृत करें</string>
+    <string name="admin_reject">अस्वीकार करें</string>
+    <string name="admin_revoke">सत्यापन रद्द करें</string>
+    <string name="admin_approve_confirm_title">%1$s को स्वीकृत करें?</string>
+    <string name="admin_approve_confirm_body">वे तुरंत ग्राहकों को दिखेंगे और बुकिंग पा सकेंगे।</string>
+    <string name="admin_cancel">रद्द करें</string>
+    <string name="admin_reject_title">%1$s को अस्वीकार करें?</string>
+    <string name="admin_reject_body">उनसे नया पहचान पत्र माँगा जाएगा। कारण चुनें।</string>
+    <string name="admin_revoke_title">%1$s का सत्यापन रद्द करें?</string>
+    <string name="admin_revoke_body">उन्हें तुरंत कैटलॉग से हटा दिया जाएगा। मौजूदा बुकिंग रद्द नहीं होंगी।</string>
+    <string name="admin_reason_details">विवरण (वैकल्पिक)</string>
+    <string name="admin_reason_PhotoUnclear">फ़ोटो साफ़ नहीं है</string>
+    <string name="admin_reason_NameMismatch">नाम मेल नहीं खाता</string>
+    <string name="admin_reason_DocumentNotAccepted">यह दस्तावेज़ मान्य नहीं</string>
+    <string name="admin_reason_DocumentExpired">दस्तावेज़ की अवधि समाप्त</string>
+    <string name="admin_reason_Complaints">ग्राहकों की शिकायतें</string>
+    <string name="admin_reason_Other">अन्य</string>
+    <string name="admin_done_approved">%1$s अब सत्यापित हैं</string>
+    <string name="admin_done_rejected">%1$s से नया पहचान पत्र माँगा गया</string>
+    <string name="admin_done_revoked">%1$s को कैटलॉग से हटा दिया गया</string>
+    <string name="admin_error_already_decided">किसी और एडमिन ने पहले ही फ़ैसला कर दिया। नई स्थिति दिखा रहे हैं।</string>
+    <string name="admin_error_forbidden">इस खाते के पास अब एडमिन पहुँच नहीं है।</string>
+    <string name="admin_doc_aadhaar">आधार कार्ड</string>
+    <string name="admin_doc_voter_id">वोटर आईडी</string>
+    <string name="admin_doc_driving_licence">ड्राइविंग लाइसेंस</string>
+    <string name="admin_doc_pan">पैन कार्ड</string>
+</resources>

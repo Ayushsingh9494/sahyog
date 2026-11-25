@@ -15,4 +15,7 @@
     <string name="app_profile_unavailable_title">आपकी प्रोफ़ाइल लोड नहीं हो सकी</string>
     <string name="app_profile_unavailable_body">इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।</string>
     <string name="app_profile_unavailable_sign_out">साइन आउट करें</string>
+    <string name="tab_overview">सार</string>
+    <string name="tab_verify">सत्यापन</string>
+    <string name="tab_workers">कारीगर</string>
 </resources>

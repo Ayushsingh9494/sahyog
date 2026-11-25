@@ -48,7 +48,12 @@ class TestClockConfig {
  * Base for API tests: a full server on a real PostGIS, with helpers to act as signed-in
  * people. Each test makes fresh users (random uids), so tests don't depend on each other.
  */
-@SpringBootTest(properties = ["sahyog.storage.documents-dir=build/test-documents"])
+@SpringBootTest(
+    properties = [
+        "sahyog.storage.documents-dir=build/test-documents",
+        "sahyog.admin.phone-numbers=+910000099999, +910000099998",
+    ],
+)
 @AutoConfigureMockMvc
 @Import(TestDatabase::class, TestClockConfig::class)
 abstract class ApiTest {

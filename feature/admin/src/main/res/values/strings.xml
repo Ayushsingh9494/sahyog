@@ -1,0 +1,126 @@
+<resources>
+    <!-- Tabs / titles -->
+    <string name="admin_overview_title">Cooperative overview</string>
+    <string name="admin_queue_title">Verifications</string>
+    <string name="admin_workers_title">Workers</string>
+    <string name="admin_console_badge">Admin</string>
+
+    <!-- Overview -->
+    <string name="admin_attention_title">Needs your attention</string>
+    <plurals name="admin_attention_body">
+        <item quantity="one">%d worker is waiting for ID verification</item>
+        <item quantity="other">%d workers are waiting for ID verification</item>
+    </plurals>
+    <string name="admin_attention_action">Review now</string>
+    <string name="admin_all_clear_title">All caught up</string>
+    <string name="admin_all_clear_body">Nobody is waiting for verification.</string>
+    <string name="admin_section_cooperative">The cooperative</string>
+    <string name="admin_section_activity">Activity</string>
+    <string name="admin_section_queue_preview">Next in line</string>
+    <string name="admin_section_recent">Recent decisions</string>
+    <string name="admin_see_all">See all</string>
+    <string name="admin_stat_verified">Verified workers</string>
+    <string name="admin_stat_customers">Customers</string>
+    <string name="admin_stat_rejected">Not approved</string>
+    <string name="admin_stat_bookings_today">Bookings today</string>
+    <string name="admin_stat_live_jobs">Jobs in progress</string>
+    <string name="admin_stat_completed_week">Completed this week</string>
+    <string name="admin_stat_rating">Average rating</string>
+    <string name="admin_stat_rating_none">No ratings yet</string>
+    <string name="admin_recent_empty">Approvals and rejections will appear here.</string>
+    <string name="admin_error_title">Couldn\'t load the admin console</string>
+
+    <!-- Decisions -->
+    <string name="admin_change_approved">Approved %1$s</string>
+    <string name="admin_change_rejected">Rejected %1$s</string>
+    <string name="admin_change_revoked">Revoked %1$s</string>
+    <string name="admin_change_submitted">%1$s submitted an ID</string>
+    <string name="admin_change_other">%1$s: %2$s</string>
+    <string name="admin_change_by">by %1$s · %2$s</string>
+    <string name="admin_change_by_worker">by the worker · %1$s</string>
+
+    <!-- Queue -->
+    <plurals name="admin_queue_count">
+        <item quantity="one">%d person waiting · oldest first</item>
+        <item quantity="other">%d people waiting · oldest first</item>
+    </plurals>
+    <string name="admin_queue_waiting">Waiting %1$s</string>
+    <string name="admin_queue_resubmitted">Re-submitted</string>
+    <string name="admin_queue_empty_title">No one is waiting</string>
+    <string name="admin_queue_empty_body">New ID submissions will appear here, oldest first.</string>
+
+    <!-- Statuses -->
+    <string name="admin_status_all">All</string>
+    <string name="admin_status_pending">Pending</string>
+    <string name="admin_status_verified">Verified</string>
+    <string name="admin_status_rejected">Not approved</string>
+    <string name="admin_status_not_submitted">No ID yet</string>
+
+    <!-- Directory -->
+    <string name="admin_search_hint">Search name, phone or area</string>
+    <string name="admin_workers_empty">No workers match.</string>
+    <plurals name="admin_workers_jobs">
+        <item quantity="one">%1$d job</item>
+        <item quantity="other">%1$d jobs</item>
+    </plurals>
+    <string name="admin_new">New</string>
+
+    <!-- Worker detail -->
+    <string name="admin_worker_title">Worker review</string>
+    <string name="admin_call">Call</string>
+    <string name="admin_joined">Joined %1$s</string>
+    <string name="admin_stat_jobs">Jobs done</string>
+    <string name="admin_stat_experience">Experience</string>
+    <plurals name="admin_years">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+    <string name="admin_section_document">Identity document</string>
+    <string name="admin_document_submitted">%1$s · submitted %2$s</string>
+    <string name="admin_document_none">No document submitted yet.</string>
+    <string name="admin_document_failed">Couldn\'t load the document.</string>
+    <string name="admin_document_unreadable">This image format can\'t be previewed on this phone.</string>
+    <string name="admin_document_tap">Tap to view full screen</string>
+    <string name="admin_document_private">Private: shown to cooperative staff only, never saved on this phone. Screenshots are blocked.</string>
+    <string name="admin_document_description">Photo of the worker\'s %1$s</string>
+    <string name="admin_section_checklist">Before you approve</string>
+    <string name="admin_check_name">The name on the ID matches \"%1$s\"</string>
+    <string name="admin_check_photo">The photo is clear and the document is not cut off</string>
+    <string name="admin_check_valid">The document is valid (not expired) and of an accepted type</string>
+    <string name="admin_section_services">Services and prices</string>
+    <string name="admin_section_profile">Profile</string>
+    <string name="admin_area">Area</string>
+    <string name="admin_languages">Languages</string>
+    <string name="admin_about">About</string>
+    <string name="admin_section_history">History</string>
+    <string name="admin_history_empty">No changes yet.</string>
+    <string name="admin_close">Close</string>
+
+    <!-- Actions -->
+    <string name="admin_approve">Approve</string>
+    <string name="admin_reject">Reject</string>
+    <string name="admin_revoke">Revoke verification</string>
+    <string name="admin_approve_confirm_title">Approve %1$s?</string>
+    <string name="admin_approve_confirm_body">They will appear to customers right away and can start receiving bookings.</string>
+    <string name="admin_cancel">Cancel</string>
+    <string name="admin_reject_title">Reject %1$s?</string>
+    <string name="admin_reject_body">They will be asked to submit a new ID. Choose a reason.</string>
+    <string name="admin_revoke_title">Revoke %1$s\'s verification?</string>
+    <string name="admin_revoke_body">They will be removed from the catalog immediately. Existing bookings are not cancelled.</string>
+    <string name="admin_reason_details">Details (optional)</string>
+    <string name="admin_reason_PhotoUnclear">Photo is unclear</string>
+    <string name="admin_reason_NameMismatch">Name doesn\'t match</string>
+    <string name="admin_reason_DocumentNotAccepted">Document type not accepted</string>
+    <string name="admin_reason_DocumentExpired">Document has expired</string>
+    <string name="admin_reason_Complaints">Customer complaints</string>
+    <string name="admin_reason_Other">Other</string>
+    <string name="admin_done_approved">%1$s is now verified</string>
+    <string name="admin_done_rejected">%1$s was asked for a new ID</string>
+    <string name="admin_done_revoked">%1$s was removed from the catalog</string>
+    <string name="admin_error_already_decided">Another admin already decided. Showing the latest status.</string>
+    <string name="admin_error_forbidden">This account no longer has admin access.</string>
+    <string name="admin_doc_aadhaar">Aadhaar card</string>
+    <string name="admin_doc_voter_id">Voter ID</string>
+    <string name="admin_doc_driving_licence">Driving licence</string>
+    <string name="admin_doc_pan">PAN card</string>
+</resources>

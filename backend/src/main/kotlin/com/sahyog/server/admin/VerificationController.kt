@@ -33,6 +33,10 @@ data class PendingVerification(
     val phoneNumber: String,
     val documentType: IdDocumentType,
     val submittedAtMillis: Long,
+    val locality: String?,
+    val categoryIds: List<String>,
+    /** True when this worker was rejected before and is trying again. */
+    val isResubmission: Boolean,
 )
 
 data class RejectRequest(val reason: String)
@@ -44,14 +48,20 @@ class VerificationService(
     private val workers: WorkerRepository,
     private val storage: DocumentStorage,
     private val jdbc: JdbcClient,
+    private val audit: StatusAudit,
 ) {
     /** Oldest first, so nobody waits longest. */
     fun pending(adminUid: String): List<PendingVerification> {
         access.admin(adminUid)
         return jdbc.sql(
             """
-            SELECT u.uid, u.name, u.phone_number, d.document_type, d.submitted_at
+            SELECT u.uid, u.name, u.phone_number, d.document_type, d.submitted_at, p.locality,
+                   ARRAY(SELECT wc.category_id FROM worker_categories wc JOIN categories c ON c.id = wc.category_id
+                         WHERE wc.uid = u.uid ORDER BY c.position) AS category_ids,
+                   EXISTS (SELECT 1 FROM worker_status_changes x
+                           WHERE x.worker_uid = u.uid AND x.to_status = 'Rejected') AS resubmission
             FROM users u
+            LEFT JOIN worker_profiles p ON p.uid = u.uid
             JOIN LATERAL (
                 SELECT * FROM id_documents d WHERE d.uid = u.uid ORDER BY submitted_at DESC, id DESC LIMIT 1
             ) d ON true
@@ -65,6 +75,9 @@ class VerificationService(
                 phoneNumber = rs.getString("phone_number"),
                 documentType = IdDocumentType.valueOf(rs.getString("document_type")),
                 submittedAtMillis = rs.getTimestamp("submitted_at").toInstant().toEpochMilli(),
+                locality = rs.getString("locality"),
+                categoryIds = (rs.getArray("category_ids").array as Array<*>).map { it.toString() },
+                isResubmission = rs.getBoolean("resubmission"),
             )
         }.list()
     }
@@ -97,7 +110,9 @@ class VerificationService(
             throw ApiException(HttpStatus.CONFLICT, "conflict", "status")
         }
         workers.decide(document.id, if (approve) "Approved" else "Rejected", adminUid, reason)
-        users.updateWorkerStatus(workerUid, if (approve) WorkerStatus.Verified else WorkerStatus.Rejected)
+        val to = if (approve) WorkerStatus.Verified else WorkerStatus.Rejected
+        users.updateWorkerStatus(workerUid, to)
+        audit.record(workerUid, worker.workerStatus, to, adminUid, reason)
     }
 }
 

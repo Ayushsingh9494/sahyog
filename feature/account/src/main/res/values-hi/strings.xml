@@ -7,7 +7,7 @@
     <string name="account_worker_verified">सत्यापित</string>
     <string name="account_worker_rejected">सत्यापन अस्वीकृत</string>
     <string name="account_mode_title">मोड</string>
-    <string name="account_mode_support">सेवाएँ बुक करने और काम करने के बीच बदलें।</string>
+    <string name="account_mode_support">सेवाएँ बुक करने, काम करने और (सहकारी समिति के स्टाफ़ के लिए) एडमिन कंसोल के बीच बदलें।</string>
     <string name="account_theme_title">दिखावट</string>
     <string name="account_theme_system">सिस्टम</string>
     <string name="account_theme_light">लाइट</string>
@@ -18,4 +18,5 @@
     <string name="account_sign_out_confirm_title">सहयोग से साइन आउट करें?</string>
     <string name="account_sign_out_confirm_body">वापस साइन इन करने के लिए आपको अपना मोबाइल नंबर फिर से सत्यापित करना होगा।</string>
     <string name="account_cancel">रद्द करें</string>
+    <string name="account_role_admin">एडमिन</string>
 </resources>

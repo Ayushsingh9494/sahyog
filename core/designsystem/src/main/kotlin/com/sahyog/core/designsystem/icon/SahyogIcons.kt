@@ -4,17 +4,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.Call
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
@@ -53,6 +56,10 @@ object SahyogIcons {
     val Star: ImageVector = Icons.Rounded.Star
 
     val Verified: ImageVector = Icons.Rounded.CheckCircle
+    val VerifiedOutlined: ImageVector = Icons.Outlined.CheckCircle
+    val Check: ImageVector = Icons.Rounded.Check
+    /** Admin / restricted areas. */
+    val Lock: ImageVector = Icons.Rounded.Lock
     val Info: ImageVector = Icons.Rounded.Info
     val Warning: ImageVector = Icons.Rounded.Warning
     val Retry: ImageVector = Icons.Rounded.Refresh

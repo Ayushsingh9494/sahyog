@@ -36,8 +36,8 @@ sealed interface SessionState {
             !user.hasCompletedOnboarding -> NeedsOnboarding(user)
             else -> {
                 val remembered = preferences.activeRole?.takeIf { it in user.roles }
-                val role = remembered
-                    ?: if (UserRole.Customer in user.roles) UserRole.Customer else UserRole.Worker
+                // Default: Customer, then Worker, then Admin.
+                val role = remembered ?: UserRole.entries.first { it in user.roles }
                 SignedIn(user, role)
             }
         }

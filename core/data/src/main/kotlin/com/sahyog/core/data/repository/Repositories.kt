@@ -2,6 +2,9 @@ package com.sahyog.core.data.repository
 
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.location.DeviceLocationResult
+import com.sahyog.core.model.AdminOverview
+import com.sahyog.core.model.AdminWorker
+import com.sahyog.core.model.AdminWorkerDetail
 import com.sahyog.core.model.AuthSession
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
@@ -15,6 +18,8 @@ import com.sahyog.core.model.User
 import com.sahyog.core.model.UserPreferences
 import com.sahyog.core.model.UserRole
 import com.sahyog.core.model.UserState
+import com.sahyog.core.model.VerificationRequest
+import com.sahyog.core.model.WorkerVerificationStatus
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerProfile
 import com.sahyog.core.model.WorkerProfileInput
@@ -143,6 +148,33 @@ sealed interface WorkerProfileState {
     data object NotSetUp : WorkerProfileState
 
     data class Ready(val profile: WorkerProfile) : WorkerProfileState
+}
+
+/**
+ * The cooperative's admin console. Always fetched live and never cached on the device: it
+ * holds other people's phone numbers and identity documents. All calls require the Admin role
+ * on the server (`AppError.Forbidden` otherwise).
+ */
+interface AdminRepository {
+    suspend fun overview(): AppResult<AdminOverview>
+
+    /** Oldest first, so nobody waits longest. */
+    suspend fun verificationQueue(): AppResult<List<VerificationRequest>>
+
+    /** The latest ID image, decoded in memory by the caller and never written to storage. */
+    suspend fun document(workerId: String): AppResult<ByteArray>
+
+    /** Fails with `Validation("status")` if someone else decided first. */
+    suspend fun approve(workerId: String): AppResult<Unit>
+
+    suspend fun reject(workerId: String, reason: String): AppResult<Unit>
+
+    suspend fun workers(status: WorkerVerificationStatus?, query: String?): AppResult<List<AdminWorker>>
+
+    suspend fun worker(workerId: String): AppResult<AdminWorkerDetail>
+
+    /** Takes a verified worker out of the catalog. */
+    suspend fun revoke(workerId: String, reason: String): AppResult<Unit>
 }
 
 /** Workers' public reviews, shown on their profiles. Cached for offline reading. */

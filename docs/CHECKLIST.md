@@ -261,7 +261,24 @@ Cloud SQL, Mumbai).
 - [ ] A full complete-and-review run on the device (only possible within 3 hours of a visit; the
       server tests cover it)
 - [ ] OpenAPI contract published by the server (springdoc) for future clients
-- [ ] Admin screen for verifications (API ready; web vs in-app still open)
+
+### M10e: Admin console (in-app) ✅
+- [x] Decided: in-app, a third mode "Admin" (Account → Mode) for cooperative staff only
+- [x] Server: admins from `ADMIN_PHONE_NUMBERS` (server config, never the API); `/me` reports `isAdmin`;
+      V4 audit trail `worker_status_changes` (who, when, why) for submissions, approvals, rejections, revocations
+- [x] Server: overview figures, workers directory (status filter + search), worker detail with history,
+      revoke verification with reason; 25 server tests
+- [x] App: `feature:admin` with Overview (needs-attention panel, next in line, figures, recent decisions),
+      Verify queue (oldest first, overdue in red, re-submissions marked), Workers directory (search +
+      filters), Worker review (profile, ID photo with full-screen zoom, approve checklist, services,
+      history; Approve / Reject with reason chips / Revoke)
+- [x] Privacy: admin data is never cached on the phone; the ID photo is decoded in memory only;
+      screenshots and Recents are blocked (FLAG_SECURE) on the review screen and the photo viewer
+- [x] Verified: 172 app unit tests (incl. admin ViewModels), lint 0 errors; on device: Admin mode via server
+      config, dashboard, queue, approve (confirm dialog), reject with reason, directory search, revoke,
+      audit rows in PostgreSQL; screenshots of the review screen come out black as intended
+- [x] Fixed during testing: the decision confirmation never showed (cleared before display)
+- [ ] Remove the test admin number before real launch; real staff numbers go in the cloud config
 
 ## M11: Notifications (FCM)
 

@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:ui"))
     implementation(project(":feature:account"))
+    implementation(project(":feature:admin"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:booking"))
     implementation(project(":feature:discovery"))

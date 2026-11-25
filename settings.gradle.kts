@@ -38,6 +38,7 @@ include(":core:testing")
 include(":core:ui")
 
 include(":feature:account")
+include(":feature:admin")
 include(":feature:auth")
 include(":feature:booking")
 include(":feature:discovery")

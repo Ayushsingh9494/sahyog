@@ -56,6 +56,10 @@ Every error is `{"code": "...", "field": "..."}` with a matching HTTP status
 | GET | `/api/v1/admin/verifications/{uid}/document` | Admin: the latest ID image (`no-store`) |
 | POST | `/api/v1/admin/verifications/{uid}/approve` | Admin: Pending → Verified |
 | POST | `/api/v1/admin/verifications/{uid}/reject` | Admin: `{"reason"}` → Rejected (the worker may submit again) |
+| GET | `/api/v1/admin/overview` | Admin: figures + recent decisions |
+| GET | `/api/v1/admin/workers?status&q` | Admin: directory, filter by status, search name/phone/area |
+| GET | `/api/v1/admin/workers/{uid}` | Admin: profile, services, document info, status history |
+| POST | `/api/v1/admin/workers/{uid}/revoke` | Admin: `{"reason"}` Verified → Rejected (removed from catalog) |
 | GET | `/api/v1/bookings` | The customer's bookings (with the start code once accepted) |
 | POST | `/api/v1/bookings` | Book: worker, service, slot, address, note, optional map pin → 201 |
 | POST | `/api/v1/bookings/{id}/cancel` | Only while Requested or Accepted |
@@ -76,7 +80,15 @@ Every error is `{"code": "...", "field": "..."}` with a matching HTTP status
 
 ## Admins
 
-Cooperative staff are marked by hand in the database, never through the API:
+Cooperative staff are configured on the server, never through the API: set `ADMIN_PHONE_NUMBERS`
+(E.164, comma-separated, e.g. `+919812345678`) and they become admins the next time they open the
+app. Removing a number doesn't revoke an existing admin; do that in the database. Locally:
+
+```sh
+ADMIN_PHONE_NUMBERS="+919876543210" ./gradlew bootRun
+```
+
+Or mark someone directly:
 
 ```sh
 docker exec backend-postgres-1 psql -U sahyog -d sahyog \

@@ -9,6 +9,10 @@ import com.sahyog.core.designsystem.catalog.DesignSystemCatalog
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.feature.account.AccountScreen
+import com.sahyog.feature.admin.navigation.AdminOverviewRoute
+import com.sahyog.feature.admin.navigation.AdminQueueRoute
+import com.sahyog.feature.admin.navigation.AdminWorkersRoute
+import com.sahyog.feature.admin.navigation.adminDestinations
 import com.sahyog.feature.booking.navigation.BookingsRoute
 import com.sahyog.feature.booking.navigation.bookingDestinations
 import com.sahyog.feature.booking.navigation.navigateToBookService
@@ -79,6 +83,26 @@ internal fun WorkerShell(
         ),
     ) { navController ->
         workerDestinations(navController)
+        sharedDestinations(navController, darkTheme, onThemeChange, showDeveloperOptions)
+    }
+}
+
+/** Cooperative staff: overview, verification queue, workers directory. */
+@Composable
+internal fun AdminShell(
+    darkTheme: Boolean,
+    onThemeChange: (ThemePreference) -> Unit,
+    showDeveloperOptions: Boolean,
+) {
+    RoleShell(
+        tabs = listOf(
+            TopLevelTab(AdminOverviewRoute, R.string.tab_overview, SahyogIcons.HomeOutlined, SahyogIcons.Home),
+            TopLevelTab(AdminQueueRoute, R.string.tab_verify, SahyogIcons.VerifiedOutlined, SahyogIcons.Verified),
+            TopLevelTab(AdminWorkersRoute, R.string.tab_workers, SahyogIcons.Jobs, SahyogIcons.Jobs),
+            accountTab,
+        ),
+    ) { navController ->
+        adminDestinations(navController, onOpenQueueTab = { navController.navigateToTab(AdminQueueRoute) })
         sharedDestinations(navController, darkTheme, onThemeChange, showDeveloperOptions)
     }
 }

@@ -82,7 +82,103 @@ internal interface SahyogApi {
 
     @POST("api/v1/worker/jobs/{id}/start")
     suspend fun startJob(@Path("id") id: String, @Body request: NetworkStartJob): NetworkBooking
+
+    // --- Admin (cooperative staff only; 403 for everyone else) ---
+
+    @GET("api/v1/admin/overview")
+    suspend fun adminOverview(): NetworkAdminOverview
+
+    @GET("api/v1/admin/verifications")
+    suspend fun verifications(): List<NetworkVerificationRequest>
+
+    /** The ID image bytes; never cached (the server sends `no-store`). */
+    @GET("api/v1/admin/verifications/{uid}/document")
+    suspend fun document(@Path("uid") uid: String): okhttp3.ResponseBody
+
+    @POST("api/v1/admin/verifications/{uid}/approve")
+    suspend fun approve(@Path("uid") uid: String)
+
+    @POST("api/v1/admin/verifications/{uid}/reject")
+    suspend fun reject(@Path("uid") uid: String, @Body request: NetworkReason)
+
+    @GET("api/v1/admin/workers")
+    suspend fun adminWorkers(
+        @retrofit2.http.Query("status") status: String?,
+        @retrofit2.http.Query("q") query: String?,
+    ): List<NetworkAdminWorker>
+
+    @GET("api/v1/admin/workers/{uid}")
+    suspend fun adminWorker(@Path("uid") uid: String): NetworkAdminWorkerDetail
+
+    @POST("api/v1/admin/workers/{uid}/revoke")
+    suspend fun revoke(@Path("uid") uid: String, @Body request: NetworkReason)
 }
+
+@Serializable
+internal data class NetworkReason(val reason: String)
+
+@Serializable
+internal data class NetworkStatusChange(
+    val workerUid: String,
+    val workerName: String,
+    val fromStatus: String? = null,
+    val toStatus: String,
+    val changedByName: String? = null,
+    val reason: String? = null,
+    val changedAtMillis: Long,
+)
+
+@Serializable
+internal data class NetworkAdminOverview(
+    val pendingVerifications: Int,
+    val verifiedWorkers: Int,
+    val rejectedWorkers: Int,
+    val customers: Int,
+    val bookingsToday: Int,
+    val liveJobs: Int,
+    val completedThisWeek: Int,
+    val averageRating: Double? = null,
+    val recentDecisions: List<NetworkStatusChange> = emptyList(),
+)
+
+@Serializable
+internal data class NetworkVerificationRequest(
+    val uid: String,
+    val name: String,
+    val phoneNumber: String,
+    val documentType: String,
+    val submittedAtMillis: Long,
+    val locality: String? = null,
+    val categoryIds: List<String> = emptyList(),
+    val isResubmission: Boolean = false,
+)
+
+@Serializable
+internal data class NetworkAdminWorker(
+    val uid: String,
+    val name: String,
+    val phoneNumber: String,
+    val status: String,
+    val locality: String? = null,
+    val categoryIds: List<String> = emptyList(),
+    val rating: Double = 0.0,
+    val ratingCount: Int = 0,
+    val jobsCompleted: Int = 0,
+    val isAvailable: Boolean = false,
+    val joinedAtMillis: Long,
+)
+
+@Serializable
+internal data class NetworkAdminWorkerDetail(
+    val summary: NetworkAdminWorker,
+    val about: String? = null,
+    val yearsExperience: Int? = null,
+    val languages: List<String> = emptyList(),
+    val services: List<com.sahyog.core.data.catalog.NetworkWorkerService> = emptyList(),
+    val documentType: String? = null,
+    val documentSubmittedAtMillis: Long? = null,
+    val history: List<NetworkStatusChange> = emptyList(),
+)
 
 /** The signed-in person's profile as the server returns it. */
 @Serializable
@@ -92,6 +188,7 @@ internal data class NetworkUser(
     val name: String,
     val roles: Set<String>,
     val workerStatus: String? = null,
+    val isAdmin: Boolean = false,
 )
 
 @Serializable
