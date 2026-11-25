@@ -153,6 +153,17 @@ Room: categories · workers · worker_categories · worker_services
 - `core:location` wraps Play services behind `DeviceLocationProvider`; `core:ui` has the permission
   requester (explain first, then ask; "denied for good" → app settings) and distance formatting.
 
+## Reviews (M9)
+
+- A review belongs to one completed booking (`Booking.review`, `Job.review`) and is written through
+  the bookings API (`BookingRepository.submitReview`), so the server can check that the caller is
+  that booking's customer, that it is Completed, not reviewed yet and within 14 days of completion.
+- Reviews are final: no editing, so a rating can't be used to bargain afterwards.
+- Public reviews (`ReviewRepository`) are read from their own cache table (`worker_reviews`) and
+  carry the reviewer's first name only. A worker's rating and count are computed by the server from
+  reviews; the app never calculates a public rating itself (the worker's own average on the Jobs
+  tab is only shown to them).
+
 ## Conventions
 
 - Base package `com.sahyog`; module namespace `com.sahyog.<area>.<module>`.

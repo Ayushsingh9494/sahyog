@@ -9,10 +9,12 @@ import com.sahyog.core.database.entity.asEntity
 import com.sahyog.core.database.entity.asExternalModel
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,6 +69,15 @@ internal class OfflineFirstBookingRepository @Inject constructor(
         cancelled
     }
 
+    override suspend fun submitReview(bookingId: String, input: ReviewInput): AppResult<Booking> = apiCall {
+        val reviewed = network.reviewBooking(
+            bookingId,
+            NetworkReviewRequest(rating = input.rating, comment = input.comment?.trim()?.ifBlank { null }),
+        ).asExternalModel()
+        dao.upsert(reviewed.asEntity())
+        reviewed
+    }
+
     override suspend fun lastUsedAddress(): String? = dao.lastUsedAddress()
 
     override suspend fun clearUserData() = dao.deleteAll()
@@ -83,5 +94,13 @@ internal fun NetworkBooking.asExternalModel() = Booking(
     note = note,
     status = BookingStatus.entries.firstOrNull { it.name == status } ?: BookingStatus.Requested,
     startCode = startCode,
+    createdAt = Instant.ofEpochMilli(createdAtMillis),
+    completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
+    review = review?.asExternalModel(),
+)
+
+internal fun NetworkReview.asExternalModel() = BookingReview(
+    rating = rating,
+    comment = comment,
     createdAt = Instant.ofEpochMilli(createdAtMillis),
 )

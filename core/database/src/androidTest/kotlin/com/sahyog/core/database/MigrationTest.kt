@@ -48,6 +48,9 @@ class MigrationTest {
             runBlocking {
                 val booking = database.bookingDao().observeBooking("SH-ABC234").first()
                 assertEquals("4821", booking?.startCode)
+                // v5 review columns start empty.
+                assertEquals(null, booking?.reviewRating)
+                assertEquals(0, database.reviewDao().observeReviews("w1").first().size)
             }
         } finally {
             database.close()
@@ -81,6 +84,6 @@ class MigrationTest {
     }
 
     private companion object {
-        const val LATEST_VERSION = 4
+        const val LATEST_VERSION = 5
     }
 }

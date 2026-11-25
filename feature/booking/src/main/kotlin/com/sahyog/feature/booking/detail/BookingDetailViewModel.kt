@@ -6,6 +6,8 @@ import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.model.Booking
+import com.sahyog.core.model.ReviewInput
+import com.sahyog.core.model.canReview
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
@@ -27,16 +30,31 @@ sealed interface BookingDetailUiState {
 
     data object NotFound : BookingDetailUiState
 
+    /** @property canReview Completed, not rated yet, and still within the review window. */
     data class Ready(
         val booking: Booking,
         val today: LocalDate,
         val isRefreshing: Boolean,
         val isCancelling: Boolean,
+        val canReview: Boolean = false,
+        val review: ReviewDraft = ReviewDraft(),
     ) : BookingDetailUiState
+}
+
+/** The rating being written. [rating] is 0 until a star is tapped. */
+data class ReviewDraft(
+    val rating: Int = 0,
+    val comment: String = "",
+    val isSubmitting: Boolean = false,
+) {
+    val canSubmit: Boolean
+        get() = !isSubmitting && ReviewInput(rating, comment).isValid
 }
 
 sealed interface BookingDetailEvent {
     data object Cancelled : BookingDetailEvent
+
+    data object Reviewed : BookingDetailEvent
 
     data class Failed(val error: AppError) : BookingDetailEvent
 }
@@ -55,6 +73,7 @@ class BookingDetailViewModel @AssistedInject constructor(
 
     private val refreshing = MutableStateFlow(false)
     private val cancelling = MutableStateFlow(false)
+    private val draft = MutableStateFlow(ReviewDraft())
 
     private val events = Channel<BookingDetailEvent>(Channel.BUFFERED)
     val eventFlow: Flow<BookingDetailEvent> = events.receiveAsFlow()
@@ -63,11 +82,19 @@ class BookingDetailViewModel @AssistedInject constructor(
         bookingRepository.booking(bookingId),
         refreshing,
         cancelling,
-    ) { booking, refreshing, cancelling ->
+        draft,
+    ) { booking, refreshing, cancelling, draft ->
         if (booking == null) {
             BookingDetailUiState.NotFound
         } else {
-            BookingDetailUiState.Ready(booking, LocalDate.now(clock), refreshing, cancelling)
+            BookingDetailUiState.Ready(
+                booking = booking,
+                today = LocalDate.now(clock),
+                isRefreshing = refreshing,
+                isCancelling = cancelling,
+                canReview = booking.canReview(clock.instant()),
+                review = draft,
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BookingDetailUiState.Loading)
 
@@ -98,6 +125,36 @@ class BookingDetailViewModel @AssistedInject constructor(
             // A refused cancel usually means the status moved on (e.g. the worker is
             // already on the way): fetch it so the screen shows why.
             if (result is AppResult.Failure) bookingRepository.refresh()
+        }
+    }
+
+    fun onReviewRatingChange(rating: Int) = draft.update { it.copy(rating = rating) }
+
+    fun onReviewCommentChange(comment: String) =
+        draft.update { it.copy(comment = comment.take(ReviewInput.COMMENT_MAX_LENGTH)) }
+
+    fun onSubmitReview() {
+        val current = draft.value
+        if (!current.canSubmit) return
+        draft.update { it.copy(isSubmitting = true) }
+        viewModelScope.launch {
+            val result = bookingRepository.submitReview(
+                bookingId,
+                ReviewInput(current.rating, current.comment.trim().ifBlank { null }),
+            )
+            when (result) {
+                is AppResult.Success -> {
+                    draft.value = ReviewDraft()
+                    events.send(BookingDetailEvent.Reviewed)
+                }
+                is AppResult.Failure -> {
+                    // Keep what they wrote so they can try again.
+                    draft.update { it.copy(isSubmitting = false) }
+                    events.send(BookingDetailEvent.Failed(result.error))
+                    // e.g. the window just closed: refetch so the card reflects it.
+                    bookingRepository.refresh()
+                }
+            }
         }
     }
 

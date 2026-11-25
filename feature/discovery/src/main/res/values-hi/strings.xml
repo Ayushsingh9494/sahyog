@@ -76,4 +76,10 @@
     <string name="discovery_radius_km">%1$d किमी के अंदर</string>
     <string name="discovery_category_none_nearby_title">%1$d किमी के अंदर कोई नहीं</string>
     <string name="discovery_category_none_nearby_message">ज़्यादा दूरी चुनें, या इस श्रेणी के सभी कारीगर देखें।</string>
+    <string name="discovery_worker_reviews">समीक्षाएँ</string>
+    <string name="discovery_worker_reviews_none">अभी तक कोई लिखित समीक्षा नहीं।</string>
+    <plurals name="discovery_worker_reviews_more">
+        <item quantity="one">%1$d समीक्षा देखें</item>
+        <item quantity="other">सभी %1$d समीक्षाएँ देखें</item>
+    </plurals>
 </resources>

@@ -18,6 +18,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import com.sahyog.core.designsystem.component.SahyogRatingSummary
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -146,6 +147,7 @@ internal fun WorkerHomeContent(
                 VerificationCard(uiState.profile, onAddId)
                 if (uiState.profile.verificationStatus == WorkerVerificationStatus.Verified) {
                     AvailabilityCard(uiState.profile.isAvailable, uiState.isUpdatingAvailability, onAvailabilityChange)
+                    uiState.rating?.let { RatingCard(it, uiState.ratingCount) }
                 }
                 SahyogTextButton(
                     text = stringResource(R.string.worker_edit_profile),
@@ -156,6 +158,19 @@ internal fun WorkerHomeContent(
                 }
             }
         }
+    }
+}
+
+/** The worker's own average, from their customers' ratings. */
+@Composable
+private fun RatingCard(rating: Float, count: Int) {
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.worker_home_rating_title),
+            style = SahyogTheme.typography.titleSmall,
+        )
+        Spacer(Modifier.height(SahyogSpacing.xs))
+        SahyogRatingSummary(rating = rating, reviewCount = count)
     }
 }
 

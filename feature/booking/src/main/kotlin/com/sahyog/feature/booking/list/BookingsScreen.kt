@@ -135,7 +135,12 @@ internal fun BookingsContent(
                         }
                     }
                     items(uiState.bookings, key = { it.id }) { booking ->
-                        BookingCard(booking = booking, today = uiState.today, onClick = { onBookingClick(booking.id) })
+                        BookingCard(
+                            booking = booking,
+                            today = uiState.today,
+                            onClick = { onBookingClick(booking.id) },
+                            awaitingReview = booking.id in uiState.awaitingReview,
+                        )
                     }
                 }
             }

@@ -8,4 +8,8 @@
         <item quantity="one">%2$d समीक्षा से 5 में से %1$s रेटिंग</item>
         <item quantity="other">%2$d समीक्षाओं से 5 में से %1$s रेटिंग</item>
     </plurals>
+    <plurals name="designsystem_rating_input_star">
+        <item quantity="one">%d स्टार</item>
+        <item quantity="other">%d स्टार</item>
+    </plurals>
 </resources>

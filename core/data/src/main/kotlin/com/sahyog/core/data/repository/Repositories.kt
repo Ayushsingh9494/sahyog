@@ -8,6 +8,7 @@ import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
 import com.sahyog.core.model.Job
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
 import com.sahyog.core.model.User
@@ -16,6 +17,7 @@ import com.sahyog.core.model.UserRole
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerProfile
 import com.sahyog.core.model.WorkerProfileInput
+import com.sahyog.core.model.WorkerReview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -116,6 +118,12 @@ interface BookingRepository {
     /** Allowed only while the booking is Requested or Accepted. */
     suspend fun cancelBooking(bookingId: String): AppResult<Booking>
 
+    /**
+     * Rates a completed booking (see `Booking.canReview`). Fails with `AppError.Validation`
+     * (`BookingErrorFields.REVIEW` or `REVIEW_CLOSED`) if the server refuses it.
+     */
+    suspend fun submitReview(bookingId: String, input: ReviewInput): AppResult<Booking>
+
     /** Address from the most recent booking, to pre-fill the next one. */
     suspend fun lastUsedAddress(): String?
 }
@@ -128,6 +136,14 @@ sealed interface WorkerProfileState {
     data object NotSetUp : WorkerProfileState
 
     data class Ready(val profile: WorkerProfile) : WorkerProfileState
+}
+
+/** Workers' public reviews, shown on their profiles. Cached for offline reading. */
+interface ReviewRepository {
+    /** Newest first; empty until [refresh] succeeds for this worker. */
+    fun reviews(workerId: String): Flow<List<WorkerReview>>
+
+    suspend fun refresh(workerId: String): AppResult<Unit>
 }
 
 /** The signed-in worker's own profile and verification. */

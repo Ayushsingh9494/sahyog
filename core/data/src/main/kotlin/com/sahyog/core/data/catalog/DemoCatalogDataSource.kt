@@ -26,7 +26,7 @@ internal class DemoCatalogDataSource @Inject constructor(
                     id = uid,
                     name = name,
                     categoryIds = profile.categoryIds,
-                    // Ratings arrive with reviews (M9); new members start unrated.
+                    // New members start unrated; their rating is the average of their reviews.
                     rating = 0f,
                     ratingCount = 0,
                     jobsCompleted = state.bookings.count {
@@ -46,15 +46,34 @@ internal class DemoCatalogDataSource @Inject constructor(
             val point = SAMPLE_AREAS[worker.locality]
             worker.copy(latitude = point?.first, longitude = point?.second)
         }
-        NetworkCatalog(categories = categories, workers = located + realWorkers)
+        // Reviews written in the app, by worker.
+        val ratings = state.bookings
+            .mapNotNull { stored -> stored.booking.review?.let { stored.booking.workerId to it.rating } }
+            .groupBy({ it.first }, { it.second })
+        val rated = (located + realWorkers).map { worker ->
+            val (rating, count) = combinedRating(worker.rating, worker.ratingCount, ratings[worker.id].orEmpty())
+            worker.copy(rating = rating, ratingCount = count)
+        }
+        NetworkCatalog(categories = categories, workers = rated)
     }
 
-    private companion object {
+    internal companion object {
+        /**
+         * Folds new star ratings into an existing average, rounded to one decimal.
+         * Sample workers start from their fictional history; real workers from zero.
+         */
+        fun combinedRating(baseRating: Float, baseCount: Int, newRatings: List<Int>): Pair<Float, Int> {
+            val count = baseCount + newRatings.size
+            if (count == 0) return 0f to 0
+            val average = (baseRating.toDouble() * baseCount + newRatings.sum()) / count
+            return (Math.round(average * 10) / 10.0).toFloat() to count
+        }
+
         /**
          * Approximate centres of the sample workers' areas, placed around Jalandhar
          * (Punjab). Fictional workers, real-world-ish points so distances look realistic.
          */
-        val SAMPLE_AREAS = mapOf(
+        private val SAMPLE_AREAS = mapOf(
             "Model Town" to (31.3085 to 75.5871),
             "Civil Lines" to (31.3302 to 75.5796),
             "Gandhi Nagar" to (31.3365 to 75.5642),
@@ -66,7 +85,7 @@ internal class DemoCatalogDataSource @Inject constructor(
         )
 
 
-        val categories = listOf(
+        private val categories = listOf(
             NetworkCategory(
                 CategoryIds.ELECTRICIAN, "Electrician",
                 listOf("electric", "wiring", "fan", "light", "switch", "बिजली", "इलेक्ट्रीशियन", "मिस्त्री"),
@@ -104,7 +123,7 @@ internal class DemoCatalogDataSource @Inject constructor(
         private fun service(name: String, rupees: Long, unit: String = "PerVisit") =
             NetworkWorkerService(name, rupees * 100, unit)
 
-        val sampleWorkers = listOf(
+        private val sampleWorkers = listOf(
             NetworkWorker(
                 id = "w-ramesh", name = "Ramesh Kumar",
                 categoryIds = listOf(CategoryIds.ELECTRICIAN, CategoryIds.APPLIANCE_REPAIR),

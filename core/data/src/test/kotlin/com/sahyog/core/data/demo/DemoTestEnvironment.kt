@@ -3,6 +3,7 @@ package com.sahyog.core.data.demo
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.sahyog.core.data.booking.DemoBookingDataSource
 import com.sahyog.core.data.catalog.DemoCatalogDataSource
+import com.sahyog.core.data.review.DemoReviewDataSource
 import com.sahyog.core.data.worker.DemoWorkerDataSource
 import com.sahyog.core.datastore.LocalProfileDataSource
 import com.sahyog.core.datastore.StoredProfile
@@ -54,6 +55,7 @@ internal class DemoTestEnvironment(tmp: TemporaryFolder, scope: TestScope) {
     val catalog = DemoCatalogDataSource(server)
     val bookings = DemoBookingDataSource(server, catalog)
     val workers = DemoWorkerDataSource(server, profiles)
+    val reviews = DemoReviewDataSource(server, catalog)
 
     /** Signs in as [uid], creating their user profile if needed. */
     suspend fun signIn(uid: String, name: String = "User $uid", roles: Set<UserRole> = setOf(UserRole.Customer)) {

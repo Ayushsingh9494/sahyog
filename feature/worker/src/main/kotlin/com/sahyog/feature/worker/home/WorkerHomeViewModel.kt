@@ -40,6 +40,7 @@ sealed interface WorkerHomeUiState {
      * @property active On the way or in progress.
      * @property upcoming Accepted, not started yet.
      * @property busyJobIds Jobs with an action in flight (buttons show progress).
+     * @property rating Average of customers' ratings of their jobs; null before the first one.
      */
     data class Ready(
         val profile: WorkerProfile,
@@ -49,6 +50,8 @@ sealed interface WorkerHomeUiState {
         val upcoming: List<Job> = emptyList(),
         val today: LocalDate,
         val busyJobIds: Set<String> = emptySet(),
+        val rating: Float? = null,
+        val ratingCount: Int = 0,
     ) : WorkerHomeUiState
 }
 
@@ -81,15 +84,20 @@ class WorkerHomeViewModel @Inject constructor(
         when (profile) {
             WorkerProfileState.NotLoaded -> if (error != null) WorkerHomeUiState.Error(error) else WorkerHomeUiState.Loading
             WorkerProfileState.NotSetUp -> WorkerHomeUiState.NeedsProfile
-            is WorkerProfileState.Ready -> WorkerHomeUiState.Ready(
-                profile = profile.profile,
-                isUpdatingAvailability = updating,
-                requests = jobs.filter { it.status == BookingStatus.Requested },
-                active = jobs.filter { it.status == BookingStatus.WorkerEnRoute || it.status == BookingStatus.InProgress },
-                upcoming = jobs.filter { it.status == BookingStatus.Accepted },
-                today = LocalDate.now(clock),
-                busyJobIds = busy,
-            )
+            is WorkerProfileState.Ready -> {
+                val ratings = jobs.mapNotNull { it.review?.rating }
+                WorkerHomeUiState.Ready(
+                    profile = profile.profile,
+                    isUpdatingAvailability = updating,
+                    requests = jobs.filter { it.status == BookingStatus.Requested },
+                    active = jobs.filter { it.status == BookingStatus.WorkerEnRoute || it.status == BookingStatus.InProgress },
+                    upcoming = jobs.filter { it.status == BookingStatus.Accepted },
+                    today = LocalDate.now(clock),
+                    busyJobIds = busy,
+                    rating = ratings.takeIf { it.isNotEmpty() }?.average()?.toFloat(),
+                    ratingCount = ratings.size,
+                )
+            }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WorkerHomeUiState.Loading)
 

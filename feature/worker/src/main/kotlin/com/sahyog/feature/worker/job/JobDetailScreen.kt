@@ -46,6 +46,7 @@ import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogLoadingView
 import com.sahyog.core.designsystem.component.SahyogOutlinedButton
+import com.sahyog.core.designsystem.component.SahyogRatingBar
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTextButton
 import com.sahyog.core.designsystem.component.SahyogTextField
@@ -215,6 +216,23 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
                 }
             }
         }
+        job.review?.let { review ->
+            item(key = "review") {
+                SahyogCard(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.worker_job_review_title),
+                        style = SahyogTheme.typography.titleSmall,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    Spacer(Modifier.height(SahyogSpacing.xs))
+                    SahyogRatingBar(rating = review.rating.toFloat(), starSize = ReviewStar)
+                    review.comment?.let {
+                        Spacer(Modifier.height(SahyogSpacing.xs))
+                        Text(it, style = SahyogTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        }
         item(key = "details") {
             SahyogCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(SahyogSpacing.md)) {
@@ -381,3 +399,5 @@ private fun AppError.jobMessageRes(): Int = when {
 
 private const val CODE_LENGTH = 4
 private val DetailLabelWidth = 88.dp
+
+private val ReviewStar = 20.dp

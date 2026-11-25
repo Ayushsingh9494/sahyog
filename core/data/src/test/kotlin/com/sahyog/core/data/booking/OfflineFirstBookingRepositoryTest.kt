@@ -7,6 +7,7 @@ import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.entity.BookingEntity
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,6 +83,15 @@ class OfflineFirstBookingRepositoryTest {
     }
 
     @Test
+    fun `a confirmed review is cached with the booking`() = runTest {
+        val booking = (repository.createBooking(request) as AppResult.Success).data
+        repository.submitReview(booking.id, ReviewInput(rating = 4, comment = "  Tidy work  "))
+        val review = repository.booking(booking.id).first()?.review
+        assertEquals(4, review?.rating)
+        assertEquals("Tidy work", review?.comment)
+    }
+
+    @Test
     fun `sign-out cleanup empties the cache`() = runTest {
         repository.createBooking(request)
         repository.clearUserData()
@@ -116,6 +126,14 @@ class OfflineFirstBookingRepositoryTest {
             val cancelled = serverBookings.first { it.id == bookingId }.copy(status = "Cancelled")
             serverBookings = serverBookings.map { if (it.id == bookingId) cancelled else it }
             return cancelled
+        }
+
+        override suspend fun reviewBooking(bookingId: String, review: NetworkReviewRequest): NetworkBooking {
+            failure?.let { throw it }
+            val reviewed = serverBookings.first { it.id == bookingId }
+                .copy(review = NetworkReview(review.rating, review.comment, createdAtMillis = 5))
+            serverBookings = serverBookings.map { if (it.id == bookingId) reviewed else it }
+            return reviewed
         }
     }
 

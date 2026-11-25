@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.data.booking.BookingErrorFields
 import com.sahyog.core.data.worker.WorkerErrorFields
+import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.JobAction
 import com.sahyog.core.model.Paise
@@ -23,10 +24,12 @@ import com.sahyog.feature.worker.schedule.EarningsViewModel
 import com.sahyog.feature.worker.schedule.ScheduleViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
+import java.time.Instant
 import java.time.ZoneOffset
 
 class WorkerJobsViewModelsTest {
@@ -56,6 +59,22 @@ class WorkerJobsViewModelsTest {
             assertEquals(listOf("later"), ready.upcoming.map { it.id })
         }
         assertEquals(1, jobs.refreshCount)
+    }
+
+    @Test
+    fun `home shows the average of customers' ratings, none before the first`() = runTest {
+        WorkerHomeViewModel(workers, jobs, clock).uiState.test {
+            assertNull(awaitReady().rating)
+            jobs.setJobs(
+                listOf(
+                    TestJobs.job("a", BookingStatus.Completed).copy(review = BookingReview(5, null, Instant.EPOCH)),
+                    TestJobs.job("b", BookingStatus.Completed).copy(review = BookingReview(4, "Good", Instant.EPOCH)),
+                    TestJobs.job("c", BookingStatus.Completed),
+                ),
+            )
+            val rated = awaitReady { it.ratingCount == 2 }
+            assertEquals(4.5f, rated.rating)
+        }
     }
 
     @Test

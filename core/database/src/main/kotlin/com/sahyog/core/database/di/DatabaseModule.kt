@@ -6,6 +6,7 @@ import com.sahyog.core.database.SahyogDatabase
 import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.dao.CatalogDao
 import com.sahyog.core.database.dao.JobDao
+import com.sahyog.core.database.dao.ReviewDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,4 +31,7 @@ internal object DatabaseModule {
 
     @Provides
     fun providesJobDao(database: SahyogDatabase): JobDao = database.jobDao()
+
+    @Provides
+    fun providesReviewDao(database: SahyogDatabase): ReviewDao = database.reviewDao()
 }

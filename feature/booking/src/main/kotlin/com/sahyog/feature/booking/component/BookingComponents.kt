@@ -19,6 +19,7 @@ import com.sahyog.core.data.booking.BookingErrorFields
 import com.sahyog.core.designsystem.component.SahyogAvatar
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
+import com.sahyog.core.designsystem.component.StatusTone
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.core.model.Booking
@@ -38,6 +39,8 @@ internal fun AppError.bookingMessageRes(): Int = when {
     this is AppError.Validation && (field == BookingErrorFields.WORKER || field == BookingErrorFields.SERVICE) ->
         R.string.booking_error_worker_gone
     this is AppError.Validation && field == BookingErrorFields.STATUS -> R.string.booking_cancel_not_allowed
+    this is AppError.Validation && field == BookingErrorFields.REVIEW_CLOSED -> R.string.booking_error_review_closed
+    this is AppError.Validation && field == BookingErrorFields.REVIEW -> R.string.booking_error_review_invalid
     else -> messageRes()
 }
 
@@ -55,6 +58,7 @@ internal fun BookingCard(
     today: LocalDate,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    awaitingReview: Boolean = false,
 ) {
     SahyogCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -80,7 +84,12 @@ internal fun BookingCard(
                 )
             }
             Spacer(Modifier.width(SahyogSpacing.sm))
-            SahyogStatusBadge(text = bookingStatusLabel(booking.status), tone = bookingStatusTone(booking.status))
+            if (awaitingReview) {
+                // A nudge to rate replaces "Completed": the status is already clear from "Past".
+                SahyogStatusBadge(text = stringResource(R.string.booking_review_to_rate), tone = StatusTone.Brand)
+            } else {
+                SahyogStatusBadge(text = bookingStatusLabel(booking.status), tone = bookingStatusTone(booking.status))
+            }
         }
     }
 }

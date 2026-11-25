@@ -4,10 +4,12 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,10 @@ class TestBookingRepository : BookingRepository {
     /** Null: succeed by turning the request into a Requested booking. */
     var createResult: AppResult<Booking>? = null
     var cancelResult: AppResult<Booking>? = null
+
+    /** Null: succeed by attaching the review to the booking. */
+    var reviewResult: AppResult<Booking>? = null
+    val reviews = mutableListOf<Pair<String, ReviewInput>>()
     var lastAddress: String? = null
 
     var refreshCount = 0
@@ -68,6 +74,18 @@ class TestBookingRepository : BookingRepository {
         return result
     }
 
+    override suspend fun submitReview(bookingId: String, input: ReviewInput): AppResult<Booking> {
+        reviews += bookingId to input
+        val result = reviewResult ?: run {
+            val booking = bookingsFlow.value.first { it.id == bookingId }
+            AppResult.Success(booking.copy(review = BookingReview(input.rating, input.comment, Instant.ofEpochMilli(0))))
+        }
+        if (result is AppResult.Success) {
+            bookingsFlow.update { list -> list.map { if (it.id == bookingId) result.data else it } }
+        }
+        return result
+    }
+
     override suspend fun lastUsedAddress(): String? = lastAddress
 }
 
@@ -80,6 +98,8 @@ object TestBookings {
         status: BookingStatus = BookingStatus.Requested,
         slot: TimeSlot = TimeSlot(date, 11),
         serviceName: String = "Repair",
+        completedAt: Instant? = null,
+        review: BookingReview? = null,
     ) = Booking(
         id = id,
         worker = BookingWorker("w1", "Ramesh Kumar"),
@@ -92,5 +112,7 @@ object TestBookings {
         status = status,
         startCode = if (status == BookingStatus.Accepted) "4821" else null,
         createdAt = Instant.ofEpochMilli(0),
+        completedAt = completedAt,
+        review = review,
     )
 }

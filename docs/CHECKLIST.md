@@ -169,7 +169,24 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
 ### M8b: Map address picker
 - [ ] Maps key via local.properties (never committed), restricted to the app; pin-drop address picker
 
-## M9: Reviews and ratings
+## M9: Reviews and ratings ✅
+- [x] `core:model` BookingReview (on the booking/job), WorkerReview (public), ReviewInput rules
+      (1–5 stars, comment ≤ 500), `Booking.canReview` (completed, not yet rated, within 14 days)
+- [x] Server rules (demo server): only the booking's customer, only once, only within the window;
+      worker rating = average of reviews (sample workers fold new ratings into their history)
+- [x] Privacy: reviewers are shown by first name only; reviews can't be edited after submitting
+- [x] Customer: "Rate" badge in Past bookings, rating card on the completed booking
+      (stars → optional comment → submit), "Your rating" afterwards
+- [x] Worker profile: recent reviews (3 shown, "Show all"), rating refreshed on open
+- [x] Worker: "Your rating from customers" on the Jobs tab, customer's rating on the job
+- [x] Design system: `SahyogRatingInput` (48dp stars, announced as "3 stars" by TalkBack)
+- [x] Room v5 (review columns, `worker_reviews` cache) via AutoMigration
+- [x] Verified: 174 unit tests, 10 device tests (incl. v5 migration and ReviewDao), lint 0 errors
+- [x] Verified on device: Asha rates Ravi's completed job 4★ with a comment → Ravi's profile goes from
+      "New" to 4.0 (1) with the review → Ravi sees the rating on his Jobs tab and on the job
+- [ ] Reporting abusive reviews / cooperative moderation (needs the admin side)
+- [ ] Accepted jobs whose visit time passed without starting stay "Coming up" forever: needs a
+      server rule (e.g. mark missed, notify the cooperative) — found during M9 testing
 
 ## M10: Backend integration
 - [ ] OpenAPI contract, Retrofit, Firebase ID token → Spring Boot verification

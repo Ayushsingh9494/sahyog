@@ -15,6 +15,13 @@ interface BookingNetworkDataSource {
     suspend fun createBooking(request: NetworkBookingRequest): NetworkBooking
 
     suspend fun cancelBooking(bookingId: String): NetworkBooking
+
+    /**
+     * Rates a completed booking, once, within `ReviewInput.REVIEW_WINDOW` of completion.
+     * Fails with [BookingErrorFields.REVIEW] for an invalid rating or comment, and
+     * [BookingErrorFields.REVIEW_CLOSED] if the booking can't be reviewed (any more).
+     */
+    suspend fun reviewBooking(bookingId: String, review: NetworkReviewRequest): NetworkBooking
 }
 
 /** Field names used in `AppError.Validation` for booking requests. */
@@ -25,6 +32,10 @@ object BookingErrorFields {
     const val SLOT_TAKEN = "slot_taken"
     const val ADDRESS = "address"
     const val STATUS = "status"
+    const val REVIEW = "review"
+
+    /** Not completed, already reviewed, or past the review window. */
+    const val REVIEW_CLOSED = "review_closed"
 }
 
 /**
@@ -32,6 +43,7 @@ object BookingErrorFields {
  * @property createdAtMillis Server time the booking was created.
  * @property customerName Shown to the worker; null in older records.
  * @property completedAtMillis When the worker marked the job done.
+ * @property review The customer's rating; visible to the customer and the worker.
  */
 @Serializable
 data class NetworkBooking(
@@ -50,6 +62,20 @@ data class NetworkBooking(
     val createdAtMillis: Long,
     val customerName: String? = null,
     val completedAtMillis: Long? = null,
+    val review: NetworkReview? = null,
+)
+
+@Serializable
+data class NetworkReview(
+    val rating: Int,
+    val comment: String? = null,
+    val createdAtMillis: Long,
+)
+
+@Serializable
+data class NetworkReviewRequest(
+    val rating: Int,
+    val comment: String? = null,
 )
 
 @Serializable

@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +42,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -47,18 +50,24 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.sahyog.core.designsystem.component.SahyogAvatar
+import com.sahyog.core.designsystem.component.SahyogButton
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogLoadingView
 import com.sahyog.core.designsystem.component.SahyogOutlinedButton
+import com.sahyog.core.designsystem.component.SahyogRatingBar
+import com.sahyog.core.designsystem.component.SahyogRatingInput
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTextButton
+import com.sahyog.core.designsystem.component.SahyogTextField
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.core.model.Booking
+import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.ui.ObserveAsEvents
 import com.sahyog.core.ui.booking.bookingStatusLabel
 import com.sahyog.core.ui.booking.bookingStatusTone
@@ -87,6 +96,7 @@ fun BookingDetailScreen(
     ObserveAsEvents(viewModel.eventFlow) { event ->
         val message = when (event) {
             BookingDetailEvent.Cancelled -> resources.getString(R.string.booking_cancelled_message)
+            BookingDetailEvent.Reviewed -> resources.getString(R.string.booking_reviewed_message)
             is BookingDetailEvent.Failed -> resources.getString(event.error.bookingMessageRes())
         }
         scope.launch { snackbarHostState.showSnackbar(message) }
@@ -112,8 +122,20 @@ fun BookingDetailScreen(
         onRefresh = viewModel::onRefresh,
         onCancel = viewModel::onCancel,
         onWorkerClick = onWorkerClick,
+        reviewActions = ReviewActions(
+            onRatingChange = viewModel::onReviewRatingChange,
+            onCommentChange = viewModel::onReviewCommentChange,
+            onSubmit = viewModel::onSubmitReview,
+        ),
     )
 }
+
+/** Callbacks of the rating card, grouped to keep the content signature short. */
+internal data class ReviewActions(
+    val onRatingChange: (Int) -> Unit = {},
+    val onCommentChange: (String) -> Unit = {},
+    val onSubmit: () -> Unit = {},
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,6 +146,7 @@ internal fun BookingDetailContent(
     onRefresh: () -> Unit,
     onCancel: () -> Unit,
     onWorkerClick: (String) -> Unit,
+    reviewActions: ReviewActions = ReviewActions(),
 ) {
     val ready = uiState as? BookingDetailUiState.Ready
     Scaffold(
@@ -150,7 +173,7 @@ internal fun BookingDetailContent(
                 onRefresh = onRefresh,
                 modifier = modifier,
             ) {
-                BookingDetail(uiState, onCancel, onWorkerClick)
+                BookingDetail(uiState, onCancel, onWorkerClick, reviewActions)
             }
         }
     }
@@ -161,6 +184,7 @@ private fun BookingDetail(
     state: BookingDetailUiState.Ready,
     onCancel: () -> Unit,
     onWorkerClick: (String) -> Unit,
+    reviewActions: ReviewActions,
 ) {
     val booking = state.booking
     var confirmCancel by rememberSaveable { mutableStateOf(false) }
@@ -175,6 +199,12 @@ private fun BookingDetail(
         verticalArrangement = Arrangement.spacedBy(SahyogSpacing.lg),
     ) {
         item(key = "status") { StatusCard(booking) }
+        val review = booking.review
+        if (review != null) {
+            item(key = "review") { YourReviewCard(review) }
+        } else if (state.canReview) {
+            item(key = "review") { ReviewCard(booking.worker.name, state.review, reviewActions) }
+        }
         val code = booking.startCode
         if (code != null && booking.status in CODE_VISIBLE) {
             item(key = "code") { StartCodeCard(code, booking.worker.name) }
@@ -214,6 +244,85 @@ private fun BookingDetail(
                 SahyogTextButton(text = stringResource(R.string.booking_cancel_keep), onClick = { confirmCancel = false })
             },
         )
+    }
+}
+
+@Composable
+private fun ReviewCard(workerName: String, draft: ReviewDraft, actions: ReviewActions) {
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.booking_review_title, workerName),
+            style = SahyogTheme.typography.titleMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        Spacer(Modifier.height(SahyogSpacing.xs))
+        Text(
+            text = stringResource(R.string.booking_review_body),
+            style = SahyogTheme.typography.bodyMedium,
+            color = SahyogTheme.colors.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(SahyogSpacing.sm))
+        SahyogRatingInput(
+            rating = draft.rating,
+            onRatingChange = actions.onRatingChange,
+            enabled = !draft.isSubmitting,
+            // The stars' touch targets are wider than the icons; line the first icon up with the text.
+            modifier = Modifier.offset(x = -SahyogSpacing.sm),
+        )
+        if (draft.rating == 0) {
+            Text(
+                text = stringResource(R.string.booking_review_pick_stars),
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
+        } else {
+            Spacer(Modifier.height(SahyogSpacing.sm))
+            SahyogTextField(
+                value = draft.comment,
+                onValueChange = actions.onCommentChange,
+                label = stringResource(R.string.booking_review_comment_label),
+                singleLine = false,
+                enabled = !draft.isSubmitting,
+                supportingText = stringResource(
+                    R.string.booking_review_comment_counter,
+                    draft.comment.length,
+                    ReviewInput.COMMENT_MAX_LENGTH,
+                ),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(SahyogSpacing.md))
+            SahyogButton(
+                text = stringResource(R.string.booking_review_submit),
+                onClick = actions.onSubmit,
+                enabled = draft.canSubmit,
+                loading = draft.isSubmitting,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(SahyogSpacing.xs))
+            Text(
+                text = stringResource(R.string.booking_review_final),
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun YourReviewCard(review: BookingReview) {
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.booking_review_yours),
+            style = SahyogTheme.typography.titleSmall,
+            modifier = Modifier.semantics { heading() },
+        )
+        Spacer(Modifier.height(SahyogSpacing.xs))
+        SahyogRatingBar(rating = review.rating.toFloat(), starSize = ReviewStar)
+        review.comment?.let {
+            Spacer(Modifier.height(SahyogSpacing.xs))
+            Text(it, style = SahyogTheme.typography.bodyMedium)
+        }
     }
 }
 
@@ -389,6 +498,7 @@ private val TIMELINE = setOf(
     BookingStatus.Completed,
 )
 private val StepDot = 24.dp
+private val ReviewStar = 20.dp
 private val StepIcon = 16.dp
 private val AvatarSize = 44.dp
 private val DetailLabelWidth = 88.dp

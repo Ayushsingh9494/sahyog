@@ -16,6 +16,10 @@ import com.sahyog.core.data.repository.AuthRepository
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.data.repository.LocalProfileUserRepository
 import com.sahyog.core.data.repository.OfflineUserPreferencesRepository
+import com.sahyog.core.data.repository.ReviewRepository
+import com.sahyog.core.data.review.DemoReviewDataSource
+import com.sahyog.core.data.review.OfflineFirstReviewRepository
+import com.sahyog.core.data.review.ReviewNetworkDataSource
 import com.sahyog.core.data.repository.UserPreferencesRepository
 import com.sahyog.core.data.repository.UserRepository
 import com.sahyog.core.data.repository.WorkerProfileRepository
@@ -67,6 +71,12 @@ internal interface DataModule {
     @Binds
     @IntoSet
     fun bindsBookingCleaner(impl: OfflineFirstBookingRepository): UserDataCleaner
+
+    @Binds
+    fun bindsReviewRepository(impl: OfflineFirstReviewRepository): ReviewRepository
+
+    @Binds
+    fun bindsReviewNetworkDataSource(impl: DemoReviewDataSource): ReviewNetworkDataSource
 
     @Binds
     fun bindsWorkerProfileRepository(impl: DefaultWorkerProfileRepository): WorkerProfileRepository

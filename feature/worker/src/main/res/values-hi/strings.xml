@@ -147,4 +147,6 @@
     <string name="worker_form_location_settings">सेटिंग खोलें</string>
     <string name="worker_form_location_off">आपके फ़ोन की लोकेशन बंद है। इसे चालू करके फिर से कोशिश करें।</string>
     <string name="worker_form_location_unavailable">आपकी लोकेशन नहीं मिल सकी। कृपया फिर से कोशिश करें।</string>
+    <string name="worker_home_rating_title">ग्राहकों से आपकी रेटिंग</string>
+    <string name="worker_job_review_title">ग्राहक की रेटिंग</string>
 </resources>

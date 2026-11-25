@@ -2,6 +2,7 @@ package com.sahyog.core.data.worker
 
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.booking.NetworkBooking
+import com.sahyog.core.data.booking.asExternalModel
 import com.sahyog.core.data.network.apiCall
 import com.sahyog.core.data.repository.JobRepository
 import com.sahyog.core.data.session.UserDataCleaner
@@ -70,4 +71,5 @@ internal fun NetworkBooking.asJob() = Job(
     status = BookingStatus.entries.firstOrNull { it.name == status } ?: BookingStatus.Requested,
     createdAt = Instant.ofEpochMilli(createdAtMillis),
     completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
+    review = review?.asExternalModel(),
 )

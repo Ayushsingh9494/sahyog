@@ -79,4 +79,10 @@
     <string name="discovery_radius_km">Within %1$d km</string>
     <string name="discovery_category_none_nearby_title">No one within %1$d km</string>
     <string name="discovery_category_none_nearby_message">Try a wider distance, or see everyone in this category.</string>
+    <string name="discovery_worker_reviews">Reviews</string>
+    <string name="discovery_worker_reviews_none">No written reviews yet.</string>
+    <plurals name="discovery_worker_reviews_more">
+        <item quantity="one">Show %1$d review</item>
+        <item quantity="other">Show all %1$d reviews</item>
+    </plurals>
 </resources>

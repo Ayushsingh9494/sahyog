@@ -63,4 +63,18 @@
     <string name="booking_step_en_route">On the way</string>
     <string name="booking_step_in_progress">In progress</string>
     <string name="booking_step_completed">Completed</string>
+
+    <!-- Reviews -->
+    <string name="booking_review_title">How was %1$s\'s work?</string>
+    <string name="booking_review_body">Your rating helps other customers choose, and helps the cooperative support its members. Only your first name is shown with it.</string>
+    <string name="booking_review_pick_stars">Tap a star to rate</string>
+    <string name="booking_review_comment_label">Comment (optional)</string>
+    <string name="booking_review_comment_counter">%1$d/%2$d</string>
+    <string name="booking_review_submit">Submit rating</string>
+    <string name="booking_review_final">Ratings can\'t be changed after you submit.</string>
+    <string name="booking_review_yours">Your rating</string>
+    <string name="booking_review_to_rate">Rate</string>
+    <string name="booking_reviewed_message">Thanks for your rating</string>
+    <string name="booking_error_review_closed">This booking can\'t be rated any more.</string>
+    <string name="booking_error_review_invalid">Pick 1 to 5 stars, and keep the comment under 500 characters.</string>
 </resources>

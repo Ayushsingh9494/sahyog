@@ -7,9 +7,11 @@ import androidx.room.TypeConverters
 import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.dao.CatalogDao
 import com.sahyog.core.database.dao.JobDao
+import com.sahyog.core.database.dao.ReviewDao
 import com.sahyog.core.database.entity.BookingEntity
 import com.sahyog.core.database.entity.CategoryEntity
 import com.sahyog.core.database.entity.JobEntity
+import com.sahyog.core.database.entity.ReviewEntity
 import com.sahyog.core.database.entity.WorkerCategoryCrossRef
 import com.sahyog.core.database.entity.WorkerEntity
 import com.sahyog.core.database.entity.WorkerServiceEntity
@@ -29,8 +31,9 @@ import com.sahyog.core.database.entity.WorkerServiceEntity
         WorkerServiceEntity::class,
         BookingEntity::class,
         JobEntity::class,
+        ReviewEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
     autoMigrations = [
         // v2: bookings table. Purely additive, so Room generates the migration.
@@ -39,6 +42,8 @@ import com.sahyog.core.database.entity.WorkerServiceEntity
         AutoMigration(from = 2, to = 3),
         // v4: worker coordinates (nullable columns).
         AutoMigration(from = 3, to = 4),
+        // v5: reviews (nullable review columns on bookings and jobs, worker_reviews table).
+        AutoMigration(from = 4, to = 5),
     ],
 )
 @TypeConverters(Converters::class)
@@ -48,4 +53,6 @@ abstract class SahyogDatabase : RoomDatabase() {
     abstract fun bookingDao(): BookingDao
 
     abstract fun jobDao(): JobDao
+
+    abstract fun reviewDao(): ReviewDao
 }

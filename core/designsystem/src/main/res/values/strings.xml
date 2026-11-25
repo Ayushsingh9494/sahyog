@@ -9,4 +9,8 @@
         <item quantity="one">Rated %1$s out of 5 from %2$d review</item>
         <item quantity="other">Rated %1$s out of 5 from %2$d reviews</item>
     </plurals>
+    <plurals name="designsystem_rating_input_star">
+        <item quantity="one">%d star</item>
+        <item quantity="other">%d stars</item>
+    </plurals>
 </resources>

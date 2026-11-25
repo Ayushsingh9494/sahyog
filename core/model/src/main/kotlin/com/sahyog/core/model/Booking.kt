@@ -91,6 +91,8 @@ data class BookingWorker(
  * @property price The service's starting price at the time of booking.
  * @property startCode Shown to the customer once the worker accepts; the worker enters it
  *   to start the job, proving they're actually at the customer's place.
+ * @property completedAt When the worker marked the job done; null until then.
+ * @property review The customer's rating, once given.
  */
 data class Booking(
     val id: String,
@@ -104,6 +106,8 @@ data class Booking(
     val status: BookingStatus,
     val startCode: String?,
     val createdAt: Instant,
+    val completedAt: Instant? = null,
+    val review: BookingReview? = null,
 )
 
 /** What the customer submits; the server fills in price, status and ids. */

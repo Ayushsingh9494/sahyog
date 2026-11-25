@@ -61,4 +61,18 @@
     <string name="booking_step_en_route">रास्ते में</string>
     <string name="booking_step_in_progress">काम जारी</string>
     <string name="booking_step_completed">पूरा हुआ</string>
+
+    <!-- Reviews -->
+    <string name="booking_review_title">%1$s का काम कैसा रहा?</string>
+    <string name="booking_review_body">आपकी रेटिंग दूसरे ग्राहकों को चुनने में और सहकारी समिति को अपने सदस्यों की मदद करने में काम आती है। इसके साथ सिर्फ़ आपका पहला नाम दिखेगा।</string>
+    <string name="booking_review_pick_stars">रेटिंग देने के लिए स्टार दबाएँ</string>
+    <string name="booking_review_comment_label">टिप्पणी (वैकल्पिक)</string>
+    <string name="booking_review_comment_counter">%1$d/%2$d</string>
+    <string name="booking_review_submit">रेटिंग भेजें</string>
+    <string name="booking_review_final">भेजने के बाद रेटिंग बदली नहीं जा सकती।</string>
+    <string name="booking_review_yours">आपकी रेटिंग</string>
+    <string name="booking_review_to_rate">रेटिंग दें</string>
+    <string name="booking_reviewed_message">रेटिंग के लिए धन्यवाद</string>
+    <string name="booking_error_review_closed">इस बुकिंग को अब रेटिंग नहीं दी जा सकती।</string>
+    <string name="booking_error_review_invalid">1 से 5 स्टार चुनें, और टिप्पणी 500 अक्षरों से कम रखें।</string>
 </resources>

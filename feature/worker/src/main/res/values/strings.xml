@@ -150,4 +150,6 @@
     <string name="worker_form_location_settings">Open settings</string>
     <string name="worker_form_location_off">Your phone\'s location is switched off. Turn it on and try again.</string>
     <string name="worker_form_location_unavailable">Couldn\'t find your location. Please try again.</string>
+    <string name="worker_home_rating_title">Your rating from customers</string>
+    <string name="worker_job_review_title">Customer\'s rating</string>
 </resources>

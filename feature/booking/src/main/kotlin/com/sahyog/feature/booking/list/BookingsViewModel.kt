@@ -6,6 +6,7 @@ import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.model.Booking
+import com.sahyog.core.model.canReview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,8 @@ data class BookingsUiState(
     /** Bookings for the selected tab: upcoming soonest first, past most recent first. */
     val bookings: List<Booking> = emptyList(),
     val upcomingCount: Int = 0,
+    /** Completed bookings the customer can still rate. */
+    val awaitingReview: Set<String> = emptySet(),
     val today: LocalDate,
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
@@ -64,6 +67,7 @@ class BookingsViewModel @Inject constructor(
                 BookingsTab.Past -> past.sortedWith(compareByDescending<Booking> { it.slot.start }.thenByDescending { it.createdAt })
             },
             upcomingCount = upcoming.size,
+            awaitingReview = past.filter { it.canReview(clock.instant()) }.map { it.id }.toSet(),
             today = LocalDate.now(clock),
             // Cached bookings show at once; the spinner is only for an empty first load.
             isLoading = !loaded && bookings.isEmpty(),

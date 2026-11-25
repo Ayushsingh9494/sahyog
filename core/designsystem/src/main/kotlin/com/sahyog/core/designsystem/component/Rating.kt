@@ -1,6 +1,8 @@
 package com.sahyog.core.designsystem.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -15,7 +17,9 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -63,6 +67,45 @@ fun SahyogRatingBar(
                             },
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Tappable 1–5 star picker. Each star is a 48dp target announced as "3 stars"
+ * (selected or not), so it works with TalkBack and for less precise taps.
+ *
+ * @param rating 0 when nothing is picked yet.
+ */
+@Composable
+fun SahyogRatingInput(
+    rating: Int,
+    onRatingChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    Row(modifier = modifier.selectableGroup()) {
+        for (stars in 1..MAX_STARS) {
+            val label = pluralStringResource(R.plurals.designsystem_rating_input_star, stars, stars)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .selectable(
+                        selected = rating == stars,
+                        enabled = enabled,
+                        role = Role.RadioButton,
+                        onClick = { onRatingChange(stars) },
+                    )
+                    .semantics { contentDescription = label },
+            ) {
+                Icon(
+                    SahyogIcons.Star,
+                    contentDescription = null,
+                    tint = if (stars <= rating) SahyogTheme.extendedColors.rating else SahyogTheme.extendedColors.ratingTrack,
+                    modifier = Modifier.size(36.dp),
+                )
             }
         }
     }

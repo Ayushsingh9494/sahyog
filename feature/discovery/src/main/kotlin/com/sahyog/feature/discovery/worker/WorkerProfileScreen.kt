@@ -18,6 +18,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -35,7 +38,9 @@ import com.sahyog.core.designsystem.component.SahyogButton
 import com.sahyog.core.designsystem.component.SahyogCard
 import com.sahyog.core.designsystem.component.SahyogEmptyView
 import com.sahyog.core.designsystem.component.SahyogLoadingView
+import com.sahyog.core.designsystem.component.SahyogRatingBar
 import com.sahyog.core.designsystem.component.SahyogStatusBadge
+import com.sahyog.core.designsystem.component.SahyogTextButton
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
 import com.sahyog.core.designsystem.component.StatusTone
 import com.sahyog.core.designsystem.icon.SahyogIcons
@@ -46,13 +51,17 @@ import com.sahyog.core.model.Paise
 import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.Worker
+import com.sahyog.core.model.WorkerReview
 import com.sahyog.core.model.WorkerService
+import com.sahyog.core.ui.booking.formatBookingDate
 import com.sahyog.core.ui.catalog.WorkerRating
 import com.sahyog.core.ui.catalog.categoryLabel
 import com.sahyog.core.ui.catalog.formatRupees
 import com.sahyog.core.ui.catalog.priceUnitSuffix
 import com.sahyog.core.ui.location.formatDistance
 import com.sahyog.feature.discovery.R
+import java.time.LocalDate
+import java.time.ZoneId
 
 @Composable
 fun WorkerProfileScreen(
@@ -104,13 +113,15 @@ internal fun WorkerProfileContent(
                 message = stringResource(R.string.discovery_not_found_message),
                 modifier = modifier,
             )
-            is WorkerProfileUiState.Ready -> WorkerProfile(uiState.worker, uiState.distanceKm, modifier)
+            is WorkerProfileUiState.Ready -> WorkerProfile(uiState, modifier)
         }
     }
 }
 
 @Composable
-private fun WorkerProfile(worker: Worker, distanceKm: Double?, modifier: Modifier) {
+private fun WorkerProfile(state: WorkerProfileUiState.Ready, modifier: Modifier) {
+    val worker = state.worker
+    val distanceKm = state.distanceKm
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(
@@ -168,6 +179,64 @@ private fun WorkerProfile(worker: Worker, distanceKm: Double?, modifier: Modifie
                     DetailRow(stringResource(R.string.discovery_worker_languages), worker.languages.joinToString(", "))
                 }
             }
+        }
+        item(key = "reviews") { ReviewsSection(state.reviews, state.today) }
+    }
+}
+
+@Composable
+private fun ReviewsSection(reviews: List<WorkerReview>, today: LocalDate) {
+    var showAll by rememberSaveable { mutableStateOf(false) }
+    Section(stringResource(R.string.discovery_worker_reviews)) {
+        if (reviews.isEmpty()) {
+            Text(
+                text = stringResource(R.string.discovery_worker_reviews_none),
+                style = SahyogTheme.typography.bodyMedium,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(SahyogSpacing.sm)) {
+                val shown = if (showAll) reviews else reviews.take(REVIEWS_PREVIEW_COUNT)
+                shown.forEach { ReviewItem(it, today) }
+                if (!showAll && reviews.size > REVIEWS_PREVIEW_COUNT) {
+                    SahyogTextButton(
+                        text = pluralStringResource(R.plurals.discovery_worker_reviews_more, reviews.size, reviews.size),
+                        onClick = { showAll = true },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewItem(review: WorkerReview, today: LocalDate) {
+    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = review.authorName,
+                style = SahyogTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = formatBookingDate(review.createdAt.atZone(ZoneId.systemDefault()).toLocalDate(), today),
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.height(SahyogSpacing.xxs))
+        SahyogRatingBar(rating = review.rating.toFloat())
+        review.comment?.let {
+            Spacer(Modifier.height(SahyogSpacing.xs))
+            Text(it, style = SahyogTheme.typography.bodyMedium)
+        }
+        if (review.serviceName.isNotBlank()) {
+            Spacer(Modifier.height(SahyogSpacing.xs))
+            Text(
+                text = review.serviceName,
+                style = SahyogTheme.typography.bodySmall,
+                color = SahyogTheme.colors.onSurfaceVariant,
+            )
         }
     }
 }
@@ -291,6 +360,7 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 
 private val HeaderAvatarSize = 72.dp
 private val DetailLabelWidth = 112.dp
+private const val REVIEWS_PREVIEW_COUNT = 3
 
 @Preview
 @Composable

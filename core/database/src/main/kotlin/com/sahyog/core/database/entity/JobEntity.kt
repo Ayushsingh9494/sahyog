@@ -29,6 +29,9 @@ data class JobEntity(
     val status: String,
     @ColumnInfo(name = "created_at") val createdAt: Instant,
     @ColumnInfo(name = "completed_at") val completedAt: Instant?,
+    @ColumnInfo(name = "review_rating") val reviewRating: Int? = null,
+    @ColumnInfo(name = "review_comment") val reviewComment: String? = null,
+    @ColumnInfo(name = "reviewed_at") val reviewedAt: Instant? = null,
 )
 
 fun JobEntity.asExternalModel() = Job(
@@ -43,6 +46,7 @@ fun JobEntity.asExternalModel() = Job(
     status = BookingStatus.entries.firstOrNull { it.name == status } ?: BookingStatus.Requested,
     createdAt = createdAt,
     completedAt = completedAt,
+    review = reviewOf(reviewRating, reviewComment, reviewedAt),
 )
 
 fun Job.asEntity() = JobEntity(
@@ -58,4 +62,7 @@ fun Job.asEntity() = JobEntity(
     status = status.name,
     createdAt = createdAt,
     completedAt = completedAt,
+    reviewRating = review?.rating,
+    reviewComment = review?.comment,
+    reviewedAt = review?.createdAt,
 )

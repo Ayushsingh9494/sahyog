@@ -7,6 +7,7 @@ import com.sahyog.core.data.demo.StoredBooking
 import com.sahyog.core.data.network.ApiException
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -79,6 +80,28 @@ internal class DemoBookingDataSource @Inject constructor(
         )
         cancelled
     }
+
+    override suspend fun reviewBooking(bookingId: String, review: NetworkReviewRequest): NetworkBooking =
+        server.call { uid ->
+            val comment = review.comment?.trim()?.ifBlank { null }
+            if (!ReviewInput(review.rating, comment).isValid) {
+                throw ApiException(AppError.Validation(BookingErrorFields.REVIEW))
+            }
+            // Only the customer who booked it can see (and so review) the booking.
+            val stored = state.bookings.find { it.customerUid == uid && it.booking.id == bookingId }
+                ?: throw ApiException(AppError.NotFound)
+            val booking = stored.booking
+            val completedAt = booking.completedAtMillis
+            val open = booking.status() == BookingStatus.Completed && booking.review == null &&
+                completedAt != null && nowMillis - completedAt < ReviewInput.REVIEW_WINDOW.toMillis()
+            if (!open) throw ApiException(AppError.Validation(BookingErrorFields.REVIEW_CLOSED))
+
+            val reviewed = booking.copy(review = NetworkReview(review.rating, comment, nowMillis))
+            state = state.copy(
+                bookings = state.bookings.map { if (it.booking.id == bookingId) it.copy(booking = reviewed) else it },
+            )
+            reviewed
+        }
 
     private fun NetworkBookingRequest.toSlot(): TimeSlot = try {
         TimeSlot(LocalDate.parse(slotDate), slotStartHour)

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.sahyog.core.model.Booking
+import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
@@ -34,7 +35,15 @@ data class BookingEntity(
     val status: String,
     @ColumnInfo(name = "start_code") val startCode: String?,
     @ColumnInfo(name = "created_at") val createdAt: Instant,
+    @ColumnInfo(name = "completed_at") val completedAt: Instant? = null,
+    @ColumnInfo(name = "review_rating") val reviewRating: Int? = null,
+    @ColumnInfo(name = "review_comment") val reviewComment: String? = null,
+    @ColumnInfo(name = "reviewed_at") val reviewedAt: Instant? = null,
 )
+
+/** The three review columns, read back as one value (all set, or none). */
+internal fun reviewOf(rating: Int?, comment: String?, createdAt: Instant?): BookingReview? =
+    if (rating != null && createdAt != null) BookingReview(rating, comment, createdAt) else null
 
 fun BookingEntity.asExternalModel() = Booking(
     id = id,
@@ -49,6 +58,8 @@ fun BookingEntity.asExternalModel() = Booking(
     status = BookingStatus.entries.firstOrNull { it.name == status } ?: BookingStatus.Requested,
     startCode = startCode,
     createdAt = createdAt,
+    completedAt = completedAt,
+    review = reviewOf(reviewRating, reviewComment, reviewedAt),
 )
 
 fun Booking.asEntity() = BookingEntity(
@@ -65,4 +76,8 @@ fun Booking.asEntity() = BookingEntity(
     status = status.name,
     startCode = startCode,
     createdAt = createdAt,
+    completedAt = completedAt,
+    reviewRating = review?.rating,
+    reviewComment = review?.comment,
+    reviewedAt = review?.createdAt,
 )
