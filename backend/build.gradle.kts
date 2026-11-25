@@ -58,6 +58,11 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.bootRun {
+    // Local runs use the dev profile (sample workers, local document folder).
+    systemProperty("spring.profiles.active", "dev")
+}
+
 tasks.test {
     useJUnitPlatform()
 }

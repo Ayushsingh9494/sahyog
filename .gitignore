@@ -28,3 +28,6 @@ Thumbs.db
 backend/.gradle/
 backend/build/
 backend/.kotlin/
+
+# Local ID-document uploads from the dev server: personal data, never commit
+backend/data/

@@ -10,6 +10,7 @@ import org.springframework.web.ErrorResponse
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 
 /**
  * The one error shape the API returns, e.g. `{"code":"validation","field":"name"}`.
@@ -64,6 +65,11 @@ class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handle(e: HttpMessageNotReadableException): ResponseEntity<ErrorBody> =
         ResponseEntity.badRequest().body(ErrorBody("validation"))
+
+    /** An upload over the multipart limit never reaches the controller. */
+    @ExceptionHandler(MaxUploadSizeExceededException::class)
+    fun handle(e: MaxUploadSizeExceededException): ResponseEntity<ErrorBody> =
+        ResponseEntity.badRequest().body(ErrorBody("validation", "document_too_large"))
 
     @ExceptionHandler(AccessDeniedException::class)
     fun handle(e: AccessDeniedException): ResponseEntity<ErrorBody> =

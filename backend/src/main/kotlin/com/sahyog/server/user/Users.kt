@@ -72,6 +72,11 @@ class UserRepository(private val jdbc: JdbcClient) {
             .update()
     }
 
+    fun updateWorkerStatus(uid: String, status: WorkerStatus) {
+        jdbc.sql("UPDATE users SET worker_status = :status, updated_at = now() WHERE uid = :uid AND is_worker")
+            .param("uid", uid).param("status", status.name).update()
+    }
+
     private fun ResultSet.toUser() = User(
         uid = getString("uid"),
         phoneNumber = getString("phone_number"),

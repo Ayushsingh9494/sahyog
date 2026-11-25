@@ -1,0 +1,10 @@
+# Local development (./gradlew bootRun turns this profile on). Never used in production.
+spring:
+  flyway:
+    # Also load the fictional sample workers (db/devdata), so the app has someone to show.
+    locations: classpath:db/migration,classpath:db/devdata
+
+sahyog:
+  storage:
+    # ID document photos, outside the source tree's tracked files (backend/data is gitignored).
+    documents-dir: ./data/documents

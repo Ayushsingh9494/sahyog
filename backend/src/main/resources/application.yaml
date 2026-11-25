@@ -13,6 +13,11 @@ spring:
           # Only the (public) project id is needed: no service-account secret.
           issuer-uri: https://securetoken.google.com/${sahyog.firebase.project-id}
           audiences: ${sahyog.firebase.project-id}
+  servlet:
+    multipart:
+      # ID photos: the app allows 10 MB; a little headroom for the multipart envelope.
+      max-file-size: 10MB
+      max-request-size: 11MB
   docker:
     compose:
       # Keep the database container running between server restarts (faster dev loop).
@@ -23,6 +28,9 @@ spring:
 sahyog:
   firebase:
     project-id: ${FIREBASE_PROJECT_ID:sahyog-f6bad}
+  storage:
+    # Private folder for ID documents. Production replaces this with a private Cloud Storage bucket.
+    documents-dir: ${DOCUMENTS_DIR:./data/documents}
 
 server:
   error:

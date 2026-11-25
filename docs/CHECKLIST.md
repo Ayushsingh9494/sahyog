@@ -216,9 +216,19 @@ Cloud SQL, Mumbai).
 - [x] `GET/PUT /api/v1/me` (onboarding; same name rule as the app; roles can be added, not dropped)
 - [x] Verified: 5 integration tests on a real PostGIS (Testcontainers); manual run: health UP, missing
       and forged tokens → 401, migration applied
-### M10b: Catalog, worker profiles, verification
-- [ ] Categories, worker profiles with PostGIS location, near-me / radius queries
-- [ ] ID document upload (private storage) and an admin approve / reject step (replaces auto-verify)
+### M10b: Catalog, worker profiles, verification ✅
+- [x] V2: categories (with Hindi keywords), worker profiles with a PostGIS `geography` point (GiST index),
+      categories, services, and an `id_documents` audit trail (who decided, when, why)
+- [x] Worker API: profile (same rules as the app's form + known categories/languages; location rounded
+      to ~1 km server-side), availability, ID upload (checked by file content, ≤ 10 MB, private storage)
+- [x] Admin API: pending queue, view document (`no-store`), approve / reject with reason; admins only
+      via SQL; nobody approves themselves; deciding twice → 409. Replaces the demo's auto-verify
+- [x] Catalog API (verified workers only) and PostGIS near-me (radius, category, nearest first)
+- [x] Dev profile loads the 18 fictional sample workers (never in production)
+- [x] Verified: 11 integration tests on real PostGIS; manual dev run: migrations + 18 workers loaded,
+      PostGIS nearest query works
+- [ ] Admin screen (web dashboard vs in-app is still an open question); the API is ready for either
+- [ ] Production: Cloud Storage bucket for documents (private, encrypted) instead of a local folder
 ### M10c: Bookings, jobs, reviews
 - [ ] Booking + job lifecycle, start code, time rules, reviews and ratings: the demo server's rules
 ### M10d: App switch-over
