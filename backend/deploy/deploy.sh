@@ -16,6 +16,10 @@
 set -euo pipefail
 
 GCLOUD="${GCLOUD:-gcloud}"
+# The server builds with Java 25; on this machine that is Android Studio's bundled runtime.
+if [ -z "${JAVA_HOME:-}" ] && [ -d "C:/Program Files/Android/Android Studio/jbr" ]; then
+  export JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"
+fi
 PROJECT="${PROJECT:-sahyog-f6bad}"
 REGION="${REGION:-asia-south1}"
 INSTANCE="${INSTANCE:-sahyog-db}"
