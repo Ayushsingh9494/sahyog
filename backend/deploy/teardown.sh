@@ -21,6 +21,7 @@ echo "== Cloud Run service";        try g run services delete "$SERVICE" --regio
 echo "== Cloud SQL instance";       try g sql instances delete "$INSTANCE"
 echo "== ID photo bucket";          try g storage rm --recursive "gs://$BUCKET"
 echo "== Database password secret"; try g secrets delete "$SECRET"
+echo "== Payment gateway key secret"; try g secrets delete "sahyog-razorpay-key-secret"
 echo "== Server images";            try g artifacts repositories delete cloud-run-source-deploy --location "$REGION"
 echo "== Service account";          try g iam service-accounts delete "$SA"
 
