@@ -17,6 +17,10 @@ spring:
 sahyog:
   storage:
     bucket: ${DOCUMENTS_BUCKET}
+  # Online payments; empty = switched off. The secret is injected by Cloud Run from Secret Manager.
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:}
+    key-secret: ${RAZORPAY_KEY_SECRET:}
 
 server:
   # Cloud Run tells the container which port to listen on.
