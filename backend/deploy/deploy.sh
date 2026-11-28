@@ -17,8 +17,10 @@ set -euo pipefail
 
 GCLOUD="${GCLOUD:-gcloud}"
 # The server builds with Java 25; on this machine that is Android Studio's bundled runtime.
-if [ -z "${JAVA_HOME:-}" ] && [ -d "C:/Program Files/Android/Android Studio/jbr" ]; then
-  export JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"
+JBR="C:/Program Files/Android/Android Studio/jbr"
+GRADLE_JAVA=()
+if [ -d "$JBR" ]; then
+  GRADLE_JAVA=("-Dorg.gradle.java.installations.paths=$JBR" "-Dorg.gradle.java.installations.auto-download=false")
 fi
 PROJECT="${PROJECT:-sahyog-f6bad}"
 REGION="${REGION:-asia-south1}"
@@ -99,7 +101,7 @@ fi
 g storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAccount:$SA" --role roles/storage.objectAdmin >/dev/null
 
 echo "== Build and deploy the server"
-(cd "$(dirname "$0")/.." && ./gradlew --console=plain -q bootJar)
+(cd "$(dirname "$0")/.." && ./gradlew "${GRADLE_JAVA[@]}" --console=plain -q bootJar)
 # Settings go through a file: on Windows gcloud runs via cmd.exe, which mangles special characters
 # (like ^) on the command line. The file holds no secrets and is deleted afterwards anyway.
 # DEMO_RELAX_START_WINDOW=true lets a worker start a job early (presentations only; default off).
