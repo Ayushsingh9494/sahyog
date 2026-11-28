@@ -280,6 +280,16 @@ Cloud SQL, Mumbai).
 - [x] Fixed during testing: the decision confirmation never showed (cleared before display)
 - [ ] Remove the test admin number before real launch; real staff numbers go in the cloud config
 
+### Cloud test deployment (temporary, started 2026-11-26)
+- [x] Mumbai: Cloud Run `sahyog-api` (scale to zero) + Cloud SQL `sahyog-db` (PostgreSQL 17, db-f1-micro,
+      no backups) + private bucket for ID photos + DB password in Secret Manager + least-privilege
+      service account; ₹500 budget alert. Scripts: `backend/deploy/deploy.sh`, `teardown.sh`
+- [x] Verified over the internet (no laptop): HTTPS health, 401 without a token, prod profile, 4 migrations
+      incl. PostGIS; app onboarding, catalog from Cloud SQL, worker profile, ID upload into the bucket;
+      the photo URL is not public (HTTP 403)
+- [ ] Add the cooperative admin's number (cloud config only), then approve a worker end to end
+- [ ] Tear down with `deploy/teardown.sh` when the test run ends (Cloud SQL bills hourly)
+
 ## M11: Notifications (FCM)
 
 ## M12: Payments (server-verified)
