@@ -31,3 +31,6 @@ backend/.kotlin/
 
 # Local ID-document uploads from the dev server: personal data, never commit
 backend/data/
+
+# Server secrets for local runs (e.g. Razorpay key secret): never commit
+backend/config/
