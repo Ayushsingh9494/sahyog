@@ -64,10 +64,16 @@ g storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAccount
 
 echo "== Build and deploy the server"
 (cd "$(dirname "$0")/.." && ./gradlew --console=plain -q bootJar)
+# Settings go through a file: on Windows gcloud runs via cmd.exe, which mangles special characters
+# (like ^) on the command line. The file holds no secrets and is deleted afterwards anyway.
+ENV_FILE="$(mktemp)"
+trap 'rm -f "$ENV_FILE"' EXIT
+printf 'DB_INSTANCE: "%s"\nDOCUMENTS_BUCKET: "%s"\nFIREBASE_PROJECT_ID: "%s"\nADMIN_PHONE_NUMBERS: "%s"\n' \
+  "$PROJECT:$REGION:$INSTANCE" "$BUCKET" "$PROJECT" "$ADMIN_PHONE_NUMBERS" > "$ENV_FILE"
 g run deploy "$SERVICE" --source "$(dirname "$0")/.." --region "$REGION" \
   --service-account "$SA" --allow-unauthenticated \
   --add-cloudsql-instances "$PROJECT:$REGION:$INSTANCE" \
-  --set-env-vars "^@^DB_INSTANCE=$PROJECT:$REGION:$INSTANCE@DOCUMENTS_BUCKET=$BUCKET@FIREBASE_PROJECT_ID=$PROJECT@ADMIN_PHONE_NUMBERS=$ADMIN_PHONE_NUMBERS" \
+  --env-vars-file "$(cygpath -w "$ENV_FILE" 2>/dev/null || echo "$ENV_FILE")" \
   --set-secrets "DB_PASSWORD=$SECRET:latest" \
   --memory 1Gi --cpu 1 --cpu-boost --min-instances 0 --max-instances 2 --timeout 60
 
