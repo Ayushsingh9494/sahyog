@@ -29,13 +29,15 @@ data class Job(
     val completedAt: Instant?,
     val review: BookingReview? = null,
     val location: GeoPoint? = null,
+    val payment: BookingPayment = BookingPayment(),
 )
 
 /** How long before the visit the worker may set off or start (so jobs can't be "done" early). */
 const val JOB_START_WINDOW_HOURS = 3L
 
 /** What the worker can do next with a job; the server enforces the same rules. */
-enum class JobAction { Accept, Decline, StartTrip, StartJob, Complete }
+/** [CashReceived]: the worker records a cash payment for a completed, unpaid job. */
+enum class JobAction { Accept, Decline, StartTrip, StartJob, Complete, CashReceived }
 
 fun BookingStatus.allowedJobActions(): Set<JobAction> = when (this) {
     BookingStatus.Requested -> setOf(JobAction.Accept, JobAction.Decline)
@@ -46,8 +48,8 @@ fun BookingStatus.allowedJobActions(): Set<JobAction> = when (this) {
 }
 
 /**
- * Totals of completed jobs. Amounts are the agreed starting prices; actual payments are
- * recorded once online payment exists (M12).
+ * Totals of completed jobs at their agreed prices, plus how much of it has actually been paid
+ * (and how) and how much is still to collect.
  */
 data class EarningsSummary(
     val thisWeek: Paise,
@@ -56,6 +58,9 @@ data class EarningsSummary(
     val thisMonthCount: Int,
     val allTime: Paise,
     val allTimeCount: Int,
+    val receivedCash: Paise = Paise(0),
+    val receivedOnline: Paise = Paise(0),
+    val toCollect: Paise = Paise(0),
 ) {
     companion object {
         /** Weeks start on Monday; "this month" is the calendar month, both in [zone]. */
@@ -73,6 +78,9 @@ data class EarningsSummary(
                 thisMonthCount = month.size,
                 allTime = done.total(),
                 allTimeCount = done.size,
+                receivedCash = done.filter { it.payment.isPaid && it.payment.via == PaymentMethod.Cash }.total(),
+                receivedOnline = done.filter { it.payment.isPaid && it.payment.via == PaymentMethod.Online }.total(),
+                toCollect = done.filter { !it.payment.isPaid }.total(),
             )
         }
     }

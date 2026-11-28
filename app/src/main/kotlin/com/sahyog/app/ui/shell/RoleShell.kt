@@ -1,6 +1,7 @@
 package com.sahyog.app.ui.shell
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -20,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sahyog.core.designsystem.component.SahyogNavigationBar
 import com.sahyog.core.designsystem.component.SahyogNavigationBarItem
+import com.sahyog.core.designsystem.component.SahyogTransitions
 import com.sahyog.core.designsystem.theme.SahyogTheme
 
 /** A bottom-navigation destination. [route] is a @Serializable route object. */
@@ -73,10 +76,21 @@ internal fun RoleShell(
             modifier = Modifier
                 .padding(padding)
                 .consumeWindowInsets(padding),
+            // Switching tabs cross-fades; going deeper (or back) slides.
+            enterTransition = { if (isTabSwitch(tabs)) SahyogTransitions.tabEnter else SahyogTransitions.push },
+            exitTransition = { if (isTabSwitch(tabs)) SahyogTransitions.tabExit else SahyogTransitions.pushExit },
+            popEnterTransition = { if (isTabSwitch(tabs)) SahyogTransitions.tabEnter else SahyogTransitions.pop },
+            popExitTransition = { if (isTabSwitch(tabs)) SahyogTransitions.tabExit else SahyogTransitions.popExit },
         ) {
             builder(navController)
         }
     }
+}
+
+/** Both ends of the transition are top-level tabs. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.isTabSwitch(tabs: List<TopLevelTab>): Boolean {
+    fun NavBackStackEntry.isTab() = tabs.any { tab -> destination.hierarchy.any { it.hasRoute(tab.route::class) } }
+    return initialState.isTab() && targetState.isTab()
 }
 
 /**

@@ -1,6 +1,7 @@
 package com.sahyog.core.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sahyog.core.designsystem.theme.SahyogSpacing
@@ -32,7 +34,16 @@ fun SahyogCard(
     val shape = SahyogTheme.shapes.large
 
     if (onClick != null) {
-        Card(onClick = onClick, modifier = modifier, shape = shape, colors = colors, border = border) {
+        // Tappable cards sink a touch while pressed, so taps feel physical.
+        val interactions = remember { MutableInteractionSource() }
+        Card(
+            onClick = onClick,
+            modifier = modifier.pressScale(interactions),
+            shape = shape,
+            colors = colors,
+            border = border,
+            interactionSource = interactions,
+        ) {
             Column(Modifier.padding(contentPadding), content = content)
         }
     } else {

@@ -140,6 +140,7 @@ internal fun BookingsContent(
                             today = uiState.today,
                             onClick = { onBookingClick(booking.id) },
                             awaitingReview = booking.id in uiState.awaitingReview,
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }

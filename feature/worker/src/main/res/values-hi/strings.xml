@@ -127,7 +127,10 @@
         <item quantity="other">%d काम</item>
     </plurals>
     <string name="worker_earnings_completed">पूरे किए काम</string>
-    <string name="worker_earnings_note">आपके शुरुआती दामों के आधार पर। ऑनलाइन भुगतान आगे के अपडेट में आएगा।</string>
+    <string name="worker_earnings_note">कुल राशि पूरे हुए कामों के तय दामों पर आधारित है।</string>
+    <string name="worker_earnings_cash">नकद में मिला</string>
+    <string name="worker_earnings_online">ऑनलाइन मिला</string>
+    <string name="worker_earnings_to_collect">अभी लेना बाकी</string>
     <string name="worker_earnings_empty_title">अभी कोई कमाई नहीं</string>
     <string name="worker_earnings_empty_message">पूरे किए काम और उनकी कमाई यहाँ दिखेगी।</string>
     <string name="worker_when">%1$s · %2$s</string>
@@ -151,4 +154,20 @@
     <string name="worker_job_review_title">ग्राहक की रेटिंग</string>
     <string name="worker_job_directions">रास्ता देखें</string>
     <string name="worker_job_directions_unavailable">रास्ता दिखाने के लिए कोई मैप ऐप नहीं मिला।</string>
+
+    <!-- भुगतान -->
+    <string name="worker_job_payment">भुगतान</string>
+    <string name="worker_job_payment_cash">नकद, काम के बाद</string>
+    <string name="worker_job_payment_online">ऑनलाइन, काम के बाद</string>
+    <string name="worker_job_to_collect">%1$s लेने हैं</string>
+    <string name="worker_job_collect_cash">%2$s से %1$s नकद लें, फिर नकद मिला दबाएँ।</string>
+    <string name="worker_job_collect_online">%1$s ऐप में भुगतान करेंगे। अगर वे आपको नकद दें, तो नकद मिला दबाएँ।</string>
+    <string name="worker_job_cash_received">नकद मिला</string>
+    <string name="worker_cash_confirm_title">नकद मिल गया?</string>
+    <string name="worker_cash_confirm_body">पुष्टि करें कि %1$s ने आपको %2$s नकद दिए। इसे बदला नहीं जा सकता।</string>
+    <string name="worker_done_cash">भुगतान दर्ज हुआ</string>
+    <string name="worker_job_paid">%1$s का भुगतान हुआ</string>
+    <string name="worker_job_paid_cash">नकद में मिला</string>
+    <string name="worker_job_paid_online">ऐप से ऑनलाइन भुगतान हुआ</string>
+    <string name="worker_badge_to_collect">लेना बाकी</string>
 </resources>

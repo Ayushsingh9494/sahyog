@@ -121,6 +121,16 @@ class WorkerJobsViewModelsTest {
             var item = awaitItem()
             while (item !is JobDetailUiState.Ready) item = awaitItem()
             assertEquals(BookingStatus.Completed, item.job.status)
+            // Done but unpaid: the only thing left is recording the cash.
+            assertEquals(setOf(JobAction.CashReceived), item.actions)
+        }
+        viewModel.eventFlow.test {
+            viewModel.onCashReceived()
+            assertEquals(JobDetailEvent.Done(JobAction.CashReceived), awaitItem())
+        }
+        viewModel.uiState.test {
+            var item = awaitItem()
+            while (item !is JobDetailUiState.Ready || !item.job.payment.isPaid) item = awaitItem()
             assertTrue(item.actions.isEmpty())
         }
     }

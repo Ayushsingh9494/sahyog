@@ -9,6 +9,7 @@ import com.sahyog.core.data.repository.BookingRepository
 import com.sahyog.core.data.repository.CatalogRepository
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.GeoPoint
+import com.sahyog.core.model.PaymentMethod
 import com.sahyog.core.model.TimeSlot
 import com.sahyog.core.model.Worker
 import com.sahyog.core.model.WorkerService
@@ -52,6 +53,9 @@ sealed interface BookServiceUiState {
         val isSubmitting: Boolean,
         /** Pin from the map picker; null if the customer only typed the address. */
         val location: GeoPoint? = null,
+        val paymentMethod: PaymentMethod = PaymentMethod.Cash,
+        /** Online is only offered while the server has the payment gateway configured. */
+        val onlinePaymentEnabled: Boolean = false,
     ) : BookServiceUiState {
         val addressIsValid: Boolean
             get() = address.trim().length >= BookingRequest.ADDRESS_MIN_LENGTH
@@ -89,6 +93,8 @@ class BookServiceViewModel @AssistedInject constructor(
         val isSubmitting: Boolean = false,
         val addressEdited: Boolean = false,
         val location: GeoPoint? = null,
+        val paymentMethod: PaymentMethod = PaymentMethod.Cash,
+        val onlineEnabled: Boolean = false,
     )
 
     private val input = MutableStateFlow(Input())
@@ -121,10 +127,16 @@ class BookServiceViewModel @AssistedInject constructor(
             note = input.note,
             isSubmitting = input.isSubmitting,
             location = input.location,
+            paymentMethod = if (input.onlineEnabled) input.paymentMethod else PaymentMethod.Cash,
+            onlinePaymentEnabled = input.onlineEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BookServiceUiState.Loading)
 
     init {
+        viewModelScope.launch {
+            val enabled = (bookingRepository.isOnlinePaymentEnabled() as? AppResult.Success)?.data == true
+            input.update { it.copy(onlineEnabled = enabled) }
+        }
         viewModelScope.launch {
             val lastAddress = bookingRepository.lastUsedAddress() ?: return@launch
             // Don't overwrite anything the user already started typing.
@@ -159,6 +171,8 @@ class BookServiceViewModel @AssistedInject constructor(
 
     fun onLocationClear() = input.update { it.copy(location = null) }
 
+    fun onPaymentMethodSelect(method: PaymentMethod) = input.update { it.copy(paymentMethod = method) }
+
     fun onNoteChange(value: String) = input.update { it.copy(note = value.take(BookingRequest.NOTE_MAX_LENGTH)) }
 
     fun onSubmit() {
@@ -176,6 +190,7 @@ class BookServiceViewModel @AssistedInject constructor(
                     address = form.address,
                     note = form.note.ifBlank { null },
                     location = form.location,
+                    paymentMethod = form.paymentMethod,
                 ),
             )
             when (result) {

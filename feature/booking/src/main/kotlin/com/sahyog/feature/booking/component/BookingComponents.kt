@@ -23,6 +23,7 @@ import com.sahyog.core.designsystem.component.StatusTone
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
 import com.sahyog.core.model.Booking
+import com.sahyog.core.model.isPaymentDue
 import com.sahyog.core.ui.booking.bookingStatusLabel
 import com.sahyog.core.ui.booking.bookingStatusTone
 import com.sahyog.core.ui.booking.formatBookingDate
@@ -41,6 +42,8 @@ internal fun AppError.bookingMessageRes(): Int = when {
     this is AppError.Validation && field == BookingErrorFields.STATUS -> R.string.booking_cancel_not_allowed
     this is AppError.Validation && field == BookingErrorFields.REVIEW_CLOSED -> R.string.booking_error_review_closed
     this is AppError.Validation && field == BookingErrorFields.REVIEW -> R.string.booking_error_review_invalid
+    this is AppError.Validation && field == BookingErrorFields.PAYMENT -> R.string.booking_error_payment_unavailable
+    this is AppError.Validation && field == BookingErrorFields.PAYMENT_FAILED -> R.string.booking_error_payment_unconfirmed
     else -> messageRes()
 }
 
@@ -84,7 +87,9 @@ internal fun BookingCard(
                 )
             }
             Spacer(Modifier.width(SahyogSpacing.sm))
-            if (awaitingReview) {
+            if (booking.isPaymentDue) {
+                SahyogStatusBadge(text = stringResource(R.string.booking_badge_to_pay), tone = StatusTone.Warning)
+            } else if (awaitingReview) {
                 // A nudge to rate replaces "Completed": the status is already clear from "Past".
                 SahyogStatusBadge(text = stringResource(R.string.booking_review_to_rate), tone = StatusTone.Brand)
             } else {

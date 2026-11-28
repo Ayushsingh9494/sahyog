@@ -95,4 +95,31 @@
     <string name="booking_map_permission_denied">लोकेशन की अनुमति के बिना, मैप को खुद अपनी जगह पर ले जाएँ।</string>
     <string name="booking_map_location_off">लोकेशन बंद है। उसे चालू करें, या मैप को अपनी जगह पर ले जाएँ।</string>
     <string name="booking_map_location_unavailable">आपकी जगह नहीं मिली। मैप को अपनी जगह पर ले जाएँ।</string>
+
+    <!-- भुगतान (काम के बाद) -->
+    <string name="booking_book_payment">आप कैसे भुगतान करेंगे?</string>
+    <string name="booking_book_pay_cash">नकद</string>
+    <string name="booking_book_pay_cash_body">काम पूरा होने पर कारीगर को दें</string>
+    <string name="booking_book_pay_online">ऑनलाइन भुगतान</string>
+    <string name="booking_book_pay_online_body">UPI, नेटबैंकिंग या कार्ड, ऐप में</string>
+    <string name="booking_book_pay_after">दोनों में, भुगतान काम पूरा होने के बाद ही होगा।</string>
+    <string name="booking_detail_payment">भुगतान</string>
+    <string name="booking_payment_method_cash">नकद, काम के बाद</string>
+    <string name="booking_payment_method_online">ऑनलाइन, काम के बाद</string>
+    <string name="booking_payment_due_title">देय राशि</string>
+    <string name="booking_payment_online_body">UPI, नेटबैंकिंग या कार्ड से भुगतान करें।</string>
+    <string name="booking_payment_cash_body">%2$s को %1$s नकद दें। वे ऐप में इसकी पुष्टि करेंगे।</string>
+    <string name="booking_payment_pay_now">%1$s भुगतान करें</string>
+    <string name="booking_payment_online_instead">इसके बजाय ऑनलाइन भुगतान करें</string>
+    <string name="booking_payment_confirming">भुगतान की पुष्टि हो रही है…</string>
+    <string name="booking_payment_secure">Razorpay द्वारा सुरक्षित भुगतान</string>
+    <string name="booking_payment_paid">%1$s का भुगतान हुआ</string>
+    <string name="booking_payment_paid_online">ऑनलाइन भुगतान हुआ। धन्यवाद!</string>
+    <string name="booking_payment_paid_cash">%1$s को नकद भुगतान हुआ</string>
+    <string name="booking_paid_message">भुगतान मिल गया। धन्यवाद!</string>
+    <string name="booking_payment_cancelled">भुगतान रद्द हुआ। कोई पैसा नहीं कटा।</string>
+    <string name="booking_payment_failed">भुगतान नहीं हो पाया। आप फिर से कोशिश कर सकते हैं।</string>
+    <string name="booking_error_payment_unavailable">अभी ऑनलाइन भुगतान उपलब्ध नहीं है। आप नकद दे सकते हैं।</string>
+    <string name="booking_error_payment_unconfirmed">हम इस भुगतान की पुष्टि नहीं कर सके। अगर पैसा कट गया है, तो दोबारा भुगतान न करें: सहकारी समिति से संपर्क करें।</string>
+    <string name="booking_badge_to_pay">भुगतान बाकी</string>
 </resources>

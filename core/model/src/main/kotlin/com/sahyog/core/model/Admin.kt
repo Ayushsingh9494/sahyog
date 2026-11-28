@@ -14,6 +14,11 @@ data class AdminOverview(
     /** Across all reviews; null until anyone has been rated. */
     val averageRating: Float?,
     val recentDecisions: List<StatusChange>,
+    /** Money paid through the app so far, by how it was paid. */
+    val collectedOnline: Paise = Paise(0),
+    val collectedCash: Paise = Paise(0),
+    /** Completed jobs not paid yet. */
+    val awaitingPayment: Int = 0,
 )
 
 /**

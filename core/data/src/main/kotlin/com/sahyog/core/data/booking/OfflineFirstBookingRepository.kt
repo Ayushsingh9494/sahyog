@@ -9,11 +9,15 @@ import com.sahyog.core.database.entity.asEntity
 import com.sahyog.core.database.entity.asExternalModel
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
+import com.sahyog.core.model.BookingPayment
 import com.sahyog.core.model.BookingReview
 import com.sahyog.core.model.BookingStatus
 import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.BookingWorker
 import com.sahyog.core.model.Paise
+import com.sahyog.core.model.PaymentMethod
+import com.sahyog.core.model.PaymentOrder
+import com.sahyog.core.model.CheckoutResult
 import com.sahyog.core.model.PriceUnit
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
@@ -60,6 +64,7 @@ internal class OfflineFirstBookingRepository @Inject constructor(
                 note = request.note?.trim()?.ifBlank { null },
                 latitude = request.location?.latitude,
                 longitude = request.location?.longitude,
+                paymentMethod = request.paymentMethod.name,
             ),
         ).asExternalModel()
         dao.upsert(created.asEntity())
@@ -81,6 +86,29 @@ internal class OfflineFirstBookingRepository @Inject constructor(
         reviewed
     }
 
+    override suspend fun isOnlinePaymentEnabled(): AppResult<Boolean> = apiCall { network.paymentConfig().onlineEnabled }
+
+    override suspend fun startOnlinePayment(bookingId: String): AppResult<PaymentOrder> = apiCall {
+        val order = network.createPaymentOrder(bookingId)
+        PaymentOrder(
+            bookingId = order.bookingId,
+            orderId = order.orderId,
+            amount = Paise(order.amountPaise),
+            keyId = order.keyId,
+            description = order.description,
+        )
+    }
+
+    override suspend fun confirmOnlinePayment(bookingId: String, result: CheckoutResult.Completed): AppResult<Booking> =
+        apiCall {
+            val paid = network.verifyPayment(
+                bookingId,
+                NetworkPaymentResult(result.orderId, result.paymentId, result.signature),
+            ).asExternalModel()
+            dao.upsert(paid.asEntity())
+            paid
+        }
+
     override suspend fun lastUsedAddress(): String? = dao.lastUsedAddress()
 
     override suspend fun clearUserData() = dao.deleteAll()
@@ -101,6 +129,15 @@ internal fun NetworkBooking.asExternalModel() = Booking(
     completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
     review = review?.asExternalModel(),
     location = GeoPoint.ofOrNull(latitude, longitude),
+    payment = paymentModel(),
+)
+
+/** The booking's payment as the server reports it. */
+internal fun NetworkBooking.paymentModel() = BookingPayment(
+    method = PaymentMethod.entries.firstOrNull { it.name == paymentMethod } ?: PaymentMethod.Cash,
+    isPaid = paymentStatus == "Paid",
+    via = PaymentMethod.entries.firstOrNull { it.name == paidVia },
+    paidAt = paidAtMillis?.let(Instant::ofEpochMilli),
 )
 
 internal fun NetworkReview.asExternalModel() = BookingReview(

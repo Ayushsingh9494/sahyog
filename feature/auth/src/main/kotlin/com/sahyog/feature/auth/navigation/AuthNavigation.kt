@@ -1,5 +1,6 @@
 package com.sahyog.feature.auth.navigation
 
+import com.sahyog.core.designsystem.component.SahyogTransitions
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -31,7 +32,15 @@ import kotlinx.serialization.Serializable
 @Composable
 fun AuthNavHost(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = WelcomeRoute, modifier = modifier) {
+    NavHost(
+        navController = navController,
+        startDestination = WelcomeRoute,
+        modifier = modifier,
+        enterTransition = { SahyogTransitions.push },
+        exitTransition = { SahyogTransitions.pushExit },
+        popEnterTransition = { SahyogTransitions.pop },
+        popExitTransition = { SahyogTransitions.popExit },
+    ) {
         composable<WelcomeRoute> {
             WelcomeScreen(onGetStarted = { navController.navigate(PhoneEntryRoute) })
         }

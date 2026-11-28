@@ -1,5 +1,10 @@
 package com.sahyog.core.designsystem.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +35,10 @@ fun SahyogStatusBadge(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
 ) {
-    val (container, content) = tone.colors()
+    // A status change (e.g. "On the way" to "In progress") glides instead of jumping.
+    val (containerTarget, contentTarget) = tone.colors()
+    val container by animateColorAsState(containerTarget, label = "badgeContainer")
+    val content by animateColorAsState(contentTarget, label = "badgeContent")
     Row(
         modifier = modifier
             .background(container, CircleShape)
@@ -40,7 +49,13 @@ fun SahyogStatusBadge(
             Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(SahyogSpacing.xs))
         }
-        Text(text = text, color = content, style = SahyogTheme.typography.labelMedium)
+        AnimatedContent(
+            targetState = text,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "badgeText",
+        ) { label ->
+            Text(text = label, color = content, style = SahyogTheme.typography.labelMedium)
+        }
     }
 }
 

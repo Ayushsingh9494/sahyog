@@ -40,6 +40,30 @@ class JobTest {
         assertEquals(Paise.rupees(700), summary.thisMonth)
         assertEquals(Paise.rupees(1_500), summary.allTime)
         assertEquals(4, summary.allTimeCount)
+        // Nothing paid yet: all of it is still to collect.
+        assertEquals(Paise.rupees(1_500), summary.toCollect)
+    }
+
+    @Test
+    fun `earnings split what was received in cash and online from what is still owed`() {
+        fun paid(job: Job, via: PaymentMethod) = job.copy(payment = BookingPayment(isPaid = true, via = via, paidAt = Instant.EPOCH))
+        val jobs = listOf(
+            paid(job(100, today), PaymentMethod.Cash),
+            paid(job(200, today), PaymentMethod.Online),
+            job(400, today),
+            paid(job(800, today, BookingStatus.Cancelled), PaymentMethod.Cash), // not a completed job: ignored
+        )
+        val summary = EarningsSummary.of(jobs, today, ZoneOffset.UTC)
+        assertEquals(Paise.rupees(100), summary.receivedCash)
+        assertEquals(Paise.rupees(200), summary.receivedOnline)
+        assertEquals(Paise.rupees(400), summary.toCollect)
+    }
+
+    @Test
+    fun `payment is due only on a completed, unpaid job`() {
+        assertEquals(true, job(100, today).isPaymentDue)
+        assertEquals(false, job(100, today, BookingStatus.InProgress).isPaymentDue)
+        assertEquals(false, job(100, today).copy(payment = BookingPayment(isPaid = true, via = PaymentMethod.Cash)).isPaymentDue)
     }
 
     @Test

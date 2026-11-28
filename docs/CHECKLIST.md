@@ -112,7 +112,7 @@ Each milestone ends with `./gradlew assembleDebug test` passing.
       bookings; first account's bookings return after signing back in
 - [ ] Worker-side status changes (on the way, start with code, complete): M7
 - [ ] Push notifications instead of polling: M11
-- [ ] Payment after completion: M12
+- [x] Payment after completion: M12
 
 ## M7: Worker side ✅
 ### M7a: Worker profile and verification ✅
@@ -293,6 +293,29 @@ Cloud SQL, Mumbai).
 ## M11: Notifications (FCM)
 
 ## M12: Payments (server-verified)
+- [x] Customer chooses Cash or Pay online (UPI / netbanking / cards) when booking; online is offered
+      only while the server has gateway keys. Either way, payment happens after the job is completed
+- [x] Server (V5 migration): payment method/status/via/paid_at + gateway order and payment ids.
+      Online: server opens a Razorpay order (re-used on retry), then marks paid only if the checkout
+      signature is valid AND Razorpay itself reports a captured payment for that order and amount
+      (authorised payments are captured). Cash: only that job's worker can confirm, once
+- [x] Key secret only in server config (git-ignored `backend/config/`, Secret Manager in the cloud);
+      the app receives just the public key id with each order
+- [x] App: Razorpay Standard Checkout (`standard-core` 1.7.22, Kotlin metadata 1.6, pinned; the
+      `checkout` wrapper's LATEST dependency avoided); NFC and READ_BASIC_PHONE_STATE stripped
+- [x] Customer: payment card on the booking (pay / pay online instead / paid receipt), "To pay" badge;
+      Worker: "Cash received" with confirmation, "To collect" badge, earnings split (cash / online /
+      still to collect); Admin overview: collected online, in cash, jobs awaiting payment
+- [x] Motion kit: drawn success tick + count-up, live-step halo and staggered timeline, springy card
+      press, popping rating stars, crossfading status badges, animated list items, slide/fade screen
+      transitions (tabs cross-fade)
+- [x] Verified on device against the laptop server with Razorpay Test Mode: online (netbanking demo
+      bank) paid and confirmed; checkout closed = "nothing charged"; app killed mid-checkout = still
+      unpaid and payable; cash confirmed by the worker; earnings split
+- [ ] Razorpay webhook (`payment.captured`) to reconcile payments whose confirmation never reached
+      the server (app killed after paying)
+- [ ] Enable UPI on the Razorpay account (not listed in this test account's checkout)
+- [ ] Live Mode: KYC with the cooperative's business PAN, then live keys in Secret Manager
 
 ## M13: Hardening
 - [ ] Enable R8 (`optimization { enable = true }`) + keep rules

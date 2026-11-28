@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    // Payment gateway checkout screen; only opened when the server offers online payment.
+    implementation(libs.razorpay.checkout)
 
     testImplementation(project(":core:testing"))
     testImplementation(libs.junit)

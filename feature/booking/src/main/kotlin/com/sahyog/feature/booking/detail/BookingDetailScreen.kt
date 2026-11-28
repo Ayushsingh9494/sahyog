@@ -1,5 +1,15 @@
 package com.sahyog.feature.booking.detail
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +45,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -61,6 +72,7 @@ import com.sahyog.core.designsystem.component.SahyogStatusBadge
 import com.sahyog.core.designsystem.component.SahyogTextButton
 import com.sahyog.core.designsystem.component.SahyogTextField
 import com.sahyog.core.designsystem.component.SahyogTopAppBar
+import com.sahyog.core.designsystem.component.pulsingHalo
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.theme.SahyogSpacing
 import com.sahyog.core.designsystem.theme.SahyogTheme
@@ -97,6 +109,9 @@ fun BookingDetailScreen(
         val message = when (event) {
             BookingDetailEvent.Cancelled -> resources.getString(R.string.booking_cancelled_message)
             BookingDetailEvent.Reviewed -> resources.getString(R.string.booking_reviewed_message)
+            BookingDetailEvent.Paid -> resources.getString(R.string.booking_paid_message)
+            BookingDetailEvent.PaymentCancelled -> resources.getString(R.string.booking_payment_cancelled)
+            BookingDetailEvent.PaymentDidNotGoThrough -> resources.getString(R.string.booking_payment_failed)
             is BookingDetailEvent.Failed -> resources.getString(event.error.bookingMessageRes())
         }
         scope.launch { snackbarHostState.showSnackbar(message) }
@@ -122,6 +137,7 @@ fun BookingDetailScreen(
         onRefresh = viewModel::onRefresh,
         onCancel = viewModel::onCancel,
         onWorkerClick = onWorkerClick,
+        onPayOnline = viewModel::onPayOnline,
         reviewActions = ReviewActions(
             onRatingChange = viewModel::onReviewRatingChange,
             onCommentChange = viewModel::onReviewCommentChange,
@@ -146,6 +162,7 @@ internal fun BookingDetailContent(
     onRefresh: () -> Unit,
     onCancel: () -> Unit,
     onWorkerClick: (String) -> Unit,
+    onPayOnline: () -> Unit = {},
     reviewActions: ReviewActions = ReviewActions(),
 ) {
     val ready = uiState as? BookingDetailUiState.Ready
@@ -173,7 +190,7 @@ internal fun BookingDetailContent(
                 onRefresh = onRefresh,
                 modifier = modifier,
             ) {
-                BookingDetail(uiState, onCancel, onWorkerClick, reviewActions)
+                BookingDetail(uiState, onCancel, onWorkerClick, onPayOnline, reviewActions)
             }
         }
     }
@@ -184,6 +201,7 @@ private fun BookingDetail(
     state: BookingDetailUiState.Ready,
     onCancel: () -> Unit,
     onWorkerClick: (String) -> Unit,
+    onPayOnline: () -> Unit,
     reviewActions: ReviewActions,
 ) {
     val booking = state.booking
@@ -198,30 +216,40 @@ private fun BookingDetail(
         ),
         verticalArrangement = Arrangement.spacedBy(SahyogSpacing.lg),
     ) {
-        item(key = "status") { StatusCard(booking) }
+        item(key = "status") { StatusCard(booking, Modifier.animateItem()) }
+        // Paying comes first once the job is done; a paid booking still shows its receipt.
+        if (booking.status == BookingStatus.Completed) {
+            item(key = "payment") {
+                Box(Modifier.animateItem()) { PaymentCard(booking, state.payment, onPayOnline) }
+            }
+        }
         val review = booking.review
         if (review != null) {
-            item(key = "review") { YourReviewCard(review) }
+            item(key = "review") { Box(Modifier.animateItem()) { YourReviewCard(review) } }
         } else if (state.canReview) {
-            item(key = "review") { ReviewCard(booking.worker.name, state.review, reviewActions) }
+            item(key = "review") { Box(Modifier.animateItem()) { ReviewCard(booking.worker.name, state.review, reviewActions) } }
         }
         val code = booking.startCode
         if (code != null && booking.status in CODE_VISIBLE) {
-            item(key = "code") { StartCodeCard(code, booking.worker.name) }
+            item(key = "code") { Box(Modifier.animateItem()) { StartCodeCard(code, booking.worker.name) } }
         }
         if (booking.status in TIMELINE) {
             item(key = "timeline") {
-                Section(stringResource(R.string.booking_detail_progress)) { Timeline(booking.status) }
+                Box(Modifier.animateItem()) {
+                    Section(stringResource(R.string.booking_detail_progress)) { Timeline(booking.status) }
+                }
             }
         }
-        item(key = "details") { DetailsSection(booking, state.today, onWorkerClick) }
+        item(key = "details") { Box(Modifier.animateItem()) { DetailsSection(booking, state.today, onWorkerClick) } }
         if (booking.status.canCancel) {
             item(key = "cancel") {
                 SahyogOutlinedButton(
                     text = stringResource(R.string.booking_cancel),
                     onClick = { confirmCancel = true },
                     loading = state.isCancelling,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem(),
                 )
             }
         }
@@ -327,7 +355,7 @@ private fun YourReviewCard(review: BookingReview) {
 }
 
 @Composable
-private fun StatusCard(booking: Booking) {
+private fun StatusCard(booking: Booking, modifier: Modifier = Modifier) {
     val name = booking.worker.name
     val title = when (booking.status) {
         BookingStatus.Requested -> stringResource(R.string.booking_detail_requested, name)
@@ -339,10 +367,16 @@ private fun StatusCard(booking: Booking) {
         BookingStatus.Rejected -> stringResource(R.string.booking_detail_rejected, name)
         BookingStatus.Expired -> stringResource(R.string.booking_detail_expired)
     }
-    SahyogCard(modifier = Modifier.fillMaxWidth()) {
+    SahyogCard(modifier = modifier.fillMaxWidth()) {
         SahyogStatusBadge(text = bookingStatusLabel(booking.status), tone = bookingStatusTone(booking.status))
         Spacer(Modifier.height(SahyogSpacing.sm))
-        Text(title, style = SahyogTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+        AnimatedContent(
+            targetState = title,
+            transitionSpec = { (fadeIn() + slideInVertically { it / 3 }) togetherWith fadeOut() },
+            label = "statusTitle",
+        ) { text ->
+            Text(text, style = SahyogTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+        }
         if (booking.status == BookingStatus.Requested) {
             Spacer(Modifier.height(SahyogSpacing.xs))
             Text(
@@ -398,24 +432,38 @@ private fun Timeline(status: BookingStatus) {
     SahyogCard(modifier = Modifier.fillMaxWidth()) {
         steps.forEachIndexed { index, (_, labelRes) ->
             val done = index <= current
+            val dot by animateColorAsState(
+                targetValue = if (done) SahyogTheme.colors.primary else SahyogTheme.colors.surfaceContainerHighest,
+                animationSpec = tween(durationMillis = 300, delayMillis = index * 90),
+                label = "stepDot",
+            )
+            val tick by animateFloatAsState(
+                targetValue = if (done) 1f else 0f,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                label = "stepTick",
+            )
+            // The step in progress pulses until the job is finished.
+            val live = index == current && status != BookingStatus.Completed
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = SahyogSpacing.xs)) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(StepDot)
-                        .background(
-                            if (done) SahyogTheme.colors.primary else SahyogTheme.colors.surfaceContainerHighest,
-                            CircleShape,
-                        ),
+                        .pulsingHalo(SahyogTheme.colors.primary, enabled = live)
+                        .background(dot, CircleShape),
                 ) {
-                    if (done) {
-                        Icon(
-                            SahyogIcons.Verified,
-                            contentDescription = null,
-                            tint = SahyogTheme.colors.onPrimary,
-                            modifier = Modifier.size(StepIcon),
-                        )
-                    }
+                    Icon(
+                        SahyogIcons.Verified,
+                        contentDescription = null,
+                        tint = SahyogTheme.colors.onPrimary,
+                        modifier = Modifier
+                            .size(StepIcon)
+                            .graphicsLayer {
+                                scaleX = tick
+                                scaleY = tick
+                                alpha = tick.coerceIn(0f, 1f)
+                            },
+                    )
                 }
                 Spacer(Modifier.width(SahyogSpacing.md))
                 Text(
@@ -455,6 +503,7 @@ private fun DetailsSection(booking: Booking, today: LocalDate, onWorkerClick: (S
                     formatRupees(booking.price) + priceUnitSuffix(booking.priceUnit),
                 )
                 DetailRow(stringResource(R.string.booking_detail_when), bookingWhen(booking, today))
+                DetailRow(stringResource(R.string.booking_detail_payment), paymentMethodLabel(booking.payment.method))
                 DetailRow(stringResource(R.string.booking_detail_address), booking.address)
                 if (booking.location != null) {
                     DetailRow(stringResource(R.string.booking_detail_pin), stringResource(R.string.booking_detail_pin_value))

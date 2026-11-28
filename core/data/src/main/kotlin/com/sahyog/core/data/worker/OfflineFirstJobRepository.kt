@@ -3,6 +3,7 @@ package com.sahyog.core.data.worker
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.booking.NetworkBooking
 import com.sahyog.core.data.booking.asExternalModel
+import com.sahyog.core.data.booking.paymentModel
 import com.sahyog.core.data.network.apiCall
 import com.sahyog.core.data.repository.JobRepository
 import com.sahyog.core.data.session.UserDataCleaner
@@ -53,6 +54,8 @@ internal class OfflineFirstJobRepository @Inject constructor(
 
     override suspend fun complete(jobId: String) = update { network.completeJob(jobId) }
 
+    override suspend fun markCashReceived(jobId: String) = update { network.markCashReceived(jobId) }
+
     override suspend fun clearUserData() = dao.deleteAll()
 
     private suspend fun update(call: suspend () -> NetworkBooking): AppResult<Job> = apiCall {
@@ -74,4 +77,5 @@ internal fun NetworkBooking.asJob() = Job(
     completedAt = completedAtMillis?.let(Instant::ofEpochMilli),
     review = review?.asExternalModel(),
     location = GeoPoint.ofOrNull(latitude, longitude),
+    payment = paymentModel(),
 )

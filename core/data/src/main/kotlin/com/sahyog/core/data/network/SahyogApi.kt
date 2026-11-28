@@ -2,6 +2,9 @@ package com.sahyog.core.data.network
 
 import com.sahyog.core.data.booking.NetworkBooking
 import com.sahyog.core.data.booking.NetworkBookingRequest
+import com.sahyog.core.data.booking.NetworkPaymentConfig
+import com.sahyog.core.data.booking.NetworkPaymentOrder
+import com.sahyog.core.data.booking.NetworkPaymentResult
 import com.sahyog.core.data.booking.NetworkReviewRequest
 import com.sahyog.core.data.catalog.NetworkCatalog
 import com.sahyog.core.data.review.NetworkWorkerReview
@@ -56,6 +59,23 @@ internal interface SahyogApi {
 
     @POST("api/v1/bookings/{id}/review")
     suspend fun reviewBooking(@Path("id") id: String, @Body review: NetworkReviewRequest): NetworkBooking
+
+    // --- Payments ---
+
+    @GET("api/v1/payments/config")
+    suspend fun paymentConfig(): NetworkPaymentConfig
+
+    @POST("api/v1/bookings/{id}/payment/order")
+    suspend fun createPaymentOrder(@Path("id") id: String): NetworkPaymentOrder
+
+    @POST("api/v1/bookings/{id}/payment/verify")
+    suspend fun verifyPayment(
+        @Path("id") id: String,
+        @Body result: NetworkPaymentResult,
+    ): NetworkBooking
+
+    @POST("api/v1/worker/jobs/{id}/cash-received")
+    suspend fun cashReceived(@Path("id") id: String): NetworkBooking
 
     // --- Worker ---
 
@@ -139,6 +159,9 @@ internal data class NetworkAdminOverview(
     val completedThisWeek: Int,
     val averageRating: Double? = null,
     val recentDecisions: List<NetworkStatusChange> = emptyList(),
+    val collectedOnlinePaise: Long = 0,
+    val collectedCashPaise: Long = 0,
+    val awaitingPayment: Int = 0,
 )
 
 @Serializable

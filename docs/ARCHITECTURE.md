@@ -144,7 +144,7 @@ Room: categories · workers · worker_categories · worker_services
   refused because the customer cancelled shows "this job changed" and refreshes.
 - The start code proves the worker is actually with the customer; trips and starts are refused more
   than 3 hours before the visit, so jobs can't be completed early.
-- Earnings are sums of completed jobs' starting prices until payments exist (M12).
+- Earnings are sums of completed jobs' agreed prices, split into received in cash, received online and still to collect (M12).
 
 ## Location (M8)
 
@@ -183,6 +183,19 @@ Room: categories · workers · worker_categories · worker_services
   in memory (downscaled) and shown with `FLAG_SECURE`, so they can't be screenshotted.
 - Every status change is written to `worker_status_changes`, which feeds "recent decisions" and each
   worker's history.
+
+## Payments (M12)
+
+- Chosen at booking (`PaymentMethod.Cash` / `Online`), paid after the job is completed, for the
+  booking's price. `BookingPayment` records how it was actually paid (`via`), which may differ.
+- Online: `BookingRepository.startOnlinePayment` asks the server for a gateway order, `PaymentCheckout`
+  (the Razorpay SDK, in `app`, bound with Hilt; `MainActivity` forwards the SDK's callbacks) shows the
+  checkout, and `confirmOnlinePayment` sends the result to the server. Nothing counts as paid until
+  the server has checked the HMAC signature with the key secret and fetched the payment from Razorpay
+  (order, amount, captured). The secret never leaves the server; the app gets only the key id.
+- Cash: the job's worker records it (`JobRepository.markCashReceived`); the server allows it once,
+  only for their own completed job.
+- With no gateway keys configured the server reports online payment as off and the app hides it.
 
 ## Reviews (M9)
 
@@ -249,7 +262,7 @@ Rules:
 | Navigation | Session-driven sections + Navigation Compose type-safe routes within | Decided |
 | Modularization | Multi-module + convention plugins | Decided |
 | Geo matching | Server-side PostGIS | Decided |
-| Payments | Server-verified via gateway webhook; gateway TBD | Open |
+| Payments | Razorpay; after the job; server-verified (signature + gateway lookup); cash confirmed by worker | Decided |
 | Pricing model | TBD (fixed / worker-set / quote) | Open |
 | Languages | English + Hindi at launch | Default |
 

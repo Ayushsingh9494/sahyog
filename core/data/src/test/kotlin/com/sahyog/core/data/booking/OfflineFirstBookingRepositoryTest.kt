@@ -7,6 +7,8 @@ import com.sahyog.core.database.dao.BookingDao
 import com.sahyog.core.database.entity.BookingEntity
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.CheckoutResult
+import com.sahyog.core.model.PaymentMethod
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.TimeSlot
 import kotlinx.coroutines.flow.Flow
@@ -83,6 +85,35 @@ class OfflineFirstBookingRepositoryTest {
     }
 
     @Test
+    fun `the chosen payment method travels with the booking`() = runTest {
+        val booking = (repository.createBooking(request.copy(paymentMethod = PaymentMethod.Online)) as AppResult.Success).data
+        assertEquals("Online", network.lastRequest?.paymentMethod)
+        assertEquals(PaymentMethod.Online, booking.payment.method)
+        assertEquals(false, booking.payment.isPaid)
+    }
+
+    @Test
+    fun `a payment the server confirmed is cached as paid, a refused one changes nothing`() = runTest {
+        val booking = (repository.createBooking(request.copy(paymentMethod = PaymentMethod.Online)) as AppResult.Success).data
+        val order = (repository.startOnlinePayment(booking.id) as AppResult.Success).data
+        assertEquals(19_900L, order.amount.value)
+
+        network.failure = ApiException(AppError.Validation(BookingErrorFields.PAYMENT_FAILED))
+        assertEquals(
+            AppResult.Failure(AppError.Validation(BookingErrorFields.PAYMENT_FAILED)),
+            repository.confirmOnlinePayment(booking.id, CheckoutResult.Completed(order.orderId, "pay_1", "sig")),
+        )
+        assertEquals(false, repository.booking(booking.id).first()?.payment?.isPaid)
+
+        network.failure = null
+        repository.confirmOnlinePayment(booking.id, CheckoutResult.Completed(order.orderId, "pay_1", "sig"))
+        val payment = repository.booking(booking.id).first()?.payment
+        assertEquals(true, payment?.isPaid)
+        assertEquals(PaymentMethod.Online, payment?.via)
+        assertEquals("pay_1", network.lastPaymentId)
+    }
+
+    @Test
     fun `a confirmed review is cached with the booking`() = runTest {
         val booking = (repository.createBooking(request) as AppResult.Success).data
         repository.submitReview(booking.id, ReviewInput(rating = 4, comment = "  Tidy work  "))
@@ -116,6 +147,7 @@ class OfflineFirstBookingRepositoryTest {
                 serviceName = request.serviceName, pricePaise = 19_900, priceUnit = "PerVisit",
                 slotDate = request.slotDate, slotStartHour = request.slotStartHour,
                 address = request.address, note = request.note, status = "Requested", createdAtMillis = 1,
+                paymentMethod = request.paymentMethod,
             )
             serverBookings = serverBookings + booking
             return booking
@@ -134,6 +166,25 @@ class OfflineFirstBookingRepositoryTest {
                 .copy(review = NetworkReview(review.rating, review.comment, createdAtMillis = 5))
             serverBookings = serverBookings.map { if (it.id == bookingId) reviewed else it }
             return reviewed
+        }
+
+        var lastPaymentId: String? = null
+
+        override suspend fun paymentConfig() = NetworkPaymentConfig(onlineEnabled = true, keyId = "rzp_test_fake")
+
+        override suspend fun createPaymentOrder(bookingId: String): NetworkPaymentOrder {
+            failure?.let { throw it }
+            val booking = serverBookings.first { it.id == bookingId }
+            return NetworkPaymentOrder(bookingId, "order_1", booking.pricePaise, "INR", "rzp_test_fake", booking.serviceName)
+        }
+
+        override suspend fun verifyPayment(bookingId: String, result: NetworkPaymentResult): NetworkBooking {
+            failure?.let { throw it }
+            lastPaymentId = result.paymentId
+            val paid = serverBookings.first { it.id == bookingId }
+                .copy(paymentStatus = "Paid", paidVia = "Online", paidAtMillis = 9)
+            serverBookings = serverBookings.map { if (it.id == bookingId) paid else it }
+            return paid
         }
     }
 

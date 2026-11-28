@@ -115,4 +115,8 @@
     <string name="admin_doc_voter_id">वोटर आईडी</string>
     <string name="admin_doc_driving_licence">ड्राइविंग लाइसेंस</string>
     <string name="admin_doc_pan">पैन कार्ड</string>
+    <string name="admin_section_payments">भुगतान</string>
+    <string name="admin_stat_paid_online">ऑनलाइन भुगतान</string>
+    <string name="admin_stat_paid_cash">नकद भुगतान</string>
+    <string name="admin_stat_awaiting_payment">भुगतान बाकी वाले काम</string>
 </resources>

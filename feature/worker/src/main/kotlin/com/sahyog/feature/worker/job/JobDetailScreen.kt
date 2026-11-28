@@ -1,5 +1,13 @@
 package com.sahyog.feature.worker.job
 
+import androidx.compose.ui.Alignment
+import com.sahyog.core.model.PaymentMethod
+import com.sahyog.core.designsystem.component.SahyogSuccessCheck
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.AnimatedContent
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.model.GeoPoint
 import androidx.compose.ui.platform.LocalContext
@@ -80,7 +88,7 @@ import kotlinx.coroutines.launch
 private const val AUTO_REFRESH_MS = 15_000L
 
 /** Which confirmation is open. Saved across rotation. */
-private enum class JobDialog { None, Decline, Code, Complete }
+private enum class JobDialog { None, Decline, Code, Complete, Cash }
 
 @Composable
 fun JobDetailScreen(
@@ -144,6 +152,7 @@ fun JobDetailScreen(
                         dialog = JobDialog.Code
                     },
                     onComplete = { dialog = JobDialog.Complete },
+                    onCashReceived = { dialog = JobDialog.Cash },
                 )
             }
         },
@@ -181,6 +190,13 @@ fun JobDetailScreen(
                 onConfirm = viewModel::onComplete,
                 onDismiss = { dialog = JobDialog.None },
             )
+            JobDialog.Cash -> ConfirmDialog(
+                title = stringResource(R.string.worker_cash_confirm_title),
+                body = stringResource(R.string.worker_cash_confirm_body, name, formatRupees(ready.job.price)),
+                confirmLabel = stringResource(R.string.worker_job_cash_received),
+                onConfirm = viewModel::onCashReceived,
+                onDismiss = { dialog = JobDialog.None },
+            )
             JobDialog.Code -> StartCodeDialog(
                 showError = codeError,
                 submitting = ready.actionInFlight == JobAction.StartJob,
@@ -206,7 +222,7 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(SahyogSpacing.lg),
     ) {
         item(key = "status") {
-            SahyogCard(modifier = Modifier.fillMaxWidth()) {
+            SahyogCard(modifier = Modifier.fillMaxWidth().animateItem()) {
                 SahyogStatusBadge(text = bookingStatusLabel(job.status), tone = bookingStatusTone(job.status))
                 Spacer(Modifier.height(SahyogSpacing.sm))
                 Text(
@@ -224,9 +240,12 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
                 }
             }
         }
+        if (job.status == BookingStatus.Completed) {
+            item(key = "payment") { JobPaymentCard(job, Modifier.animateItem()) }
+        }
         job.review?.let { review ->
             item(key = "review") {
-                SahyogCard(modifier = Modifier.fillMaxWidth()) {
+                SahyogCard(modifier = Modifier.fillMaxWidth().animateItem()) {
                     Text(
                         text = stringResource(R.string.worker_job_review_title),
                         style = SahyogTheme.typography.titleSmall,
@@ -242,7 +261,7 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
             }
         }
         item(key = "details") {
-            SahyogCard(modifier = Modifier.fillMaxWidth()) {
+            SahyogCard(modifier = Modifier.fillMaxWidth().animateItem()) {
                 Column(verticalArrangement = Arrangement.spacedBy(SahyogSpacing.md)) {
                     DetailRow(stringResource(R.string.worker_job_customer), customerName(job))
                     DetailRow(stringResource(R.string.worker_job_service), job.serviceName)
@@ -251,6 +270,12 @@ private fun JobDetail(state: JobDetailUiState.Ready, modifier: Modifier) {
                         formatRupees(job.price) + priceUnitSuffix(job.priceUnit),
                     )
                     DetailRow(stringResource(R.string.worker_job_when), jobWhen(job, state.today))
+                    DetailRow(
+                        stringResource(R.string.worker_job_payment),
+                        stringResource(
+                            if (job.payment.method == PaymentMethod.Online) R.string.worker_job_payment_online else R.string.worker_job_payment_cash,
+                        ),
+                    )
                     DetailRow(stringResource(R.string.worker_job_address), job.address)
                     job.note?.let { DetailRow(stringResource(R.string.worker_job_note), it) }
                 }
@@ -293,6 +318,7 @@ private fun ActionBar(
     onStartTrip: () -> Unit,
     onStartJob: () -> Unit,
     onComplete: () -> Unit,
+    onCashReceived: () -> Unit,
 ) {
     val busy = state.actionInFlight
     Surface(color = SahyogTheme.colors.surfaceContainer, tonalElevation = SahyogElevation.medium) {
@@ -318,6 +344,8 @@ private fun ActionBar(
                 JobAction.StartTrip in actions -> Triple(R.string.worker_job_start_trip, JobAction.StartTrip, onStartTrip)
                 JobAction.StartJob in actions -> Triple(R.string.worker_job_start_job, JobAction.StartJob, onStartJob)
                 JobAction.Complete in actions -> Triple(R.string.worker_job_complete, JobAction.Complete, onComplete)
+                JobAction.CashReceived in actions ->
+                    Triple(R.string.worker_job_cash_received, JobAction.CashReceived, onCashReceived)
                 else -> return@Row
             }
             SahyogButton(
@@ -408,6 +436,64 @@ private fun JobAction.doneRes(): Int = when (this) {
     JobAction.StartTrip -> R.string.worker_done_trip
     JobAction.StartJob -> R.string.worker_done_start
     JobAction.Complete -> R.string.worker_done_complete
+    JobAction.CashReceived -> R.string.worker_done_cash
+}
+
+/**
+ * What's owed for a completed job, or the receipt once paid. The tick animates only when
+ * the payment arrives while the worker is looking at the job.
+ */
+@Composable
+private fun JobPaymentCard(job: Job, modifier: Modifier = Modifier) {
+    val paidWhenOpened = remember { job.payment.isPaid }
+    val amount = formatRupees(job.price)
+    val name = customerName(job)
+    SahyogCard(modifier = modifier.fillMaxWidth()) {
+        AnimatedContent(
+            targetState = job.payment.isPaid,
+            transitionSpec = { (fadeIn() + scaleIn(initialScale = 0.96f)) togetherWith fadeOut() },
+            label = "jobPayment",
+        ) { paid ->
+            if (paid) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SahyogSuccessCheck(size = 48.dp, color = SahyogTheme.extendedColors.success, animate = !paidWhenOpened)
+                    Spacer(Modifier.width(SahyogSpacing.md))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.worker_job_paid, amount),
+                            style = SahyogTheme.typography.titleMedium,
+                            modifier = Modifier.semantics { heading() },
+                        )
+                        Text(
+                            text = stringResource(
+                                if (job.payment.via == PaymentMethod.Online) R.string.worker_job_paid_online else R.string.worker_job_paid_cash,
+                            ),
+                            style = SahyogTheme.typography.bodyMedium,
+                            color = SahyogTheme.colors.onSurfaceVariant,
+                        )
+                    }
+                }
+            } else {
+                Column {
+                    Text(
+                        text = stringResource(R.string.worker_job_to_collect, amount),
+                        style = SahyogTheme.typography.titleMedium,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    Spacer(Modifier.height(SahyogSpacing.xs))
+                    Text(
+                        text = if (job.payment.method == PaymentMethod.Online) {
+                            stringResource(R.string.worker_job_collect_online, name)
+                        } else {
+                            stringResource(R.string.worker_job_collect_cash, amount, name)
+                        },
+                        style = SahyogTheme.typography.bodyMedium,
+                        color = SahyogTheme.colors.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
 }
 
 private fun AppError.jobMessageRes(): Int = when {

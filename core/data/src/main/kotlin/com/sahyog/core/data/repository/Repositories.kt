@@ -10,7 +10,9 @@ import com.sahyog.core.model.Booking
 import com.sahyog.core.model.BookingRequest
 import com.sahyog.core.model.GeoPoint
 import com.sahyog.core.model.IdDocumentType
+import com.sahyog.core.model.CheckoutResult
 import com.sahyog.core.model.Job
+import com.sahyog.core.model.PaymentOrder
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.ServiceCategory
 import com.sahyog.core.model.ThemePreference
@@ -136,6 +138,18 @@ interface BookingRepository {
      */
     suspend fun submitReview(bookingId: String, input: ReviewInput): AppResult<Booking>
 
+    /** Whether customers can choose online payment (the gateway is configured on the server). */
+    suspend fun isOnlinePaymentEnabled(): AppResult<Boolean>
+
+    /** Opens a gateway order for a completed, unpaid booking, to pay in the checkout. */
+    suspend fun startOnlinePayment(bookingId: String): AppResult<PaymentOrder>
+
+    /**
+     * Sends the checkout's result to the server, which confirms it with the gateway itself.
+     * Fails with `Validation(PAYMENT_FAILED)` if the gateway doesn't confirm it.
+     */
+    suspend fun confirmOnlinePayment(bookingId: String, result: CheckoutResult.Completed): AppResult<Booking>
+
     /** Address from the most recent booking, to pre-fill the next one. */
     suspend fun lastUsedAddress(): String?
 }
@@ -228,6 +242,17 @@ interface JobRepository {
     suspend fun startJob(jobId: String, startCode: String): AppResult<Job>
 
     suspend fun complete(jobId: String): AppResult<Job>
+
+    /** The customer paid in cash: records it on a completed job. */
+    suspend fun markCashReceived(jobId: String): AppResult<Job>
+}
+
+/**
+ * The payment gateway's checkout screen (Razorpay). Opens over the app and returns what the
+ * customer did; the result proves nothing until the server confirms it.
+ */
+interface PaymentCheckout {
+    suspend fun pay(order: PaymentOrder, phoneNumber: String?): CheckoutResult
 }
 
 /** The customer's approximate location, for showing distances and sorting by "near me". */

@@ -123,4 +123,8 @@
     <string name="admin_doc_voter_id">Voter ID</string>
     <string name="admin_doc_driving_licence">Driving licence</string>
     <string name="admin_doc_pan">PAN card</string>
+    <string name="admin_section_payments">Payments</string>
+    <string name="admin_stat_paid_online">Paid online</string>
+    <string name="admin_stat_paid_cash">Paid in cash</string>
+    <string name="admin_stat_awaiting_payment">Jobs awaiting payment</string>
 </resources>

@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.BookingRepository
+import com.sahyog.core.data.repository.PaymentCheckout
+import com.sahyog.core.data.repository.UserRepository
+import com.sahyog.core.model.CheckoutResult
 import com.sahyog.core.model.Booking
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.model.canReview
@@ -18,10 +21,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Clock
 import java.time.LocalDate
 
@@ -38,7 +43,28 @@ sealed interface BookingDetailUiState {
         val isCancelling: Boolean,
         val canReview: Boolean = false,
         val review: ReviewDraft = ReviewDraft(),
+        val payment: PaymentUi = PaymentUi(),
     ) : BookingDetailUiState
+}
+
+/**
+ * @property onlineEnabled The server offers online payment (the gateway is configured).
+ * @property justPaid Paid during this visit: the screen celebrates it once.
+ */
+data class PaymentUi(
+    val onlineEnabled: Boolean = false,
+    val step: PaymentStep = PaymentStep.Idle,
+    val justPaid: Boolean = false,
+)
+
+enum class PaymentStep {
+    Idle,
+
+    /** Asking the server for an order and opening the checkout. */
+    Opening,
+
+    /** The checkout finished; the server is confirming it with the gateway. */
+    Confirming,
 }
 
 /** The rating being written. [rating] is 0 until a star is tapped. */
@@ -56,6 +82,14 @@ sealed interface BookingDetailEvent {
 
     data object Reviewed : BookingDetailEvent
 
+    data object Paid : BookingDetailEvent
+
+    /** The customer closed the checkout; nothing was charged. */
+    data object PaymentCancelled : BookingDetailEvent
+
+    /** The checkout reported a failure (declined, timed out...). */
+    data object PaymentDidNotGoThrough : BookingDetailEvent
+
     data class Failed(val error: AppError) : BookingDetailEvent
 }
 
@@ -63,6 +97,8 @@ sealed interface BookingDetailEvent {
 class BookingDetailViewModel @AssistedInject constructor(
     @Assisted private val bookingId: String,
     private val bookingRepository: BookingRepository,
+    private val userRepository: UserRepository,
+    private val checkout: PaymentCheckout,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -74,6 +110,7 @@ class BookingDetailViewModel @AssistedInject constructor(
     private val refreshing = MutableStateFlow(false)
     private val cancelling = MutableStateFlow(false)
     private val draft = MutableStateFlow(ReviewDraft())
+    private val payment = MutableStateFlow(PaymentUi())
 
     private val events = Channel<BookingDetailEvent>(Channel.BUFFERED)
     val eventFlow: Flow<BookingDetailEvent> = events.receiveAsFlow()
@@ -81,9 +118,9 @@ class BookingDetailViewModel @AssistedInject constructor(
     val uiState: StateFlow<BookingDetailUiState> = combine(
         bookingRepository.booking(bookingId),
         refreshing,
-        cancelling,
+        combine(cancelling, payment, ::Pair),
         draft,
-    ) { booking, refreshing, cancelling, draft ->
+    ) { booking, refreshing, (cancelling, payment), draft ->
         if (booking == null) {
             BookingDetailUiState.NotFound
         } else {
@@ -94,12 +131,61 @@ class BookingDetailViewModel @AssistedInject constructor(
                 isCancelling = cancelling,
                 canReview = booking.canReview(clock.instant()),
                 review = draft,
+                payment = payment,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BookingDetailUiState.Loading)
 
     init {
         refresh(userInitiated = false)
+        viewModelScope.launch {
+            val enabled = (bookingRepository.isOnlinePaymentEnabled() as? AppResult.Success)?.data == true
+            payment.update { it.copy(onlineEnabled = enabled) }
+        }
+    }
+
+    /**
+     * Pays a completed booking online: the server opens an order, the customer pays in the
+     * gateway's checkout, then the server confirms it with the gateway before it counts.
+     */
+    fun onPayOnline() {
+        if (payment.value.step != PaymentStep.Idle) return
+        payment.update { it.copy(step = PaymentStep.Opening) }
+        viewModelScope.launch {
+            try {
+                val order = when (val result = bookingRepository.startOnlinePayment(bookingId)) {
+                    is AppResult.Success -> result.data
+                    is AppResult.Failure -> {
+                        events.send(BookingDetailEvent.Failed(result.error))
+                        bookingRepository.refresh()
+                        return@launch
+                    }
+                }
+                // Pre-fills the checkout; never blocks it if the profile is slow to load.
+                val phone = withTimeoutOrNull(PHONE_LOOKUP_MS) { userRepository.currentUser.first()?.phoneNumber }
+                when (val result = checkout.pay(order, phone)) {
+                    is CheckoutResult.Completed -> confirm(result)
+                    CheckoutResult.Cancelled -> events.send(BookingDetailEvent.PaymentCancelled)
+                    is CheckoutResult.Failed -> events.send(BookingDetailEvent.PaymentDidNotGoThrough)
+                }
+            } finally {
+                payment.update { it.copy(step = PaymentStep.Idle) }
+            }
+        }
+    }
+
+    private suspend fun confirm(result: CheckoutResult.Completed) {
+        payment.update { it.copy(step = PaymentStep.Confirming) }
+        when (val confirmed = bookingRepository.confirmOnlinePayment(bookingId, result)) {
+            is AppResult.Success -> {
+                payment.update { it.copy(justPaid = true) }
+                events.send(BookingDetailEvent.Paid)
+            }
+            is AppResult.Failure -> {
+                events.send(BookingDetailEvent.Failed(confirmed.error))
+                bookingRepository.refresh()
+            }
+        }
     }
 
     fun onRefresh() = refresh(userInitiated = true)
@@ -156,6 +242,10 @@ class BookingDetailViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    private companion object {
+        const val PHONE_LOOKUP_MS = 1_000L
     }
 
     private fun refresh(userInitiated: Boolean) {

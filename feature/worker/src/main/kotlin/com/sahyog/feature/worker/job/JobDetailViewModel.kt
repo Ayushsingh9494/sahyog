@@ -1,5 +1,6 @@
 package com.sahyog.feature.worker.job
 
+import com.sahyog.core.model.isPaymentDue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sahyog.core.common.result.AppError
@@ -35,7 +36,8 @@ sealed interface JobDetailUiState {
         val today: LocalDate,
         val actionInFlight: JobAction?,
     ) : JobDetailUiState {
-        val actions: Set<JobAction> get() = job.status.allowedJobActions()
+        val actions: Set<JobAction>
+            get() = job.status.allowedJobActions() + if (job.isPaymentDue) setOf(JobAction.CashReceived) else emptySet()
     }
 }
 
@@ -84,6 +86,8 @@ class JobDetailViewModel @AssistedInject constructor(
     fun onStartJob(code: String) = perform(JobAction.StartJob) { jobRepository.startJob(jobId, code) }
 
     fun onComplete() = perform(JobAction.Complete) { jobRepository.complete(jobId) }
+
+    fun onCashReceived() = perform(JobAction.CashReceived) { jobRepository.markCashReceived(jobId) }
 
     private fun perform(action: JobAction, call: suspend () -> AppResult<Job>) {
         if (inFlight.value != null) return

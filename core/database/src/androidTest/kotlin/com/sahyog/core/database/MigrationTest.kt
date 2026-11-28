@@ -52,6 +52,8 @@ class MigrationTest {
                 assertEquals(null, booking?.reviewRating)
                 // v6 pin columns start empty.
                 assertEquals(null, booking?.latitude)
+                // v7: unpaid, cash by default.
+                assertEquals(null, booking?.paidVia)
                 assertEquals(0, database.reviewDao().observeReviews("w1").first().size)
             }
         } finally {
@@ -86,6 +88,6 @@ class MigrationTest {
     }
 
     private companion object {
-        const val LATEST_VERSION = 6
+        const val LATEST_VERSION = 7
     }
 }

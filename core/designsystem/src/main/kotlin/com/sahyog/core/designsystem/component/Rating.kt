@@ -1,5 +1,10 @@
 package com.sahyog.core.designsystem.component
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -10,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -100,11 +107,28 @@ fun SahyogRatingInput(
                     )
                     .semantics { contentDescription = label },
             ) {
+                // Lit stars pop in one after another, in order.
+                val lit = stars <= rating
+                val scale by animateFloatAsState(
+                    targetValue = if (lit) 1f else 0.86f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioHighBouncy, stiffness = Spring.StiffnessMedium),
+                    label = "starScale",
+                )
+                val tint by animateColorAsState(
+                    if (lit) SahyogTheme.extendedColors.rating else SahyogTheme.extendedColors.ratingTrack,
+                    animationSpec = tween(durationMillis = SahyogMotion.SHORT, delayMillis = if (lit) (stars - 1) * 40 else 0),
+                    label = "starTint",
+                )
                 Icon(
                     SahyogIcons.Star,
                     contentDescription = null,
-                    tint = if (stars <= rating) SahyogTheme.extendedColors.rating else SahyogTheme.extendedColors.ratingTrack,
-                    modifier = Modifier.size(36.dp),
+                    tint = tint,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                        },
                 )
             }
         }

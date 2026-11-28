@@ -127,7 +127,10 @@
         <item quantity="other">%d jobs</item>
     </plurals>
     <string name="worker_earnings_completed">Completed jobs</string>
-    <string name="worker_earnings_note">Based on your starting prices. Online payments arrive in a later update.</string>
+    <string name="worker_earnings_note">Totals use the agreed prices of completed jobs.</string>
+    <string name="worker_earnings_cash">Received in cash</string>
+    <string name="worker_earnings_online">Received online</string>
+    <string name="worker_earnings_to_collect">Still to collect</string>
     <string name="worker_earnings_empty_title">No earnings yet</string>
     <string name="worker_earnings_empty_message">Completed jobs and what you earned will show here.</string>
     <!-- e.g. "Tomorrow · 11 AM – 1 PM" -->
@@ -154,4 +157,20 @@
     <string name="worker_job_review_title">Customer\'s rating</string>
     <string name="worker_job_directions">Directions</string>
     <string name="worker_job_directions_unavailable">No maps app found to show directions.</string>
+
+    <!-- Payments -->
+    <string name="worker_job_payment">Payment</string>
+    <string name="worker_job_payment_cash">Cash, after the job</string>
+    <string name="worker_job_payment_online">Online, after the job</string>
+    <string name="worker_job_to_collect">%1$s to collect</string>
+    <string name="worker_job_collect_cash">Collect %1$s in cash from %2$s, then tap Cash received.</string>
+    <string name="worker_job_collect_online">%1$s will pay in the app. If they pay you in cash instead, tap Cash received.</string>
+    <string name="worker_job_cash_received">Cash received</string>
+    <string name="worker_cash_confirm_title">Cash received?</string>
+    <string name="worker_cash_confirm_body">Confirm that %1$s paid you %2$s in cash. This can\'t be undone.</string>
+    <string name="worker_done_cash">Payment recorded</string>
+    <string name="worker_job_paid">Paid %1$s</string>
+    <string name="worker_job_paid_cash">Received in cash</string>
+    <string name="worker_job_paid_online">Paid online through the app</string>
+    <string name="worker_badge_to_collect">To collect</string>
 </resources>

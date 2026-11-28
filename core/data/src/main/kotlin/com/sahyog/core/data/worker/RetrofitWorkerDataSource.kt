@@ -50,6 +50,8 @@ internal class RetrofitWorkerDataSource @Inject constructor(
 
     override suspend fun completeJob(jobId: String): NetworkBooking = api.jobAction(jobId, "complete")
 
+    override suspend fun markCashReceived(jobId: String): NetworkBooking = api.cashReceived(jobId)
+
     private companion object {
         const val HTTP_NO_CONTENT = 204
         val TEXT = "text/plain".toMediaType()

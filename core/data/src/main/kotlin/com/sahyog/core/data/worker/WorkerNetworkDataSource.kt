@@ -41,6 +41,9 @@ interface WorkerNetworkDataSource {
 
     /** InProgress -> Completed. */
     suspend fun completeJob(jobId: String): NetworkBooking
+
+    /** The worker was paid in cash for a completed job. */
+    suspend fun markCashReceived(jobId: String): NetworkBooking
 }
 
 /** Field names used in `AppError.Validation` for worker requests. */

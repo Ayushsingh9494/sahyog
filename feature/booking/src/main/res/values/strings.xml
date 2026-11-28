@@ -97,4 +97,31 @@
     <string name="booking_map_permission_denied">Without location access, move the map to your place yourself.</string>
     <string name="booking_map_location_off">Location is off. Turn it on, or move the map to your place.</string>
     <string name="booking_map_location_unavailable">Couldn\'t find where you are. Move the map to your place.</string>
+
+    <!-- Payments (after the job) -->
+    <string name="booking_book_payment">How will you pay?</string>
+    <string name="booking_book_pay_cash">Cash</string>
+    <string name="booking_book_pay_cash_body">Pay the worker when the job is done</string>
+    <string name="booking_book_pay_online">Pay online</string>
+    <string name="booking_book_pay_online_body">UPI, netbanking or card, in the app</string>
+    <string name="booking_book_pay_after">Either way, you pay only after the job is done.</string>
+    <string name="booking_detail_payment">Payment</string>
+    <string name="booking_payment_method_cash">Cash, after the job</string>
+    <string name="booking_payment_method_online">Online, after the job</string>
+    <string name="booking_payment_due_title">Amount to pay</string>
+    <string name="booking_payment_online_body">Pay by UPI, netbanking or card.</string>
+    <string name="booking_payment_cash_body">Pay %1$s in cash to %2$s. They\'ll confirm it in the app.</string>
+    <string name="booking_payment_pay_now">Pay %1$s</string>
+    <string name="booking_payment_online_instead">Pay online instead</string>
+    <string name="booking_payment_confirming">Confirming payment…</string>
+    <string name="booking_payment_secure">Secure checkout by Razorpay</string>
+    <string name="booking_payment_paid">Paid %1$s</string>
+    <string name="booking_payment_paid_online">Paid online. Thank you!</string>
+    <string name="booking_payment_paid_cash">Paid in cash to %1$s</string>
+    <string name="booking_paid_message">Payment received. Thank you!</string>
+    <string name="booking_payment_cancelled">Payment cancelled. Nothing was charged.</string>
+    <string name="booking_payment_failed">The payment didn\'t go through. You can try again.</string>
+    <string name="booking_error_payment_unavailable">Online payment isn\'t available right now. You can pay in cash.</string>
+    <string name="booking_error_payment_unconfirmed">We couldn\'t confirm this payment. If money was deducted, don\'t pay again: contact the cooperative.</string>
+    <string name="booking_badge_to_pay">To pay</string>
 </resources>

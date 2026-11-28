@@ -15,4 +15,11 @@ internal class RetrofitBookingDataSource @Inject constructor(
 
     override suspend fun reviewBooking(bookingId: String, review: NetworkReviewRequest): NetworkBooking =
         api.reviewBooking(bookingId, review)
+
+    override suspend fun paymentConfig(): NetworkPaymentConfig = api.paymentConfig()
+
+    override suspend fun createPaymentOrder(bookingId: String): NetworkPaymentOrder = api.createPaymentOrder(bookingId)
+
+    override suspend fun verifyPayment(bookingId: String, result: NetworkPaymentResult): NetworkBooking =
+        api.verifyPayment(bookingId, result)
 }

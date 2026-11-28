@@ -21,7 +21,32 @@ interface BookingNetworkDataSource {
      * [BookingErrorFields.REVIEW_CLOSED] if the booking can't be reviewed (any more).
      */
     suspend fun reviewBooking(bookingId: String, review: NetworkReviewRequest): NetworkBooking
+
+    /** Whether online payment is offered right now. */
+    suspend fun paymentConfig(): NetworkPaymentConfig
+
+    /** Opens (or re-uses) a gateway order for a completed, unpaid booking. */
+    suspend fun createPaymentOrder(bookingId: String): NetworkPaymentOrder
+
+    /** Hands the checkout's result to the server, which confirms it with the gateway. */
+    suspend fun verifyPayment(bookingId: String, result: NetworkPaymentResult): NetworkBooking
 }
+
+@Serializable
+data class NetworkPaymentConfig(val onlineEnabled: Boolean, val keyId: String? = null)
+
+@Serializable
+data class NetworkPaymentOrder(
+    val bookingId: String,
+    val orderId: String,
+    val amountPaise: Long,
+    val currency: String,
+    val keyId: String,
+    val description: String,
+)
+
+@Serializable
+data class NetworkPaymentResult(val orderId: String, val paymentId: String, val signature: String)
 
 /** Field names used in `AppError.Validation` for booking requests. */
 object BookingErrorFields {
@@ -36,6 +61,12 @@ object BookingErrorFields {
 
     /** Not completed, already reviewed, or past the review window. */
     const val REVIEW_CLOSED = "review_closed"
+
+    /** Online payment unavailable, or nothing to pay right now. */
+    const val PAYMENT = "payment"
+
+    /** The gateway didn't confirm the payment. */
+    const val PAYMENT_FAILED = "payment_failed"
 }
 
 /**
@@ -67,6 +98,10 @@ data class NetworkBooking(
     val review: NetworkReview? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
+    val paymentMethod: String = "Cash",
+    val paymentStatus: String = "Unpaid",
+    val paidVia: String? = null,
+    val paidAtMillis: Long? = null,
 )
 
 @Serializable
@@ -92,4 +127,5 @@ data class NetworkBookingRequest(
     val note: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
+    val paymentMethod: String = "Cash",
 )

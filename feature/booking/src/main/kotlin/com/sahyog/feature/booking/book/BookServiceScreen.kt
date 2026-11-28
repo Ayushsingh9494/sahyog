@@ -1,5 +1,7 @@
 package com.sahyog.feature.booking.book
 
+import com.sahyog.core.model.PaymentMethod
+import com.sahyog.core.designsystem.component.SahyogSelectableCard
 import androidx.compose.material3.Icon
 import com.sahyog.core.designsystem.icon.SahyogIcons
 import com.sahyog.core.designsystem.component.SahyogTextButton
@@ -101,6 +103,7 @@ fun BookServiceScreen(
             onSlotSelect = viewModel::onSlotSelect,
             onAddressChange = viewModel::onAddressChange,
             onNoteChange = viewModel::onNoteChange,
+            onPaymentMethodSelect = viewModel::onPaymentMethodSelect,
             onSubmit = viewModel::onSubmit,
             onPickOnMap = if (LocalContext.current.hasMapsKey()) onPickOnMap else null,
             onLocationClear = viewModel::onLocationClear,
@@ -115,6 +118,7 @@ internal data class BookServiceActions(
     val onAddressChange: (String) -> Unit,
     val onNoteChange: (String) -> Unit,
     val onSubmit: () -> Unit,
+    val onPaymentMethodSelect: (PaymentMethod) -> Unit = {},
     /** Null when this build has no Maps key: the map option is hidden. */
     val onPickOnMap: ((GeoPoint?) -> Unit)? = null,
     val onLocationClear: () -> Unit = {},
@@ -258,6 +262,46 @@ private fun BookingForm(form: BookServiceUiState.Form, actions: BookServiceActio
                 )
             }
         }
+        if (form.onlinePaymentEnabled) {
+            item(key = "payment") {
+                Section(stringResource(R.string.booking_book_payment)) {
+                    PaymentChoice(form.paymentMethod, actions.onPaymentMethodSelect)
+                }
+            }
+        }
+    }
+}
+
+/** Cash or online, both paid after the job: a one-of-two choice. */
+@Composable
+private fun PaymentChoice(selected: PaymentMethod, onSelect: (PaymentMethod) -> Unit) {
+    Column(
+        modifier = Modifier.selectableGroup(),
+        verticalArrangement = Arrangement.spacedBy(SahyogSpacing.sm),
+    ) {
+        SahyogSelectableCard(
+            title = stringResource(R.string.booking_book_pay_cash),
+            description = stringResource(R.string.booking_book_pay_cash_body),
+            icon = SahyogIcons.Cash,
+            selected = selected == PaymentMethod.Cash,
+            onSelectedChange = { onSelect(PaymentMethod.Cash) },
+            role = Role.RadioButton,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        SahyogSelectableCard(
+            title = stringResource(R.string.booking_book_pay_online),
+            description = stringResource(R.string.booking_book_pay_online_body),
+            icon = SahyogIcons.PayOnline,
+            selected = selected == PaymentMethod.Online,
+            onSelectedChange = { onSelect(PaymentMethod.Online) },
+            role = Role.RadioButton,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = stringResource(R.string.booking_book_pay_after),
+            style = SahyogTheme.typography.bodySmall,
+            color = SahyogTheme.colors.onSurfaceVariant,
+        )
     }
 }
 

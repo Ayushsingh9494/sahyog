@@ -5,14 +5,20 @@ import app.cash.turbine.test
 import com.sahyog.core.common.result.AppError
 import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.booking.BookingErrorFields
+import com.sahyog.core.model.BookingPayment
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.CheckoutResult
+import com.sahyog.core.model.PaymentMethod
 import com.sahyog.core.model.ReviewInput
 import com.sahyog.core.testing.MainDispatcherRule
 import com.sahyog.core.testing.TestBookingRepository
 import com.sahyog.core.testing.TestBookings
+import com.sahyog.core.testing.TestPaymentCheckout
+import com.sahyog.core.testing.TestUserRepository
 import com.sahyog.feature.booking.detail.BookingDetailEvent
 import com.sahyog.feature.booking.detail.BookingDetailUiState
 import com.sahyog.feature.booking.detail.BookingDetailViewModel
+import com.sahyog.feature.booking.detail.PaymentStep
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,7 +38,10 @@ class BookingDetailViewModelTest {
         setBookings(listOf(TestBookings.booking("b1", BookingStatus.Accepted)))
     }
 
-    private fun viewModel(id: String = "b1") = BookingDetailViewModel(id, repository, clock)
+    private val users = TestUserRepository()
+    private val checkout = TestPaymentCheckout()
+
+    private fun viewModel(id: String = "b1") = BookingDetailViewModel(id, repository, users, checkout, clock)
 
     @Test
     fun `shows the booking and refreshes it on open`() = runTest {
@@ -142,10 +151,66 @@ class BookingDetailViewModelTest {
         }
     }
 
-    private fun completed() = TestBookings.booking(
+    @Test
+    fun `paying online opens the checkout for the order, then the server's confirmation marks it paid`() = runTest {
+        repository.setBookings(listOf(completed(PaymentMethod.Online)))
+        val viewModel = viewModel("done")
+        viewModel.uiState.test {
+            assertTrue(awaitReady { it.payment.onlineEnabled }.payment.onlineEnabled)
+            viewModel.eventFlow.test {
+                viewModel.onPayOnline()
+                assertEquals(BookingDetailEvent.Paid, awaitItem())
+            }
+            val paid = awaitReady { it.booking.payment.isPaid }
+            assertEquals(PaymentMethod.Online, paid.booking.payment.via)
+            assertTrue(paid.payment.justPaid)
+        }
+        assertEquals("order_done", checkout.opened.single().first.orderId)
+        assertEquals("pay_test", repository.confirmations.single().second.paymentId)
+    }
+
+    @Test
+    fun `closing the checkout charges nothing and leaves the booking unpaid`() = runTest {
+        repository.setBookings(listOf(completed(PaymentMethod.Online)))
+        checkout.result = CheckoutResult.Cancelled
+        val viewModel = viewModel("done")
+        viewModel.eventFlow.test {
+            viewModel.onPayOnline()
+            assertEquals(BookingDetailEvent.PaymentCancelled, awaitItem())
+        }
+        assertTrue(repository.confirmations.isEmpty())
+        viewModel.uiState.test { assertFalse(awaitReady().booking.payment.isPaid) }
+    }
+
+    @Test
+    fun `a payment the server can't confirm is reported, not shown as paid`() = runTest {
+        repository.setBookings(listOf(completed(PaymentMethod.Online)))
+        val refused = AppResult.Failure(AppError.Validation(BookingErrorFields.PAYMENT_FAILED))
+        repository.confirmResult = refused
+        val viewModel = viewModel("done")
+        viewModel.eventFlow.test {
+            viewModel.onPayOnline()
+            assertEquals(BookingDetailEvent.Failed(refused.error), awaitItem())
+        }
+        viewModel.uiState.test {
+            val ready = awaitReady()
+            assertFalse(ready.booking.payment.isPaid)
+            assertEquals(PaymentStep.Idle, ready.payment.step)
+        }
+    }
+
+    @Test
+    fun `online payment is not offered when the server has it switched off`() = runTest {
+        repository.onlinePaymentEnabled = false
+        repository.setBookings(listOf(completed()))
+        viewModel("done").uiState.test { assertFalse(awaitReady().payment.onlineEnabled) }
+    }
+
+    private fun completed(method: PaymentMethod = PaymentMethod.Cash) = TestBookings.booking(
         "done",
         BookingStatus.Completed,
         completedAt = clock.instant() - Duration.ofHours(2),
+        payment = BookingPayment(method = method),
     )
 
     private suspend fun ReceiveTurbine<BookingDetailUiState>.awaitReady(

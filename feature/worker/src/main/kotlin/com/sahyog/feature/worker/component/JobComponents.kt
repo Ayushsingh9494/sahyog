@@ -1,5 +1,7 @@
 package com.sahyog.feature.worker.component
 
+import com.sahyog.core.designsystem.component.StatusTone
+import com.sahyog.core.model.isPaymentDue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -71,7 +73,11 @@ internal fun JobCard(
             }
             Spacer(Modifier.width(SahyogSpacing.sm))
             Column(horizontalAlignment = Alignment.End) {
-                SahyogStatusBadge(text = bookingStatusLabel(job.status), tone = bookingStatusTone(job.status))
+                if (job.isPaymentDue) {
+                    SahyogStatusBadge(text = stringResource(R.string.worker_badge_to_collect), tone = StatusTone.Warning)
+                } else {
+                    SahyogStatusBadge(text = bookingStatusLabel(job.status), tone = bookingStatusTone(job.status))
+                }
                 Spacer(Modifier.height(SahyogSpacing.xs))
                 Text(
                     text = formatRupees(job.price) + priceUnitSuffix(job.priceUnit),

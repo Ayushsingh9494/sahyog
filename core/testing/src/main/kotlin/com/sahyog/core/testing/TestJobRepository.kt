@@ -5,7 +5,9 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.booking.BookingErrorFields
 import com.sahyog.core.data.repository.JobRepository
 import com.sahyog.core.data.worker.WorkerErrorFields
+import com.sahyog.core.model.BookingPayment
 import com.sahyog.core.model.BookingStatus
+import com.sahyog.core.model.PaymentMethod
 import com.sahyog.core.model.Job
 import com.sahyog.core.model.JobAction
 import com.sahyog.core.model.Paise
@@ -53,6 +55,20 @@ class TestJobRepository : JobRepository {
     override suspend fun complete(jobId: String) =
         step(jobId, JobAction.Complete) { it.copy(status = BookingStatus.Completed, completedAt = Instant.EPOCH) }
 
+    override suspend fun markCashReceived(jobId: String): AppResult<Job> {
+        failNextAction?.let {
+            failNextAction = null
+            return AppResult.Failure(it)
+        }
+        val job = jobsFlow.value.find { it.id == jobId } ?: return AppResult.Failure(AppError.NotFound)
+        if (job.status != BookingStatus.Completed || job.payment.isPaid) {
+            return AppResult.Failure(AppError.Validation(BookingErrorFields.PAYMENT))
+        }
+        val updated = job.copy(payment = job.payment.copy(isPaid = true, via = PaymentMethod.Cash, paidAt = Instant.EPOCH))
+        jobsFlow.update { list -> list.map { if (it.id == jobId) updated else it } }
+        return AppResult.Success(updated)
+    }
+
     private fun step(jobId: String, action: JobAction, change: (Job) -> Job): AppResult<Job> {
         failNextAction?.let {
             failNextAction = null
@@ -78,6 +94,7 @@ object TestJobs {
         slot: TimeSlot = TimeSlot(date, 11),
         rupees: Long = 300,
         completedAt: Instant? = null,
+        payment: BookingPayment = BookingPayment(),
     ) = Job(
         id = id,
         customerName = "Asha Devi",
@@ -90,5 +107,6 @@ object TestJobs {
         status = status,
         createdAt = Instant.EPOCH,
         completedAt = completedAt,
+        payment = payment,
     )
 }

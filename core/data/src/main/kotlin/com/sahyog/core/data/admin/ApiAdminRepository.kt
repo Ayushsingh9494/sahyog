@@ -35,6 +35,9 @@ internal class ApiAdminRepository @Inject constructor(private val api: SahyogApi
             completedThisWeek = o.completedThisWeek,
             averageRating = o.averageRating?.toFloat(),
             recentDecisions = o.recentDecisions.map { it.asExternalModel() },
+            collectedOnline = Paise(o.collectedOnlinePaise),
+            collectedCash = Paise(o.collectedCashPaise),
+            awaitingPayment = o.awaitingPayment,
         )
     }
 

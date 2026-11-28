@@ -1,5 +1,6 @@
 package com.sahyog.feature.admin.overview
 
+import com.sahyog.core.ui.catalog.formatRupees
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -184,6 +185,21 @@ private fun Dashboard(state: AdminOverviewUiState.Ready, onOpenQueue: () -> Unit
                         overview.completedThisWeek.toString(),
                         stringResource(R.string.admin_stat_completed_week),
                         StatusTone.Success,
+                    ),
+                ),
+            )
+        }
+
+        item(key = "payments") {
+            StatGrid(
+                title = stringResource(R.string.admin_section_payments),
+                tiles = listOf(
+                    Triple(formatRupees(overview.collectedOnline), stringResource(R.string.admin_stat_paid_online), StatusTone.Brand),
+                    Triple(formatRupees(overview.collectedCash), stringResource(R.string.admin_stat_paid_cash), StatusTone.Success),
+                    Triple(
+                        overview.awaitingPayment.toString(),
+                        stringResource(R.string.admin_stat_awaiting_payment),
+                        if (overview.awaitingPayment > 0) StatusTone.Warning else StatusTone.Neutral,
                     ),
                 ),
             )
