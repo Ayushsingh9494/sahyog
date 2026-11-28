@@ -4,7 +4,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
@@ -45,18 +49,21 @@ fun NavGraphBuilder.adminDestinations(navController: NavController, onOpenQueueT
         val viewModel = hiltViewModel<AdminOverviewViewModel>()
         val snackbar = remember { SnackbarHostState() }
         DecisionResult(entry, snackbar, viewModel::onRefresh)
+        RefreshWhenShownAgain(viewModel::onScreenShown)
         AdminOverviewScreen(onOpenQueueTab, openWorker, viewModel, snackbar)
     }
     composable<AdminQueueRoute> { entry ->
         val viewModel = hiltViewModel<VerificationQueueViewModel>()
         val snackbar = remember { SnackbarHostState() }
         DecisionResult(entry, snackbar, viewModel::onRefresh)
+        RefreshWhenShownAgain(viewModel::onScreenShown)
         VerificationQueueScreen(viewModel, openWorker, snackbar)
     }
     composable<AdminWorkersRoute> { entry ->
         val viewModel = hiltViewModel<WorkersDirectoryViewModel>()
         val snackbar = remember { SnackbarHostState() }
         DecisionResult(entry, snackbar, viewModel::onRefresh)
+        RefreshWhenShownAgain(viewModel::onScreenShown)
         WorkersDirectoryScreen(viewModel, openWorker, snackbar)
     }
     composable<AdminWorkerRoute> { entry ->
@@ -71,6 +78,21 @@ fun NavGraphBuilder.adminDestinations(navController: NavController, onOpenQueueT
                 navController.navigateUp()
             },
         )
+    }
+}
+
+/**
+ * Tabs keep their screen (and data) while hidden. When one is shown again (tab switch, or back
+ * from a pushed screen) its data may be stale, e.g. the Overview's count after an approval made
+ * on the Verify tab, so reload it. The very first appearance is skipped: the ViewModel already
+ * loads when it's created.
+ */
+@Composable
+private fun RefreshWhenShownAgain(onShownAgain: () -> Unit) {
+    var seen by rememberSaveable { mutableStateOf(false) }
+    LifecycleResumeEffect(Unit) {
+        if (seen) onShownAgain() else seen = true
+        onPauseOrDispose { }
     }
 }
 

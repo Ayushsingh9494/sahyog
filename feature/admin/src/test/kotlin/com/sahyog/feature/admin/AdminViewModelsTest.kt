@@ -59,6 +59,25 @@ class AdminViewModelsTest {
     }
 
     @Test
+    fun `coming back to the overview picks up an approval made on another tab, quietly`() = runTest {
+        repository.overviewResult = AppResult.Success(TestAdmin.overview(pending = 1))
+        val viewModel = AdminOverviewViewModel(repository)
+        viewModel.uiState.first { it is AdminOverviewUiState.Ready }
+
+        // Approved on the Verify tab; the Overview tab is shown again.
+        repository.overviewResult = AppResult.Success(TestAdmin.overview(pending = 0))
+        viewModel.uiState.test {
+            viewModel.onScreenShown()
+            var state = awaitItem() as AdminOverviewUiState.Ready
+            while (state.overview.pendingVerifications != 0) {
+                state = awaitItem() as AdminOverviewUiState.Ready
+                // No pull-to-refresh spinner for a tab switch.
+                assertTrue(!state.isRefreshing)
+            }
+        }
+    }
+
+    @Test
     fun `queue lists requests and refreshes after a decision`() = runTest {
         repository.queueResult = AppResult.Success(listOf(TestAdmin.request("w1")))
         val viewModel = VerificationQueueViewModel(repository, clock)

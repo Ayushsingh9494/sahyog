@@ -63,6 +63,9 @@ class WorkersDirectoryViewModel @Inject constructor(
 
     fun onRefresh() = reload.update { it + 1 }
 
+    /** Each time the tab is shown again (statuses may have changed on the Verify tab). */
+    fun onScreenShown() = onRefresh()
+
     private suspend fun load(q: String, s: WorkerVerificationStatus?) {
         state.update { it.copy(isLoading = true, error = null) }
         when (val result = adminRepository.workers(s, q)) {

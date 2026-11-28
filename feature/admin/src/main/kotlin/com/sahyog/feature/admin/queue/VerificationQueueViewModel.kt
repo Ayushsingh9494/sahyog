@@ -7,6 +7,7 @@ import com.sahyog.core.common.result.AppResult
 import com.sahyog.core.data.repository.AdminRepository
 import com.sahyog.core.model.VerificationRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,20 +39,23 @@ class VerificationQueueViewModel @Inject constructor(
     private val state = MutableStateFlow<QueueUiState>(QueueUiState.Loading)
     val uiState: StateFlow<QueueUiState> = state.asStateFlow()
 
+    private var loading: Job? = null
+
     init {
-        load()
+        load(showIndicator = false)
     }
 
-    /** Also called when returning from a decision, so the decided person disappears. */
-    fun onRefresh() = load()
+    /** Pull to refresh, and after returning from a decision. */
+    fun onRefresh() = load(showIndicator = true)
 
-    private fun load() {
+    /** Each time the tab is shown again, quietly. */
+    fun onScreenShown() = load(showIndicator = false)
+
+    private fun load(showIndicator: Boolean) {
+        if (loading?.isActive == true) return
         val current = state.value
-        if (current is QueueUiState.Ready) {
-            if (current.isRefreshing) return
-            state.value = current.copy(isRefreshing = true)
-        }
-        viewModelScope.launch {
+        if (showIndicator && current is QueueUiState.Ready) state.value = current.copy(isRefreshing = true)
+        loading = viewModelScope.launch {
             state.value = when (val result = adminRepository.verificationQueue()) {
                 is AppResult.Success -> QueueUiState.Ready(result.data, clock.instant())
                 is AppResult.Failure -> (state.value as? QueueUiState.Ready)?.copy(isRefreshing = false)

@@ -8,6 +8,7 @@ import com.sahyog.core.data.repository.AdminRepository
 import com.sahyog.core.model.AdminOverview
 import com.sahyog.core.model.VerificationRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,19 +39,26 @@ class AdminOverviewViewModel @Inject constructor(
     private val state = MutableStateFlow<AdminOverviewUiState>(AdminOverviewUiState.Loading)
     val uiState: StateFlow<AdminOverviewUiState> = state.asStateFlow()
 
+    private var loading: Job? = null
+
     init {
-        load()
+        load(showIndicator = false)
     }
 
-    fun onRefresh() = load()
+    /** Pull to refresh. */
+    fun onRefresh() = load(showIndicator = true)
 
-    private fun load() {
+    /**
+     * Each time the tab is shown again: figures may have changed elsewhere (e.g. an approval on
+     * the Verify tab). Quiet, so switching tabs doesn't flash a spinner.
+     */
+    fun onScreenShown() = load(showIndicator = false)
+
+    private fun load(showIndicator: Boolean) {
+        if (loading?.isActive == true) return
         val current = state.value
-        if (current is AdminOverviewUiState.Ready) {
-            if (current.isRefreshing) return
-            state.value = current.copy(isRefreshing = true)
-        }
-        viewModelScope.launch {
+        if (showIndicator && current is AdminOverviewUiState.Ready) state.value = current.copy(isRefreshing = true)
+        loading = viewModelScope.launch {
             val overview = async { adminRepository.overview() }
             val queue = async { adminRepository.verificationQueue() }
             val o = overview.await()
