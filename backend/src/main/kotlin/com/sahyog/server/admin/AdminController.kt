@@ -37,6 +37,11 @@ data class AdminOverview(
     val completedThisWeek: Int,
     val averageRating: Double?,
     val recentDecisions: List<StatusChange>,
+    /** Money collected through the app (all time), by how it was paid. */
+    val collectedOnlinePaise: Long = 0,
+    val collectedCashPaise: Long = 0,
+    /** Completed jobs not paid yet. */
+    val awaitingPayment: Int = 0,
 )
 
 /** One entry of the audit trail. */
@@ -109,8 +114,15 @@ class AdminService(
                 .query { rs, _ -> rs.getDouble(1).takeUnless { rs.wasNull() } }.list().firstOrNull()
                 ?.let { Math.round(it * 10) / 10.0 },
             recentDecisions = changes("WHERE c.changed_by IS NOT NULL", emptyMap(), limit = 10),
+            collectedOnlinePaise = sum("Online"),
+            collectedCashPaise = sum("Cash"),
+            awaitingPayment = count("SELECT count(*) FROM bookings WHERE status = 'Completed' AND payment_status = 'Unpaid'"),
         )
     }
+
+    private fun sum(via: String): Long =
+        jdbc.sql("SELECT COALESCE(sum(price_paise), 0) FROM bookings WHERE payment_status = 'Paid' AND paid_via = :via")
+            .param("via", via).query(Long::class.java).single()
 
     /** Workers, newest first; [status] filters, [query] matches name, phone or area. */
     fun workers(adminUid: String, status: String?, query: String?): List<AdminWorkerSummary> {

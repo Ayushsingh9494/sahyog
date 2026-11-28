@@ -3,6 +3,7 @@ package com.sahyog.server.booking
 import com.sahyog.server.api.ForbiddenException
 import com.sahyog.server.api.NotFoundException
 import com.sahyog.server.api.ValidationException
+import com.sahyog.server.payment.PaymentGateway
 import com.sahyog.server.user.Access
 import com.sahyog.server.user.Role
 import com.sahyog.server.user.WorkerStatus
@@ -30,6 +31,8 @@ data class BookingRequest(
     val note: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
+    /** Cash on delivery unless the customer chose to pay online. */
+    val paymentMethod: PaymentMethod = PaymentMethod.Cash,
 )
 
 data class ReviewRequest(val rating: Int, val comment: String? = null)
@@ -51,6 +54,7 @@ class BookingService(
     private val workers: WorkerRepository,
     private val access: Access,
     private val clock: Clock,
+    private val gateway: PaymentGateway,
 ) {
     private val random = SecureRandom()
 
@@ -92,6 +96,11 @@ class BookingService(
                 ?: throw ValidationException(BookingErrorFields.LOCATION)
         }
 
+        // Online payment is only offered while the gateway is configured.
+        if (request.paymentMethod == PaymentMethod.Online && !gateway.isEnabled) {
+            throw ValidationException(BookingErrorFields.PAYMENT)
+        }
+
         val booking = Booking(
             id = newBookingId(),
             customerUid = uid,
@@ -112,6 +121,7 @@ class BookingService(
             createdAt = clock.instant(),
             completedAt = null,
             review = null,
+            payment = Payment(method = request.paymentMethod),
         )
         try {
             bookings.insert(booking)

@@ -34,6 +34,12 @@ object BookingErrorFields {
     const val REVIEW_CLOSED = "review_closed"
     const val START_CODE = "start_code"
     const val TOO_EARLY = "too_early"
+
+    /** Online payment isn't available (not configured), or the payment can't be made now. */
+    const val PAYMENT = "payment"
+
+    /** The gateway didn't confirm the payment (bad signature, wrong amount, not captured). */
+    const val PAYMENT_FAILED = "payment_failed"
 }
 
 /**
@@ -65,6 +71,24 @@ object BookingRules {
 
 data class ReviewDto(val rating: Int, val comment: String?, val createdAtMillis: Long)
 
+/** Chosen when booking. Payment itself happens after the job is completed. */
+enum class PaymentMethod { Cash, Online }
+
+enum class PaymentStatus { Unpaid, Paid }
+
+/**
+ * @property via How it was actually paid (may differ from the method chosen when booking).
+ * @property gatewayOrderId The open online order, reused if the customer tries again.
+ */
+data class Payment(
+    val method: PaymentMethod = PaymentMethod.Cash,
+    val status: PaymentStatus = PaymentStatus.Unpaid,
+    val via: PaymentMethod? = null,
+    val paidAt: Instant? = null,
+    val gatewayOrderId: String? = null,
+    val gatewayPaymentId: String? = null,
+)
+
 /** A booking as stored. */
 data class Booking(
     val id: String,
@@ -86,6 +110,7 @@ data class Booking(
     val createdAt: Instant,
     val completedAt: Instant?,
     val review: ReviewDto?,
+    val payment: Payment = Payment(),
 ) {
     val slotStart: LocalDateTime get() = slotDate.atTime(slotStartHour, 0)
 }
@@ -113,6 +138,10 @@ data class BookingResponse(
     val review: ReviewDto?,
     val latitude: Double?,
     val longitude: Double?,
+    val paymentMethod: PaymentMethod,
+    val paymentStatus: PaymentStatus,
+    val paidVia: PaymentMethod?,
+    val paidAtMillis: Long?,
 )
 
 fun Booking.toResponse(forWorker: Boolean) = BookingResponse(
@@ -135,6 +164,10 @@ fun Booking.toResponse(forWorker: Boolean) = BookingResponse(
     review = review,
     latitude = latitude,
     longitude = longitude,
+    paymentMethod = payment.method,
+    paymentStatus = payment.status,
+    paidVia = payment.via,
+    paidAtMillis = payment.paidAt?.toEpochMilli(),
 )
 
 @Repository
@@ -161,9 +194,9 @@ class BookingRepository(private val jdbc: JdbcClient) {
             """
             INSERT INTO bookings (id, customer_uid, worker_uid, customer_name, worker_name, service_name,
                 price_paise, price_unit, slot_date, slot_start_hour, address, note, latitude, longitude,
-                status, created_at)
+                status, created_at, payment_method)
             VALUES (:id, :customer, :worker, :customerName, :workerName, :service, :price, :unit, :date, :hour,
-                :address, :note, :lat, :lng, :status, :createdAt)
+                :address, :note, :lat, :lng, :status, :createdAt, :paymentMethod)
             """.trimIndent(),
         )
             .param("id", b.id).param("customer", b.customerUid).param("worker", b.workerUid)
@@ -173,6 +206,7 @@ class BookingRepository(private val jdbc: JdbcClient) {
             .param("address", b.address).param("note", b.note)
             .param("lat", b.latitude).param("lng", b.longitude)
             .param("status", b.status.name).param("createdAt", b.createdAt.atOffset(ZoneOffset.UTC))
+            .param("paymentMethod", b.payment.method.name)
             .update()
     }
 
@@ -180,7 +214,9 @@ class BookingRepository(private val jdbc: JdbcClient) {
         jdbc.sql(
             """
             UPDATE bookings SET status = :status, start_code = :code, completed_at = :completedAt,
-                review_rating = :rating, review_comment = :comment, reviewed_at = :reviewedAt
+                review_rating = :rating, review_comment = :comment, reviewed_at = :reviewedAt,
+                payment_status = :payStatus, paid_via = :paidVia, paid_at = :paidAt,
+                gateway_order_id = :orderId, gateway_payment_id = :paymentId
             WHERE id = :id
             """.trimIndent(),
         )
@@ -188,6 +224,9 @@ class BookingRepository(private val jdbc: JdbcClient) {
             .param("completedAt", b.completedAt?.atOffset(ZoneOffset.UTC))
             .param("rating", b.review?.rating).param("comment", b.review?.comment)
             .param("reviewedAt", b.review?.let { Instant.ofEpochMilli(it.createdAtMillis).atOffset(ZoneOffset.UTC) })
+            .param("payStatus", b.payment.status.name).param("paidVia", b.payment.via?.name)
+            .param("paidAt", b.payment.paidAt?.atOffset(ZoneOffset.UTC))
+            .param("orderId", b.payment.gatewayOrderId).param("paymentId", b.payment.gatewayPaymentId)
             .update()
     }
 
@@ -227,6 +266,14 @@ class BookingRepository(private val jdbc: JdbcClient) {
                     createdAtMillis = getObject("reviewed_at", OffsetDateTime::class.java).toInstant().toEpochMilli(),
                 )
             },
+            payment = Payment(
+                method = PaymentMethod.valueOf(getString("payment_method")),
+                status = PaymentStatus.valueOf(getString("payment_status")),
+                via = getString("paid_via")?.let(PaymentMethod::valueOf),
+                paidAt = getObject("paid_at", OffsetDateTime::class.java)?.toInstant(),
+                gatewayOrderId = getString("gateway_order_id"),
+                gatewayPaymentId = getString("gateway_payment_id"),
+            ),
         )
     }
 }
