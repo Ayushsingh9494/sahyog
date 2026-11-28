@@ -55,6 +55,7 @@ class BookingService(
     private val access: Access,
     private val clock: Clock,
     private val gateway: PaymentGateway,
+    private val demo: DemoMode,
 ) {
     private val random = SecureRandom()
 
@@ -174,7 +175,7 @@ class BookingService(
         val job = bookings.findForUpdate(jobId)?.takeIf { it.workerUid == uid } ?: throw NotFoundException()
         // e.g. the customer cancelled while the worker was looking at the request.
         if (job.status !in action.from) throw ValidationException(BookingErrorFields.STATUS)
-        if (action == JobAction.StartTrip || action == JobAction.StartJob) {
+        if ((action == JobAction.StartTrip || action == JobAction.StartJob) && !demo.relaxStartWindow) {
             if (now().isBefore(job.slotStart.minusHours(BookingRules.JOB_START_WINDOW_HOURS))) {
                 throw ValidationException(BookingErrorFields.TOO_EARLY)
             }

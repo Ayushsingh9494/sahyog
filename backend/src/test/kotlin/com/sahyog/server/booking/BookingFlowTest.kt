@@ -112,6 +112,28 @@ class BookingFlowTest : ApiTest() {
         book(onboard("Bina", "Customer"), request(ravi, hour = 13)).andExpect { status { isCreated() } }
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
+    lateinit var demo: DemoMode
+
+    @Test
+    fun `demo mode lets the worker set off and start early, but still needs the start code`() {
+        val ravi = verifiedWorker("Ravi")
+        val asha = onboard("Asha Devi", "Customer")
+        val id = book(asha, request(ravi, date = "2026-11-24")).id()
+        job(ravi, id, "accept")
+        val code = startCode(asha, id)
+        demo.relaxStartWindow = true
+        try {
+            job(ravi, id, "start-trip").andExpect { jsonPath("$.status") { value("WorkerEnRoute") } }
+            job(ravi, id, "start", "{\"startCode\":\"0000\"}").andExpect {
+                jsonPath("$.field") { value(if (code == "0000") "status" else "start_code") }
+            }
+            job(ravi, id, "start", "{\"startCode\":\"$code\"}").andExpect { jsonPath("$.status") { value("InProgress") } }
+        } finally {
+            demo.relaxStartWindow = false
+        }
+    }
+
     @Test
     fun `the full job lifecycle, and the worker never sees the start code`() {
         val ravi = verifiedWorker("Ravi")

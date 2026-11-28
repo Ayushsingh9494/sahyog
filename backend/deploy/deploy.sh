@@ -102,10 +102,11 @@ echo "== Build and deploy the server"
 (cd "$(dirname "$0")/.." && ./gradlew --console=plain -q bootJar)
 # Settings go through a file: on Windows gcloud runs via cmd.exe, which mangles special characters
 # (like ^) on the command line. The file holds no secrets and is deleted afterwards anyway.
+# DEMO_RELAX_START_WINDOW=true lets a worker start a job early (presentations only; default off).
 ENV_FILE="$(mktemp)"
 trap 'rm -f "$ENV_FILE"' EXIT
-printf 'DB_INSTANCE: "%s"\nDOCUMENTS_BUCKET: "%s"\nFIREBASE_PROJECT_ID: "%s"\nADMIN_PHONE_NUMBERS: "%s"\nRAZORPAY_KEY_ID: "%s"\n' \
-  "$PROJECT:$REGION:$INSTANCE" "$BUCKET" "$PROJECT" "$ADMIN_PHONE_NUMBERS" "$RAZORPAY_KEY_ID" > "$ENV_FILE"
+printf 'DB_INSTANCE: "%s"\nDOCUMENTS_BUCKET: "%s"\nFIREBASE_PROJECT_ID: "%s"\nADMIN_PHONE_NUMBERS: "%s"\nRAZORPAY_KEY_ID: "%s"\nDEMO_RELAX_START_WINDOW: "%s"\n' \
+  "$PROJECT:$REGION:$INSTANCE" "$BUCKET" "$PROJECT" "$ADMIN_PHONE_NUMBERS" "$RAZORPAY_KEY_ID" "${DEMO_RELAX_START_WINDOW:-false}" > "$ENV_FILE"
 g run deploy "$SERVICE" --source "$(dirname "$0")/.." --region "$REGION" \
   --service-account "$SA" --allow-unauthenticated \
   --add-cloudsql-instances "$PROJECT:$REGION:$INSTANCE" \

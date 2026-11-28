@@ -21,6 +21,9 @@ sahyog:
   razorpay:
     key-id: ${RAZORPAY_KEY_ID:}
     key-secret: ${RAZORPAY_KEY_SECRET:}
+  # Presentations only: lets the worker start a job early. Switch with DEMO_RELAX_START_WINDOW.
+  demo:
+    relax-start-window: ${DEMO_RELAX_START_WINDOW:false}
 
 server:
   # Cloud Run tells the container which port to listen on.
